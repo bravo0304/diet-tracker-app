@@ -88,26 +88,31 @@ body {
 
 .macro-grid {
   display: flex;
-  justify-content: center;
-  gap: 40px;
-  flex-wrap: wrap;   /* IMPORTANT */
+  flex-wrap: wrap;
+  justify-content: space-around;  /* instead of center */
+  gap: 30px;
+  margin-top: 30px;
 }
+
 
 
 .macro-card {
-  width: 140px;   /* fixed width so they don’t stretch */
+  width: 140px;
   text-align: center;
 }
 
-@media (max-width: 768px) {
+
+@media (max-width: 600px) {
   .macro-grid {
-    gap: 20px;
+    justify-content: center;
+    gap: 40px;
   }
 
   .macro-card {
-    width: 110px;
+    width: 160px;
   }
 }
+
 
 
 
