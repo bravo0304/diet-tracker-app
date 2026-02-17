@@ -1,125 +1,58 @@
-const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
-const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
+function nextStep(step){
+  document.querySelectorAll(".step").forEach(s => s.style.display="none");
+  document.getElementById("step-" + step).style.display = "block";
 
+  if(step === 2){
+    toggleWeightLossOptions();
+  }
+}
 
 function toggleWeightLossOptions(){
   const goal = document.getElementById("goal").value;
   const box = document.getElementById("weightloss_box");
-
   box.style.display = goal === "weight_loss" ? "block" : "none";
 }
 
-
-function nextStep(step){
-  document.querySelectorAll(".step").forEach(s => s.style.display="none");
-
-  const current = document.getElementById("step-"+step);
-  current.style.display="block";
-
-  const percent = step === 1 ? 33 : step === 2 ? 66 : 100;
-  document.getElementById("progress-bar").style.width = percent + "%";
-
-  // Wait for DOM paint before checking goal
-  if(step === 2){
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        toggleWeightLossOptions();
-      });
-    });
-  }
-}
-
-
-
-
-// ---------- helpers ----------
-function parseJwt(token) {
-  const base64Url = token.split(".")[1];
-  const base64 = atob(base64Url);
-  return JSON.parse(base64);
-}
-
-function lbToKg(lb) {
-  return lb * 0.453592;
-}
-
-function ftInToCm(ft, inch) {
-  return Math.round(ft * 30.48 + inch * 2.54);
-}
-
-// ---------- main ----------
-async function finishOnboarding() {
+async function finishOnboarding(){
   const token = localStorage.getItem("token");
-  if (!token) {
-    window.location.href = "/";
-    return;
-  }
+  if(!token) return;
 
-  const user = parseJwt(token);
-  const user_id = user.sub;
+  const firstName = document.getElementById("firstName").value;
+  const lastName = document.getElementById("lastName").value;
+  const age = parseInt(document.getElementById("age").value);
+  const sex = document.getElementById("sex").value;
 
-  // form values
-  const first_name = document.getElementById("first_name").value.trim();
-  const last_name  = document.getElementById("last_name").value.trim();
+  const heightInput = document.getElementById("height").value.split("'");
+  const heightFt = parseInt(heightInput[0]);
+  const heightIn = parseInt(heightInput[1]);
+  const height_cm = heightFt*30.48 + heightIn*2.54;
+
+  const weight_lb = parseFloat(document.getElementById("weight").value);
+  const weight_kg = weight_lb * 0.453592;
+
   const goal = document.getElementById("goal").value;
-  const sex  = document.getElementById("sex").value;
+  const weight_loss_speed = document.getElementById("weightLossSpeed")?.value || null;
 
-  const age    = parseInt(document.getElementById("age").value, 10);
-  const feet   = parseFloat(document.getElementById("feet").value);
-  const inches = parseFloat(document.getElementById("inches").value);
-  const pounds = parseFloat(document.getElementById("weight_lb").value);
+  const profile = {
+    first_name: firstName,
+    last_name: lastName,
+    age: age,
+    sex: sex,
+    height_cm: height_cm,
+    weight_kg: weight_kg,
+    goal: goal,
+    weight_loss_speed: weight_loss_speed
+  };
 
-  const weight_loss_speed =
-  goal === "weight_loss"
-  ? document.getElementById("weight_loss_speed").value
-  : null;
-  
-  // basic validation
-  if (!first_name) return alert("Please enter your first name.");
-  if (!last_name)  return alert("Please enter your last name.");
-  if (!age || age < 5 || age > 120) return alert("Please enter a valid age.");
-  if (!feet || feet < 3 || feet > 8) return alert("Please enter a valid height (feet).");
-  if (inches < 0 || inches > 11) return alert("Inches must be 0–11.");
-  if (!pounds || pounds < 50 || pounds > 800) return alert("Please enter a valid weight (lb).");
-
-  // convert units
-  const height_cm = ftInToCm(feet, inches);
-  const weight_kg = lbToKg(pounds);
-
-  // Upsert profile (insert if new, update if exists)
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
+  await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
     method: "POST",
     headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      Prefer: "resolution=merge-duplicates,return=minimal"
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-  id: user_id,
-  first_name,
-  last_name,
-  goal,
-  sex,
-  age,
-  height_cm,
-  weight_kg,
-  weight_loss_speed
-    })
+    body: JSON.stringify(profile)
   });
 
-  if (res.ok) {
-    window.location.href = "/dashboard.html";
-  } else {
-    const text = await res.text();
-    console.error("Profile save failed:", text);
-    alert("Failed saving profile. Check console.");
-  }
+  window.location.href = "/dashboard.html";
 }
-
-window.addEventListener("DOMContentLoaded", () => {
-  if(document.getElementById("goal")){
-    toggleWeightLossOptions();
-  }
-});
-
