@@ -29,29 +29,106 @@ async function login() {
   window.location.href = "/dashboard.html";
 }
 
-// ---------- DASHBOARD ----------
+// ---------- UTIL ----------
 function parseJwt(token) {
   return JSON.parse(atob(token.split('.')[1]));
 }
 
-async function loadCalories() {
-  const caloriesLabel = document.getElementById("caloriesLabel");
-  if (!caloriesLabel) return;
+function getToken() {
+  return localStorage.getItem("token");
+}
 
-  const token = localStorage.getItem("token");
-  if (!token) {
+function getUserIdFromToken() {
+  const token = getToken();
+  if (!token) return null;
+  const user = parseJwt(token);
+  return user.sub;
+}
+
+function getTodayString() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today.toISOString().split("T")[0];
+}
+
+// ---------- ADD MEAL ----------
+async function openMealPrompt() {
+  const food_name = prompt("Food name:");
+  const calories = parseInt(prompt("Calories:"), 10);
+  const protein = parseInt(prompt("Protein (g):"), 10);
+  const carbs = parseInt(prompt("Carbs (g):"), 10);
+  const fat = parseInt(prompt("Fat (g):"), 10);
+
+  if (!food_name || isNaN(calories)) {
+    alert("Invalid input.");
+    return;
+  }
+
+  await saveMeal({
+    food_name,
+    calories,
+    protein,
+    carbs,
+    fat
+  });
+}
+
+async function saveMeal(meal) {
+  const token = getToken();
+  const user_id = getUserIdFromToken();
+
+  if (!token || !user_id) {
+    alert("Not authenticated.");
     window.location.href = "/";
     return;
   }
 
-  const user = parseJwt(token);
-  const user_id = user.sub;
-  console.log("JWT user_id:", user_id);
+  const today = getTodayString();
 
-  // ---------- DATE ----------
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const todayStr = today.toISOString().split("T")[0];
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/meals`, {
+    method: "POST",
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json",
+      "Prefer": "return=minimal"
+    },
+    body: JSON.stringify({
+      user_id,
+      food_name: meal.food_name,
+      calories: meal.calories,
+      protein: meal.protein || 0,
+      carbs: meal.carbs || 0,
+      fat: meal.fat || 0,
+      meal_type: "general",
+      date: today
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    console.error("Insert error:", err);
+    alert("Error saving meal.");
+    return;
+  }
+
+  loadCalories();
+}
+
+// ---------- DASHBOARD ----------
+async function loadCalories() {
+  const caloriesLabel = document.getElementById("caloriesLabel");
+  if (!caloriesLabel) return;
+
+  const token = getToken();
+  const user_id = getUserIdFromToken();
+
+  if (!token || !user_id) {
+    window.location.href = "/";
+    return;
+  }
+
+  const todayStr = getTodayString();
 
   // ---------- FETCH PROFILE ----------
   const profileRes = await fetch(
@@ -76,7 +153,6 @@ async function loadCalories() {
   const H = profile.height_cm || 170;
   const A = profile.age || 32;
   const sex = profile.sex || "male";
-  const goal = profile.goal || "weight_loss";
 
   let bmr = sex === "male"
     ? 10 * W + 6.25 * H - 5 * A + 5
@@ -89,9 +165,9 @@ async function loadCalories() {
   const fatG = Math.round((targetCalories * 0.25) / 9);
   const carbsG = Math.round((targetCalories * 0.45) / 4);
 
-  // ---------- FETCH MEALS ----------
+  // ---------- FETCH MEALS (using date column) ----------
   const mealsRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&created_at=gte.${todayStr}&select=calories,protein,fat,carbs`,
+    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&date=eq.${todayStr}&select=*`,
     {
       headers: {
         "apikey": SUPABASE_KEY,
@@ -99,8 +175,6 @@ async function loadCalories() {
       }
     }
   );
-
-  console.log("Meals status:", mealsRes.status);
 
   const meals = await mealsRes.json();
 
@@ -131,7 +205,7 @@ async function loadCalories() {
 
       const li = document.createElement("li");
       li.innerText =
-        `${i + 1}. Entry - ${m.calories} Cal | ` +
+        `${i + 1}. ${m.food_name} - ${m.calories} Cal | ` +
         `P:${m.protein}g F:${m.fat}g C:${m.carbs}g`;
       foodList.appendChild(li);
     });
@@ -145,71 +219,14 @@ async function loadCalories() {
     `Fat: ${eatenFat} / ${fatG} g`;
   document.getElementById("carbsLabel").innerText =
     `Carbs: ${eatenCarbs} / ${carbsG} g`;
-
-  drawCaloriesRing(eatenCalories, targetCalories);
-  drawMacroPie("proteinPie", eatenProtein, proteinG, "#FF6B4A");
-  drawMacroPie("fatPie", eatenFat, fatG, "#4ABEFF");
-  drawMacroPie("carbsPie", eatenCarbs, carbsG, "#28A745");
-  document.querySelector("main").classList.add("loaded");
-
-}
-
-// ---------- CHARTS ----------
-var caloriesChart;
-
-function drawCaloriesRing(consumed, target) {
-  const ctx = document.getElementById("caloriesRing").getContext("2d");
-
-  if (caloriesChart) caloriesChart.destroy();
-
-  const remaining = Math.max(target - consumed, 0);
-
-  caloriesChart = new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      datasets: [{
-        data: consumed === 0
-          ? [1]                       // show empty ring cleanly
-          : [consumed, remaining],
-        backgroundColor: consumed === 0
-          ? ["#EEEEEE"]
-          : ["#FF6B4A", "#EEEEEE"],
-        borderWidth: 0
-      }]
-    },
-    options: {
-      cutout: "75%",
-      plugins: { legend: { display: false } },
-      responsive: false,
-      maintainAspectRatio: false
-
-    }
-  });
-}
-
-
-function drawMacroPie(id, consumed, target, color) {
-  const ctx = document.getElementById(id).getContext("2d");
-  new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels: ["Consumed", "Remaining"],
-      datasets: [{
-        data: [consumed, Math.max(target - consumed, 0)],
-        backgroundColor: [color, "#EEEEEE"],
-        borderWidth: 0
-      }]
-    },
-    options: {
-      cutout: "70%",
-      plugins: { legend: { display: false } },
-      responsive: false,
-      maintainAspectRatio: false
-    }
-  });
 }
 
 // ---------- INIT ----------
 document.addEventListener("DOMContentLoaded", () => {
   loadCalories();
+
+  const newEntryBtn = document.getElementById("newEntryBtn");
+  if (newEntryBtn) {
+    newEntryBtn.addEventListener("click", openMealPrompt);
+  }
 });
