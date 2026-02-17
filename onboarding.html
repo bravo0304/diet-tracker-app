@@ -1,81 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Setup Your Plan</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="/styles.css">
-
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onboarding</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
+  <header class="navbar">
+    <h1>Onboarding</h1>
+  </header>
 
-<body>
+  <main class="container">
+    <div class="card">
+      <form id="onboardingForm">
 
-<div class="card">
+        <!-- Step 1: Personal Info -->
+        <div class="step" id="step-1">
+          <h3>Personal Info</h3>
+          <label>First Name</label>
+          <input type="text" id="firstName" required>
 
-  <div id="progress">
-    <div id="progress-bar"></div>
-  </div>
+          <label>Last Name</label>
+          <input type="text" id="lastName" required>
 
-  <!-- STEP 1 -->
-  <div class="step" id="step-1">
-    <h2>What's your name?</h2>
-    <input id="first_name" placeholder="First name">
-    <input id="last_name" placeholder="Last name">
-    <button onclick="nextStep(2)">Next</button>
-  </div>
+          <label>Age</label>
+          <input type="number" id="age" required>
 
-<!-- STEP 2 -->
-<div class="step" id="step-2" style="display:none">
-  <h2>Your goal</h2>
+          <label>Sex</label>
+          <select id="sex">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
 
- <select id="goal" onchange="toggleWeightLossOptions()">
-  <option value="weight_loss">Lose weight</option>
-  <option value="fitness">Build muscle</option>
-  <option value="health">General health</option>
-</select>
+          <button type="button" onclick="nextStep(2)" class="primary-btn">Next</button>
+        </div>
 
+        <!-- Step 2: Body Info -->
+        <div class="step" id="step-2" style="display:none;">
+          <h3>Body Info</h3>
 
-  <!-- Weight loss speed (hidden by default) -->
-<div id="weightloss_box" style="display:none; margin-top:20px;">
-  <p>How fast do you want to lose weight?</p>
+          <label>Height (ft / in)</label>
+          <input type="text" id="height" placeholder="e.g., 5'7"" required>
 
-  <select id="weight_loss_speed">
-    <option value="slow">Slow & sustainable</option>
-    <option value="moderate" selected>Balanced</option>
-    <option value="aggressive">Fast cut</option>
-  </select>
-</div>
+          <label>Weight (lb)</label>
+          <input type="number" id="weight" required>
 
+          <button type="button" onclick="nextStep(3)" class="primary-btn">Next</button>
+        </div>
 
-  <button onclick="nextStep(3)">Next</button>
-</div>
+        <!-- Step 3: Goal -->
+        <div class="step" id="step-3" style="display:none;">
+          <h3>Your Goal</h3>
+          <select id="goal">
+            <option value="weight_loss">Lose weight</option>
+            <option value="fitness">Build muscle</option>
+            <option value="health">General health</option>
+          </select>
 
+          <div id="weightloss_box" style="display:none;">
+            <label>Weight Loss Speed</label>
+            <select id="weightLossSpeed">
+              <option value="slow">Slow</option>
+              <option value="moderate">Moderate</option>
+              <option value="aggressive">Aggressive</option>
+            </select>
+          </div>
 
-  <!-- STEP 3 -->
-  <div class="step" id="step-3" style="display:none">
-    <h2>Your body</h2>
+          <button type="button" onclick="finishOnboarding()" class="primary-btn">Finish</button>
+        </div>
 
-    <select id="sex">
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-    </select>
+      </form>
+    </div>
+  </main>
 
-    <input id="age" type="number" placeholder="Age">
-    <input id="feet" placeholder="Height (ft)">
-    <input id="inches" placeholder="Height (in)">
-    <input id="weight_lb" placeholder="Weight (lb)">
-
-    <button onclick="finishOnboarding()">Finish</button>
-  </div>
-
-</div>
-
-<script src="/onboarding.js"></script>
-
-</body>
-
-
+  <script src="onboarding.js"></script>
 </body>
 </html>
