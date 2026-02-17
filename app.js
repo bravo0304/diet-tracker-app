@@ -1,8 +1,9 @@
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
+const DAILY_GOAL = 1900;
 
 
-// ================= LOGIN =================
+// ---------- LOGIN ----------
 async function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -10,77 +11,86 @@ async function login() {
 
   status.innerText = "Logging in...";
 
-  try {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-      method: "POST",
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method: "POST",
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email, password })
+  });
+
+  const data = await res.json();
+
+  if (data.access_token) {
+    localStorage.setItem("token", data.access_token);
+    window.location.href = "/dashboard.html";
+  } else {
+    status.innerText = "Login failed";
+  }
+}
+
+
+// ---------- DASHBOARD LOAD ----------
+function parseJwt(token) {
+  return JSON.parse(atob(token.split('.')[1]));
+}
+
+async function loadCalories() {
+
+  const remainingEl = document.getElementById("remaining");
+  if(!remainingEl) return;
+
+  const token = localStorage.getItem("token");
+  if(!token){
+    window.location.href="/";
+    return;
+  }
+
+  const user = parseJwt(token);
+  const user_id = user.sub;
+  const today = new Date().toISOString().split("T")[0];
+
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&created_at=gte.${today}&select=calories`,
+    {
       headers: {
         "apikey": SUPABASE_KEY,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email, password })
-    });
-
-    const data = await res.json();
-
-    if (data.access_token) {
-      localStorage.setItem("token", data.access_token);
-      localStorage.setItem("refresh_token", data.refresh_token);
-
-      status.innerText = "Login success";
-      window.location.href = "/dashboard.html";
-    } else {
-      status.innerText = data.error_description || "Login failed";
+        "Authorization": `Bearer ${token}`
+      }
     }
+  );
 
-  } catch (err) {
-    status.innerText = "Network error";
-    console.error(err);
-  }
+  const meals = await res.json();
+
+  let eaten = 0;
+  meals.forEach(m => eaten += m.calories);
+
+  remainingEl.innerText = (DAILY_GOAL - eaten) + " kcal";
 }
 
 
-
-// ================= KEEP SESSION =================
-function requireLogin() {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    window.location.href = "/";
-  }
-}
-
-
-
-// ================= CAMERA =================
+// ---------- CAMERA ----------
 function openCamera() {
   document.getElementById("cameraInput").click();
 }
 
-
-// runs when user takes picture
-document.addEventListener("DOMContentLoaded", () => {
-
+function setupCamera(){
   const input = document.getElementById("cameraInput");
   if (!input) return;
 
-  input.addEventListener("change", async (e) => {
+  input.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    console.log("Image captured:", file);
-
-    // preview image so we KNOW camera works
-    let preview = document.getElementById("preview");
-    if (!preview) {
-      preview = document.createElement("img");
-      preview.id = "preview";
-      preview.style.width = "200px";
-      preview.style.marginTop = "20px";
-      document.body.appendChild(preview);
-    }
-
+    const preview = document.getElementById("preview");
     preview.src = URL.createObjectURL(file);
-
-    // next step will be AI analysis
   });
+}
 
+
+// ---------- INIT ----------
+document.addEventListener("DOMContentLoaded", () => {
+  loadCalories();
+  setupCamera();
 });
