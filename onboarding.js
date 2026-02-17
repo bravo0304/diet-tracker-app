@@ -12,11 +12,23 @@ function toggleWeightLossOptions(){
 
 function nextStep(step){
   document.querySelectorAll(".step").forEach(s => s.style.display="none");
-  document.getElementById("step-"+step).style.display="block";
+
+  const current = document.getElementById("step-"+step);
+  current.style.display="block";
 
   const percent = step === 1 ? 33 : step === 2 ? 66 : 100;
   document.getElementById("progress-bar").style.width = percent + "%";
+
+  // Wait for DOM paint before checking goal
+  if(step === 2){
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        toggleWeightLossOptions();
+      });
+    });
+  }
 }
+
 
 
 
