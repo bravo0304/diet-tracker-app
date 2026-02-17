@@ -55,3 +55,25 @@ button {
 button:active {
   transform: scale(0.98);
 }
+
+
+#progress {
+  height: 8px;
+  background: #334155;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+#progress-bar {
+  height: 100%;
+  width: 33%;
+  background: #22c55e;
+  transition: width .3s ease;
+}
+
+.step h2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
