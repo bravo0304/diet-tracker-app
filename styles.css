@@ -160,3 +160,11 @@ main.loaded {
   opacity: 1;
 }
 
+#top-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
