@@ -168,16 +168,13 @@ async function loadCalories() {
   const remaining = targetCalories - eatenCalories;
   remainingEl.innerText = `${eatenCalories} / ${targetCalories} kcal`;
 
-  // Update mini macro text
-// ---------- Update macro text (always show X / Y) ----------
-document.getElementById("proteinLabel").innerText = `Protein: ${eatenProtein} / ${proteinG} g`;
-document.getElementById("fatLabel").innerText = `Fat: ${eatenFat} / ${fatG} g`;
-document.getElementById("carbsLabel").innerText = `Carbs: ${eatenCarbs} / ${carbsG} g`;
+  // ---------- UPDATE MACRO LABELS ----------
+  document.getElementById("proteinLabel").innerText = `Protein: ${eatenProtein} / ${proteinG} g`;
+  document.getElementById("fatLabel").innerText = `Fat: ${eatenFat} / ${fatG} g`;
+  document.getElementById("carbsLabel").innerText = `Carbs: ${eatenCarbs} / ${carbsG} g`;
 
-
-
-  // Update charts if drawing functions exist
-  if(typeof drawCaloriesRing === "function") drawCaloriesRing(remaining, targetCalories);
+  // ---------- DRAW CHARTS ----------
+  if(typeof drawCaloriesRing === "function") drawCaloriesRing(eatenCalories, targetCalories);
   if(typeof drawMacroPie === "function"){
     drawMacroPie('proteinPie', eatenProtein, proteinG, '#FF6B4A');
     drawMacroPie('fatPie', eatenFat, fatG, '#4ABEFF');
@@ -209,3 +206,69 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCamera();
   if(typeof startResetTimer === "function") startResetTimer();
 });
+
+// ---------- DRAW CALORIES RING ----------
+let caloriesChart;
+function drawCaloriesRing(consumed, target) {
+  const ctx = document.getElementById('caloriesRing').getContext('2d');
+  if(caloriesChart) caloriesChart.destroy();
+
+  caloriesChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Consumed','Remaining'],
+      datasets: [{
+        data: [consumed, Math.max(target - consumed, 0)],
+        backgroundColor: ['#FF6B4A','#EEEEEE'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      cutout: '70%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false }
+      },
+      responsive: false,
+      maintainAspectRatio: false
+    }
+  });
+}
+
+// ---------- DRAW MINI MACRO PIES ----------
+function drawMacroPie(id, consumed, target, color) {
+  const ctx = document.getElementById(id).getContext('2d');
+  const data = [consumed, Math.max(target - consumed, 0)];
+  const bg = [color, '#EEEEEE'];
+
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Consumed','Remaining'],
+      datasets: [{ data: data, backgroundColor: bg, borderWidth: 0 }]
+    },
+    options: {
+      cutout: '70%',
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      responsive: false,
+      maintainAspectRatio: false
+    }
+  });
+}
+
+// ---------- DAILY RESET TIMER ----------
+function startResetTimer() {
+  const timerEl = document.getElementById('reset-timer');
+  function updateTimer() {
+    const now = new Date();
+    const nextMidnight = new Date();
+    nextMidnight.setHours(24,0,0,0);
+    const diff = nextMidnight - now;
+    const hours = String(Math.floor(diff / 3600000)).padStart(2,'0');
+    const mins = String(Math.floor((diff % 3600000)/60000)).padStart(2,'0');
+    const secs = String(Math.floor((diff % 60000)/1000)).padStart(2,'0');
+    timerEl.innerText = `Time to reset: ${hours}:${mins}:${secs}`;
+  }
+  updateTimer();
+  setInterval(updateTimer, 1000);
+}
