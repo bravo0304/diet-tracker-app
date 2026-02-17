@@ -2,6 +2,14 @@ const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
 
 
+function toggleWeightLossOptions(){
+  const goal = document.getElementById("goal").value;
+  const box = document.getElementById("weightloss_box");
+
+  box.style.display = goal === "weight_loss" ? "block" : "none";
+}
+
+
 function nextStep(step){
   document.querySelectorAll(".step").forEach(s => s.style.display="none");
   document.getElementById("step-"+step).style.display="block";
