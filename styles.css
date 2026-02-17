@@ -1,103 +1,148 @@
-* {
-  box-sizing: border-box;
+/* ---------- GLOBAL ---------- */
+body {
+  font-family: 'Inter', sans-serif;
+  background: #F7F7F7;
+  color: #333;
+  margin: 0;
+  padding: 0;
 }
 
-body {
-  font-family: Arial, sans-serif;
-  background: #0f172a;
-  color: white;
-  margin: 0;
+h1, h2, h3 {
+  font-weight: 700;
+  margin: 0 0 10px 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
   padding: 20px;
 }
 
-/* card container */
-.card {
-  width: 100%;
-  max-width: 420px;
-  margin: 40px auto;
-  padding: 28px 22px;
-  background: #1e293b;
-  border-radius: 20px;
+/* ---------- NAVBAR ---------- */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #FF6B4A;
+  color: #fff;
+  padding: 10px 20px;
 }
 
-/* inputs */
-input, select {
-  width: 100%;
-  padding: 16px 18px;
-  margin-top: 14px;
-
-  border-radius: 14px;
-  border: none;
-  outline: none;
-
-  background: #e5e7eb;
-  color: #111827;
-
-  font-size: 16px;
+.navbar h1 {
+  font-size: 20px;
 }
 
-/* button */
-button {
-  width: 100%;
-  padding: 16px;
-  margin-top: 22px;
-
-  border: none;
-  border-radius: 14px;
-
-  background: #22c55e;
-  color: white;
-  font-size: 18px;
-  font-weight: 600;
-  cursor: pointer;
+.navbar a.primary-btn {
+  background: #fff;
+  color: #FF6B4A;
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
 }
 
-button:active {
-  transform: scale(0.98);
+.navbar a.primary-btn:hover {
+  background: #f0f0f0;
 }
 
-
-#progress {
-  height: 8px;
-  background: #334155;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  overflow: hidden;
-}
-
-#progress-bar {
-  height: 100%;
-  width: 33%;
-  background: #22c55e;
-  transition: width .3s ease;
-}
-
-.step h2 {
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-
-
+/* ---------- CARDS ---------- */
 .card {
   background: #fff;
   border-radius: 10px;
-  padding: 15px;
+  padding: 20px;
   margin-bottom: 20px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.meal-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+/* ---------- DASHBOARD ---------- */
+.calories-text {
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  margin-top: -120px; /* centers inside calories ring */
 }
 
-button {
-  border-radius: 8px;
+.timer-text {
+  font-size: 12px;
+  text-align: center;
+  color: #666;
+  margin-top: 5px;
+}
+
+.macro-grid {
+  display: flex;
+  justify-content: space-around;
+  margin: 15px 0;
+}
+
+.macro-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 12px;
+}
+
+/* ---------- DAILY LOG ---------- */
+#daily-log ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 10px 0 0 0;
+}
+
+#daily-log li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+/* ---------- BUTTONS ---------- */
+.primary-btn {
   background: #FF6B4A;
   color: #fff;
-  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 15px;
   font-weight: 500;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
+.primary-btn:hover {
+  background: #e55b3c;
+}
+
+/* ---------- TOGGLES FOR SETTINGS ---------- */
+.toggle {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.toggle input[type="checkbox"] {
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* ---------- FORMS ---------- */
+form select, form input[type="text"], form input[type="number"] {
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width: 600px){
+  .macro-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+  .macro-card {
+    margin-bottom: 15px;
+  }
+}
