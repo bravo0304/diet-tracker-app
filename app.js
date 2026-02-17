@@ -1,6 +1,5 @@
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
-const DAILY_GOAL = 1900;
 
 
 // ---------- LOGIN ----------
