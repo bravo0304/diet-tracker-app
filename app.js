@@ -82,7 +82,6 @@ async function loadCalories() {
 
   const profiles = await profileRes.json();
   if (profiles.length === 0) return;
-
   const profile = profiles[0];
 
   // ---------- CONVERT UNITS ----------
@@ -113,7 +112,7 @@ async function loadCalories() {
 
   let surplus = 0;
   if(profile.goal === "fitness" && applySurplus){
-    surplus = 250; // optional muscle gain surplus
+    surplus = 250;
   }
 
   const targetCalories = Math.round(tdee - deficit + surplus);
@@ -132,7 +131,7 @@ async function loadCalories() {
 
   // ---------- FETCH TODAY'S MEALS ----------
   const mealsRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&created_at=gte.${today}&select=calories`,
+    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&created_at=gte.${today}&select=calories,protein,fat,carbs,title`,
     {
       headers: {
         "apikey": SUPABASE_KEY,
@@ -142,20 +141,32 @@ async function loadCalories() {
   );
 
   const meals = await mealsRes.json();
-  let eaten = 0;
-  meals.forEach(m => eaten += m.calories);
+  let eatenCalories = 0, eatenProtein=0, eatenFat=0, eatenCarbs=0;
 
-  const remaining = targetCalories - eaten;
+  const foodList = document.getElementById("foodEntries");
+  foodList.innerHTML = ""; // clear previous entries
 
-  // ---------- UPDATE DOM ----------
+  meals.forEach((m, i) => {
+    eatenCalories += m.calories;
+    eatenProtein += m.protein;
+    eatenFat += m.fat;
+    eatenCarbs += m.carbs;
+
+    const li = document.createElement("li");
+    li.innerText = `${i+1}. ${m.title || "Entry"} - ${m.calories} Cal | P:${m.protein}g F:${m.fat}g C:${m.carbs}g`;
+    foodList.appendChild(li);
+  });
+
+  const remaining = targetCalories - eatenCalories;
   remainingEl.innerText = remaining + " kcal";
 
-  const proteinEl = document.getElementById("protein");
-  const fatEl = document.getElementById("fat");
-  const carbsEl = document.getElementById("carbs");
-  if(proteinEl) proteinEl.innerText = proteinG;
-  if(fatEl) fatEl.innerText = fatG;
-  if(carbsEl) carbsEl.innerText = carbsG;
+  // Update charts
+  if(typeof drawCaloriesRing === "function") drawCaloriesRing(remaining, targetCalories);
+  if(typeof drawMacroPie === "function"){
+    drawMacroPie('proteinPie', eatenProtein, proteinG, '#FF6B4A');
+    drawMacroPie('fatPie', eatenFat, fatG, '#4ABEFF');
+    drawMacroPie('carbsPie', eatenCarbs, carbsG, '#28A745');
+  }
 }
 
 // ---------- CAMERA ----------
@@ -180,4 +191,5 @@ function setupCamera(){
 document.addEventListener("DOMContentLoaded", () => {
   loadCalories();
   setupCamera();
+  if(typeof startResetTimer === "function") startResetTimer();
 });
