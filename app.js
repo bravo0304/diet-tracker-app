@@ -51,26 +51,13 @@ function getTodayString() {
   return today.toISOString().split("T")[0];
 }
 
-// ---------- ADD MEAL ----------
-async function openMealPrompt() {
-  const food_name = prompt("Food name:");
-  const calories = parseInt(prompt("Calories:"), 10);
-  const protein = parseInt(prompt("Protein (g):"), 10);
-  const carbs = parseInt(prompt("Carbs (g):"), 10);
-  const fat = parseInt(prompt("Fat (g):"), 10);
+// ---------- ADD MEAL MODAL ----------
+function openMealModal() {
+  document.getElementById("mealModal")?.classList.remove("hidden");
+}
 
-  if (!food_name || isNaN(calories)) {
-    alert("Invalid input.");
-    return;
-  }
-
-  await saveMeal({
-    food_name,
-    calories,
-    protein,
-    carbs,
-    fat
-  });
+function closeMealModal() {
+  document.getElementById("mealModal")?.classList.add("hidden");
 }
 
 async function saveMeal(meal) {
@@ -112,10 +99,61 @@ async function saveMeal(meal) {
     return;
   }
 
+  closeMealModal();
   loadCalories();
 }
 
 // ---------- DASHBOARD ----------
+var caloriesChart;
+
+function drawCaloriesRing(consumed, target) {
+  const ctx = document.getElementById("caloriesRing")?.getContext("2d");
+  if (!ctx) return;
+
+  if (caloriesChart) caloriesChart.destroy();
+
+  const remaining = Math.max(target - consumed, 0);
+
+  caloriesChart = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      datasets: [{
+        data: consumed === 0 ? [1] : [consumed, remaining],
+        backgroundColor: consumed === 0 ? ["#EEEEEE"] : ["#FF6B4A", "#EEEEEE"],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      cutout: "75%",
+      plugins: { legend: { display: false } },
+      responsive: false,
+      maintainAspectRatio: false
+    }
+  });
+}
+
+function drawMacroPie(id, consumed, target, color) {
+  const ctx = document.getElementById(id)?.getContext("2d");
+  if (!ctx) return;
+
+  new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      datasets: [{
+        data: [consumed, Math.max(target - consumed, 0)],
+        backgroundColor: [color, "#EEEEEE"],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      cutout: "70%",
+      plugins: { legend: { display: false } },
+      responsive: false,
+      maintainAspectRatio: false
+    }
+  });
+}
+
 async function loadCalories() {
   const caloriesLabel = document.getElementById("caloriesLabel");
   if (!caloriesLabel) return;
@@ -165,7 +203,7 @@ async function loadCalories() {
   const fatG = Math.round((targetCalories * 0.25) / 9);
   const carbsG = Math.round((targetCalories * 0.45) / 4);
 
-  // ---------- FETCH MEALS (using date column) ----------
+  // ---------- FETCH MEALS ----------
   const mealsRes = await fetch(
     `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&date=eq.${todayStr}&select=*`,
     {
@@ -211,7 +249,6 @@ async function loadCalories() {
     });
   }
 
-  // ---------- UPDATE UI ----------
   caloriesLabel.innerText = `${eatenCalories} / ${targetCalories} kcal`;
   document.getElementById("proteinLabel").innerText =
     `Protein: ${eatenProtein} / ${proteinG} g`;
@@ -219,6 +256,11 @@ async function loadCalories() {
     `Fat: ${eatenFat} / ${fatG} g`;
   document.getElementById("carbsLabel").innerText =
     `Carbs: ${eatenCarbs} / ${carbsG} g`;
+
+  drawCaloriesRing(eatenCalories, targetCalories);
+  drawMacroPie("proteinPie", eatenProtein, proteinG, "#FF6B4A");
+  drawMacroPie("fatPie", eatenFat, fatG, "#4ABEFF");
+  drawMacroPie("carbsPie", eatenCarbs, carbsG, "#28A745");
 }
 
 // ---------- INIT ----------
@@ -227,6 +269,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const newEntryBtn = document.getElementById("newEntryBtn");
   if (newEntryBtn) {
-    newEntryBtn.addEventListener("click", openMealPrompt);
+    newEntryBtn.addEventListener("click", openMealModal);
   }
+
+  document.getElementById("cancelMeal")?.addEventListener("click", closeMealModal);
+
+  document.getElementById("saveMealBtn")?.addEventListener("click", async () => {
+    const food_name = document.getElementById("mealName").value;
+    const calories = parseInt(document.getElementById("mealCalories").value, 10);
+    const protein = parseInt(document.getElementById("mealProtein").value, 10);
+    const carbs = parseInt(document.getElementById("mealCarbs").value, 10);
+    const fat = parseInt(document.getElementById("mealFat").value, 10);
+
+    if (!food_name || isNaN(calories)) {
+      alert("Invalid input.");
+      return;
+    }
+
+    await saveMeal({ food_name, calories, protein, carbs, fat });
+  });
 });
