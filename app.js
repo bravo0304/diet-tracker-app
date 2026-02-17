@@ -84,37 +84,38 @@ async function loadCalories() {
   if (profiles.length === 0) return;
   const profile = profiles[0];
 
-  // ---------- Fallback for missing profile values ----------
+  // ---------- SAFETY FALLBACK ----------
   const height_cm = profile.height_cm && profile.height_cm > 0 ? profile.height_cm : 170;
   const weight_kg = profile.weight_kg && profile.weight_kg > 0 ? profile.weight_kg : 70;
   const age = profile.age && profile.age > 0 ? profile.age : 30;
+  const sex = profile.sex || "male";
 
   // ---------- BMR / TDEE ----------
-  let bmr = profile.sex === "male"
+  let bmr = sex === "male"
     ? 10 * weight_kg + 6.25 * height_cm - 5 * age + 5
     : 10 * weight_kg + 6.25 * height_cm - 5 * age - 161;
 
-  const tdee = bmr * 1.4;
+  const tdee = bmr * 1.4; // light activity
 
   // ---------- DEFICIT / SURPLUS ----------
+  const goal = profile.goal || "health";
+  const speed = profile.weight_loss_speed || "slow";
+
   let deficit = 0;
-  if(profile.goal === "weight_loss" && applyDeficit){
-    if(profile.weight_loss_speed === "slow") deficit = 300;
-    if(profile.weight_loss_speed === "moderate") deficit = 500;
-    if(profile.weight_loss_speed === "aggressive") deficit = 750;
+  if(goal === "weight_loss" && applyDeficit){
+    if(speed === "slow") deficit = 300;
+    if(speed === "moderate") deficit = 500;
+    if(speed === "aggressive") deficit = 750;
   }
 
-  let surplus = 0;
-  if(profile.goal === "fitness" && applySurplus){
-    surplus = 250;
-  }
+  const surplus = goal === "fitness" && applySurplus ? 250 : 0;
 
-  const targetCalories = Math.max(Math.round(tdee - deficit + surplus), 1); // fallback to 1 if somehow 0
+  const targetCalories = Math.max(Math.round(tdee - deficit + surplus), 1);
 
   // ---------- MACROS ----------
   let macroPercent = { protein: 0.3, fat: 0.25, carbs: 0.45 };
-  if(profile.goal === "fitness") macroPercent = { protein: 0.35, fat: 0.25, carbs: 0.4 };
-  if(profile.goal === "health") macroPercent = { protein: 0.25, fat: 0.3, carbs: 0.45 };
+  if(goal === "fitness") macroPercent = { protein: 0.35, fat: 0.25, carbs: 0.4 };
+  if(goal === "health") macroPercent = { protein: 0.25, fat: 0.3, carbs: 0.45 };
   if(expertOverride && userSettings.customMacros){
     macroPercent = userSettings.customMacros;
   }
@@ -135,10 +136,10 @@ async function loadCalories() {
   );
 
   const meals = await mealsRes.json();
-  let eatenCalories = 0, eatenProtein=0, eatenFat=0, eatenCarbs=0;
+  let eatenCalories = 0, eatenProtein = 0, eatenFat = 0, eatenCarbs = 0;
 
   const foodList = document.getElementById("foodEntries");
-  foodList.innerHTML = ""; // clear previous entries
+  foodList.innerHTML = "";
 
   if(meals.length === 0){
     const li = document.createElement("li");
@@ -146,7 +147,7 @@ async function loadCalories() {
     li.innerText = "No meals logged today";
     foodList.appendChild(li);
   } else {
-    meals.forEach((m, i) => {
+    meals.forEach((m,i)=>{
       eatenCalories += m.calories;
       eatenProtein += m.protein;
       eatenFat += m.fat;
@@ -161,12 +162,10 @@ async function loadCalories() {
   // ---------- UPDATE DASHBOARD ----------
   caloriesLabel.innerText = `${eatenCalories} / ${targetCalories} kcal`;
 
-  // ---------- UPDATE MACRO LABELS ----------
   document.getElementById("proteinLabel").innerText = `Protein: ${eatenProtein} / ${proteinG} g`;
   document.getElementById("fatLabel").innerText = `Fat: ${eatenFat} / ${fatG} g`;
   document.getElementById("carbsLabel").innerText = `Carbs: ${eatenCarbs} / ${carbsG} g`;
 
-  // ---------- DRAW CHARTS ----------
   if(typeof drawCaloriesRing === "function") drawCaloriesRing(eatenCalories, targetCalories);
   if(typeof drawMacroPie === "function"){
     drawMacroPie('proteinPie', eatenProtein, proteinG, '#FF6B4A');
@@ -182,86 +181,75 @@ function openCamera() {
 
 function setupCamera(){
   const input = document.getElementById("cameraInput");
-  if (!input) return;
+  if(!input) return;
 
-  input.addEventListener("change", (e) => {
+  input.addEventListener("change",(e)=>{
     const file = e.target.files[0];
-    if (!file) return;
-
+    if(!file) return;
     const preview = document.getElementById("preview");
     preview.src = URL.createObjectURL(file);
   });
 }
 
 // ---------- INIT ----------
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded",()=>{
   loadCalories();
   setupCamera();
-  if(typeof startResetTimer === "function") startResetTimer();
+  if(typeof startResetTimer==="function") startResetTimer();
 });
 
 // ---------- DRAW CALORIES RING ----------
 let caloriesChart;
-function drawCaloriesRing(consumed, target) {
+function drawCaloriesRing(consumed,target){
   const ctx = document.getElementById('caloriesRing').getContext('2d');
   if(caloriesChart) caloriesChart.destroy();
 
-  caloriesChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Consumed','Remaining'],
-      datasets: [{
-        data: [consumed, Math.max(target - consumed, 0)],
-        backgroundColor: ['#FF6B4A','#EEEEEE'],
-        borderWidth: 0
-      }]
+  caloriesChart = new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels:['Consumed','Remaining'],
+      datasets:[{data:[consumed,Math.max(target-consumed,0)],backgroundColor:['#FF6B4A','#EEEEEE'],borderWidth:0}]
     },
-    options: {
-      cutout: '70%',
-      plugins: {
-        legend: { display: false },
-        tooltip: { enabled: false }
-      },
-      responsive: false,
-      maintainAspectRatio: false
+    options:{
+      cutout:'70%',
+      plugins:{legend:{display:false},tooltip:{enabled:false}},
+      responsive:false,
+      maintainAspectRatio:false
     }
   });
 }
 
 // ---------- DRAW MINI MACRO PIES ----------
-function drawMacroPie(id, consumed, target, color) {
+function drawMacroPie(id,consumed,target,color){
   const ctx = document.getElementById(id).getContext('2d');
-  const data = [consumed, Math.max(target - consumed, 0)];
-  const bg = [color, '#EEEEEE'];
+  const data = [consumed,Math.max(target-consumed,0)];
+  const bg = [color,'#EEEEEE'];
 
-  new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Consumed','Remaining'],
-      datasets: [{ data: data, backgroundColor: bg, borderWidth: 0 }]
-    },
-    options: {
-      cutout: '70%',
-      plugins: { legend: { display: false }, tooltip: { enabled: false } },
-      responsive: false,
-      maintainAspectRatio: false
+  new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:['Consumed','Remaining'],datasets:[{data:data,backgroundColor:bg,borderWidth:0}]},
+    options:{
+      cutout:'70%',
+      plugins:{legend:{display:false},tooltip:{enabled:false}},
+      responsive:false,
+      maintainAspectRatio:false
     }
   });
 }
 
 // ---------- DAILY RESET TIMER ----------
-function startResetTimer() {
+function startResetTimer(){
   const timerEl = document.getElementById('reset-timer');
-  function updateTimer() {
+  function updateTimer(){
     const now = new Date();
     const nextMidnight = new Date();
     nextMidnight.setHours(24,0,0,0);
-    const diff = nextMidnight - now;
-    const hours = String(Math.floor(diff / 3600000)).padStart(2,'0');
-    const mins = String(Math.floor((diff % 3600000)/60000)).padStart(2,'0');
-    const secs = String(Math.floor((diff % 60000)/1000)).padStart(2,'0');
-    timerEl.innerText = `Time to reset: ${hours}:${mins}:${secs}`;
+    const diff = nextMidnight-now;
+    const hours = String(Math.floor(diff/3600000)).padStart(2,'0');
+    const mins = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+    const secs = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+    timerEl.innerText=`Time to reset: ${hours}:${mins}:${secs}`;
   }
   updateTimer();
-  setInterval(updateTimer, 1000);
+  setInterval(updateTimer,1000);
 }
