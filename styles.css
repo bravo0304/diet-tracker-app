@@ -89,10 +89,10 @@ body {
 .macro-grid {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;  /* instead of center */
-  gap: 30px;
-  margin-top: 30px;
+  justify-content: space-around;
+  gap: clamp(30px, 6vw, 60px);
 }
+
 
 
 
