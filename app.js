@@ -23,8 +23,32 @@ async function login() {
   const data = await res.json();
 
   if (data.access_token) {
+
     localStorage.setItem("token", data.access_token);
-    window.location.href = "/dashboard.html";
+
+    // decode user id from token
+    const user = JSON.parse(atob(data.access_token.split('.')[1]));
+    const user_id = user.sub;
+
+    // check if profile exists
+    const profileRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/profiles?id=eq.${user_id}`,
+      {
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${data.access_token}`
+        }
+      }
+    );
+
+    const profile = await profileRes.json();
+
+    if (profile.length === 0) {
+      window.location.href = "/onboarding.html";
+    } else {
+      window.location.href = "/dashboard.html";
+    }
+
   } else {
     status.innerText = "Login failed";
   }
