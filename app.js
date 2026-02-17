@@ -11,6 +11,7 @@ async function login() {
 
   status.innerText = "Logging in...";
 
+  // 1️⃣ login
   const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
     method: "POST",
     headers: {
@@ -22,37 +23,34 @@ async function login() {
 
   const data = await res.json();
 
-  if (data.access_token) {
-
-    localStorage.setItem("token", data.access_token);
-
-    // decode user id from token
-    const user = JSON.parse(atob(data.access_token.split('.')[1]));
-    const user_id = user.sub;
-
-    // check if profile exists
-    const profileRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/profiles?id=eq.${user_id}`,
-      {
-        headers: {
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${data.access_token}`
-        }
-      }
-    );
-
-    const profile = await profileRes.json();
-
-    if (profile.length === 0) {
-      window.location.href = "/onboarding.html";
-    } else {
-      window.location.href = "/dashboard.html";
-    }
-
-  } else {
+  if (!data.access_token) {
     status.innerText = "Login failed";
+    return;
+  }
+
+  // save token
+  localStorage.setItem("token", data.access_token);
+
+  // 2️⃣ check if profile exists
+  const profileRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=id`, {
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${data.access_token}`
+    }
+  });
+
+  const profile = await profileRes.json();
+
+  // 3️⃣ route user
+  if (profile.length === 0) {
+    // FIRST TIME USER
+    window.location.href = "/onboarding.html";
+  } else {
+    // RETURNING USER
+    window.location.href = "/dashboard.html";
   }
 }
+
 
 
 // ---------- DASHBOARD LOAD ----------
