@@ -150,6 +150,8 @@ async function loadCalories() {
   drawMacroPie("proteinPie", eatenProtein, proteinG, "#FF6B4A");
   drawMacroPie("fatPie", eatenFat, fatG, "#4ABEFF");
   drawMacroPie("carbsPie", eatenCarbs, carbsG, "#28A745");
+  document.querySelector("main").classList.add("loaded");
+
 }
 
 // ---------- CHARTS ----------
