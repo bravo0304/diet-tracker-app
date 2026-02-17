@@ -166,7 +166,7 @@ async function loadCalories() {
 
   // ---------- UPDATE DASHBOARD ----------
   const remaining = targetCalories - eatenCalories;
-  remainingEl.innerText = `${eatenCalories} / ${targetCalories} kcal`;
+  const caloriesLabel = document.getElementById("caloriesLabel"); caloriesLabel.innerText = `${eatenCalories} / ${targetCalories} kcal`;
 
   // ---------- UPDATE MACRO LABELS ----------
   document.getElementById("proteinLabel").innerText = `Protein: ${eatenProtein} / ${proteinG} g`;
