@@ -88,10 +88,12 @@ body {
 
 .macro-grid {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 120px;        /* control spacing evenly */
   margin-bottom: 60px;
   text-align: center;
 }
+
 
 .macro-card {
   flex: 1;
