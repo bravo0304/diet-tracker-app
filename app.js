@@ -60,6 +60,8 @@ async function loadCalories() {
 
   const user = parseJwt(token);
   const user_id = user.sub;
+  console.log("JWT user_id:", user_id);
+
   const today = new Date().toISOString().split("T")[0];
 
   // ---------- SETTINGS ----------
