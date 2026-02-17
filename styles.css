@@ -95,9 +95,7 @@ body {
 }
 
 
-.macro-card {
-  flex: 1;
-}
+
 
 .macro-card span {
   display: block;
