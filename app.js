@@ -49,8 +49,8 @@ function parseJwt(token) {
 }
 
 async function loadCalories() {
-  const remainingEl = document.getElementById("caloriesLabel");
-  if (!remainingEl) return;
+  const caloriesLabel = document.getElementById("caloriesLabel");
+  if (!caloriesLabel) return;
 
   const token = localStorage.getItem("token");
   if (!token) {
@@ -84,21 +84,15 @@ async function loadCalories() {
   if (profiles.length === 0) return;
   const profile = profiles[0];
 
-  // ---------- CONVERT UNITS ----------
-  let height_cm = profile.height_cm;
-  let weight_kg = profile.weight_kg;
-  if(units === "imperial"){
-    height_cm = height_cm * 2.54;
-    weight_kg = weight_kg * 0.453592;
-  }
+  // ---------- Fallback for missing profile values ----------
+  const height_cm = profile.height_cm && profile.height_cm > 0 ? profile.height_cm : 170;
+  const weight_kg = profile.weight_kg && profile.weight_kg > 0 ? profile.weight_kg : 70;
+  const age = profile.age && profile.age > 0 ? profile.age : 30;
 
   // ---------- BMR / TDEE ----------
-  const W = weight_kg;
-  const H = height_cm;
-  const A = profile.age;
   let bmr = profile.sex === "male"
-    ? 10 * W + 6.25 * H - 5 * A + 5
-    : 10 * W + 6.25 * H - 5 * A - 161;
+    ? 10 * weight_kg + 6.25 * height_cm - 5 * age + 5
+    : 10 * weight_kg + 6.25 * height_cm - 5 * age - 161;
 
   const tdee = bmr * 1.4;
 
@@ -115,7 +109,7 @@ async function loadCalories() {
     surplus = 250;
   }
 
-  const targetCalories = Math.round(tdee - deficit + surplus);
+  const targetCalories = Math.max(Math.round(tdee - deficit + surplus), 1); // fallback to 1 if somehow 0
 
   // ---------- MACROS ----------
   let macroPercent = { protein: 0.3, fat: 0.25, carbs: 0.45 };
@@ -165,8 +159,7 @@ async function loadCalories() {
   }
 
   // ---------- UPDATE DASHBOARD ----------
-  const remaining = targetCalories - eatenCalories;
-  const caloriesLabel = document.getElementById("caloriesLabel"); caloriesLabel.innerText = `${eatenCalories} / ${targetCalories} kcal`;
+  caloriesLabel.innerText = `${eatenCalories} / ${targetCalories} kcal`;
 
   // ---------- UPDATE MACRO LABELS ----------
   document.getElementById("proteinLabel").innerText = `Protein: ${eatenProtein} / ${proteinG} g`;
