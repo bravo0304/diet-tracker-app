@@ -4,33 +4,51 @@
   <title>Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <script>
-  const SUPABASE_URL = "https://rvwozaxippmuwekubbn.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
-  const DAILY_GOAL = 1900;
+ <script>
+const SUPABASE_URL = "https://rvwozaxippmuwekubbn.supabase.co";
+const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
+const DAILY_GOAL = 1900;
 
-  async function loadCalories() {
-    const token = localStorage.getItem("token");
+function parseJwt (token) {
+  const base64Url = token.split('.')[1];
+  const base64 = atob(base64Url);
+  return JSON.parse(base64);
+}
 
-    const today = new Date().toISOString().split("T")[0];
+async function loadCalories() {
 
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/meals?created_at=gte.${today}&select=calories`, {
+  const token = localStorage.getItem("token");
+  if(!token){
+    window.location.href="/";
+    return;
+  }
+
+  const user = parseJwt(token);
+  const user_id = user.sub;
+
+  const today = new Date().toISOString().split("T")[0];
+
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&created_at=gte.${today}&select=calories`,
+    {
       headers: {
         "apikey": SUPABASE_KEY,
         "Authorization": `Bearer ${token}`
       }
-    });
+    }
+  );
 
-    const meals = await res.json();
+  const meals = await res.json();
 
-    let eaten = 0;
-    meals.forEach(m => eaten += m.calories);
+  let eaten = 0;
+  meals.forEach(m => eaten += m.calories);
 
-    document.getElementById("remaining").innerText = DAILY_GOAL - eaten + " kcal";
-  }
+  document.getElementById("remaining").innerText = (DAILY_GOAL - eaten) + " kcal";
+}
 
-  window.onload = loadCalories;
-  </script>
+window.onload = loadCalories;
+</script>
+
 
   <style>
     body {font-family: Arial;background:#0f172a;color:white;margin:0;padding:20px;}
