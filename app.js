@@ -171,7 +171,7 @@ if (!Array.isArray(meals)) {
       eatenCarbs += m.carbs;
 
       const li = document.createElement("li");
-      li.innerText = `${i+1}. ${m.title || "Entry"} - ${m.calories} Cal | P:${m.protein}g F:${m.fat}g C:${m.carbs}g`;
+      li.innerText = `${i+1}. ${m.name || "Entry"} - ${m.calories} Cal | P:${m.protein}g F:${m.fat}g C:${m.carbs}g`;
       foodList.appendChild(li);
     });
   }
