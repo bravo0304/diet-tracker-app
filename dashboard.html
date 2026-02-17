@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: Arial;
+      background:#0f172a;
+      color:white;
+      margin:0;
+      padding:20px;
+    }
+    .box {
+      background:#1e293b;
+      padding:20px;
+      border-radius:16px;
+      margin-bottom:15px;
+    }
+    button {
+      width:100%;
+      padding:15px;
+      margin-top:10px;
+      border:none;
+      border-radius:12px;
+      background:#22c55e;
+      color:white;
+      font-size:16px;
+      cursor:pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Today</h2>
+
+  <div class="box">
+    <h3>Remaining Calories</h3>
+    <p id="remaining">Loading...</p>
+  </div>
+
+  <div class="box">
+    <button onclick="alert('Camera logging coming next')">📸 Log Meal</button>
+    <button onclick="alert('Simulation coming next')">🤔 Can I eat this?</button>
+  </div>
+
+</body>
+</html>
