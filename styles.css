@@ -77,3 +77,27 @@ button:active {
   text-align: center;
 }
 
+
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.meal-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+button {
+  border-radius: 8px;
+  background: #FF6B4A;
+  color: #fff;
+  padding: 10px;
+  font-weight: 500;
+}
+
