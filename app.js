@@ -62,9 +62,11 @@ async function loadCalories() {
   const user_id = user.sub;
   console.log("JWT user_id:", user_id);
 
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  const todayISO = today.toISOString();
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const todayISO = today.toISOString();
+const todayStr = todayISO.split("T")[0];
+
 
 
   // ---------- SETTINGS ----------
