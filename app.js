@@ -49,7 +49,7 @@ function parseJwt(token) {
 }
 
 async function loadCalories() {
-  const remainingEl = document.getElementById("remaining");
+  const remainingEl = document.getElementById("caloriesLabel");
   if (!remainingEl) return;
 
   const token = localStorage.getItem("token");
