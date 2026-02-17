@@ -57,6 +57,11 @@ async function finishOnboarding() {
   const inches = parseFloat(document.getElementById("inches").value);
   const pounds = parseFloat(document.getElementById("weight_lb").value);
 
+  const weight_loss_speed =
+  goal === "weight_loss"
+  ? document.getElementById("weight_loss_speed").value
+  : null;
+  
   // basic validation
   if (!first_name) return alert("Please enter your first name.");
   if (!last_name)  return alert("Please enter your last name.");
@@ -79,14 +84,15 @@ async function finishOnboarding() {
       Prefer: "resolution=merge-duplicates,return=minimal"
     },
     body: JSON.stringify({
-      id: user_id,
-      first_name,
-      last_name,
-      goal,
-      sex,
-      age,
-      height_cm,
-      weight_kg
+  id: user_id,
+  first_name,
+  last_name,
+  goal,
+  sex,
+  age,
+  height_cm,
+  weight_kg,
+  weight_loss_speed
     })
   });
 
