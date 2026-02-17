@@ -104,3 +104,10 @@ async function finishOnboarding() {
     alert("Failed saving profile. Check console.");
   }
 }
+
+window.addEventListener("DOMContentLoaded", () => {
+  if(document.getElementById("goal")){
+    toggleWeightLossOptions();
+  }
+});
+
