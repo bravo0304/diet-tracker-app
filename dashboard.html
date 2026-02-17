@@ -11,6 +11,38 @@
 <body>
   <h2>Today</h2>
 
+
+<!-- Top Summary -->
+<div id="top-summary" class="card">
+  <canvas id="caloriesRing" width="150" height="150"></canvas>
+  <div id="remaining">0 kcal</div>
+  <div id="consumed">0 kcal</div>
+</div>
+
+<!-- Meal Buttons -->
+<div id="meal-buttons" class="meal-grid">
+  <button id="breakfastBtn">Breakfast 0 Cal</button>
+  <button id="lunchBtn">Lunch 0 Cal</button>
+  <button id="dinnerBtn">Dinner 0 Cal</button>
+  <button id="snackBtn">Snack 0 Cal</button>
+</div>
+
+<!-- Macro Pie Chart -->
+<div id="macro-chart" class="card">
+  <canvas id="macroPie" width="200" height="200"></canvas>
+  <div id="protein">0 g</div>
+  <div id="fat">0 g</div>
+  <div id="carbs">0 g</div>
+</div>
+
+<!-- Daily Log -->
+<div id="daily-log"></div>
+
+<!-- Reset Timer -->
+<div id="reset-timer"></div>
+
+
+  
   <div class="box">
     <h3>Remaining Calories</h3>
     <p id="remaining">Loading...</p>
