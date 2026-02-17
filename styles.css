@@ -133,7 +133,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 120px;
+  gap: 60px;
   margin: 60px auto;
   max-width: 900px;
 }
