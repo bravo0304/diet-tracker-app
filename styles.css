@@ -173,3 +173,24 @@ body.loading main {
 }
 
 
+#top-summary {
+  position: relative;
+}
+
+.calories-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.timer-text {
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  font-size: 12px;
+  color: #666;
+}
