@@ -170,9 +170,10 @@ async function loadCalories() {
 
   // Update mini macro text
 // ---------- Update macro text (always show X / Y) ----------
-document.getElementById("protein").innerText = `${eatenProtein} / ${proteinG} g`;
-document.getElementById("fat").innerText = `${eatenFat} / ${fatG} g`;
-document.getElementById("carbs").innerText = `${eatenCarbs} / ${carbsG} g`;
+document.getElementById("proteinLabel").innerText = `Protein: ${eatenProtein} / ${proteinG} g`;
+document.getElementById("fatLabel").innerText = `Fat: ${eatenFat} / ${fatG} g`;
+document.getElementById("carbsLabel").innerText = `Carbs: ${eatenCarbs} / ${carbsG} g`;
+
 
 
   // Update charts if drawing functions exist
