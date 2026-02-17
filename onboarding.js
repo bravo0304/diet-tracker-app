@@ -1,6 +1,17 @@
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
 
+
+function nextStep(step){
+  document.querySelectorAll(".step").forEach(s => s.style.display="none");
+  document.getElementById("step-"+step).style.display="block";
+
+  const percent = step === 1 ? 33 : step === 2 ? 66 : 100;
+  document.getElementById("progress-bar").style.width = percent + "%";
+}
+
+
+
 // ---------- helpers ----------
 function parseJwt(token) {
   const base64Url = token.split(".")[1];
