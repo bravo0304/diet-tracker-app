@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
  <script>
+// keep session alive
+setInterval(() => {
+  const token = localStorage.getItem("token");
+  if(!token) window.location.href="/";
+}, 3000);
+
+
+   
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
 const DAILY_GOAL = 1900;
@@ -50,6 +58,8 @@ window.onload = loadCalories;
 </script>
 
 
+
+  
   <style>
     body {font-family: Arial;background:#0f172a;color:white;margin:0;padding:20px;}
     .box {background:#1e293b;padding:20px;border-radius:16px;margin-bottom:15px;}
