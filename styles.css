@@ -150,3 +150,13 @@ form select, form input[type="text"], form input[type="number"] {
 body.loading main {
   opacity: 0;
 }
+
+main {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+main.loaded {
+  opacity: 1;
+}
+
