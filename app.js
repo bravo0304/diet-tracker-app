@@ -1,5 +1,6 @@
-const SUPABASE_URL = "PASTE_SUPABASE_URL";
-const SUPABASE_KEY = "PASTE_PUBLIC_ANON_KEY";
+const SUPABASE_URL = "https://rvwozaxippmuwekubbn.supabase.co";
+const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
+
 
 async function login() {
   const email = document.getElementById("email").value;
