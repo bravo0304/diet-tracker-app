@@ -158,6 +158,11 @@ body.loading main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
+  text-align: center;
 }
+
+#top-summary canvas {
+  display: block;
+}
+
 
