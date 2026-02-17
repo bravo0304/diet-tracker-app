@@ -85,22 +85,21 @@ async function loadCalories() {
   const profile = profiles[0];
 
   // ---------- SAFETY FALLBACK ----------
-  const height_cm = profile.height_cm && profile.height_cm > 0 ? profile.height_cm : 170;
-  const weight_kg = profile.weight_kg && profile.weight_kg > 0 ? profile.weight_kg : 70;
-  const age = profile.age && profile.age > 0 ? profile.age : 30;
+  const W = profile.weight_kg && profile.weight_kg > 0 ? profile.weight_kg : 72;
+  const H = profile.height_cm && profile.height_cm > 0 ? profile.height_cm : 170;
+  const A = profile.age && profile.age > 0 ? profile.age : 32;
   const sex = profile.sex || "male";
+  const goal = profile.goal || "weight_loss";
+  const speed = profile.weight_loss_speed || "slow";
 
   // ---------- BMR / TDEE ----------
   let bmr = sex === "male"
-    ? 10 * weight_kg + 6.25 * height_cm - 5 * age + 5
-    : 10 * weight_kg + 6.25 * height_cm - 5 * age - 161;
+    ? 10 * W + 6.25 * H - 5 * A + 5
+    : 10 * W + 6.25 * H - 5 * A - 161;
 
-  const tdee = bmr * 1.4; // light activity
+  const tdee = bmr * 1.4;
 
   // ---------- DEFICIT / SURPLUS ----------
-  const goal = profile.goal || "health";
-  const speed = profile.weight_loss_speed || "slow";
-
   let deficit = 0;
   if(goal === "weight_loss" && applyDeficit){
     if(speed === "slow") deficit = 300;
@@ -109,8 +108,7 @@ async function loadCalories() {
   }
 
   const surplus = goal === "fitness" && applySurplus ? 250 : 0;
-
-  const targetCalories = Math.max(Math.round(tdee - deficit + surplus), 1);
+  const targetCalories = Math.round(tdee - deficit + surplus);
 
   // ---------- MACROS ----------
   let macroPercent = { protein: 0.3, fat: 0.25, carbs: 0.45 };
@@ -161,7 +159,6 @@ async function loadCalories() {
 
   // ---------- UPDATE DASHBOARD ----------
   caloriesLabel.innerText = `${eatenCalories} / ${targetCalories} kcal`;
-
   document.getElementById("proteinLabel").innerText = `Protein: ${eatenProtein} / ${proteinG} g`;
   document.getElementById("fatLabel").innerText = `Fat: ${eatenFat} / ${fatG} g`;
   document.getElementById("carbsLabel").innerText = `Carbs: ${eatenCarbs} / ${carbsG} g`;
@@ -182,12 +179,10 @@ function openCamera() {
 function setupCamera(){
   const input = document.getElementById("cameraInput");
   if(!input) return;
-
   input.addEventListener("change",(e)=>{
     const file = e.target.files[0];
     if(!file) return;
-    const preview = document.getElementById("preview");
-    preview.src = URL.createObjectURL(file);
+    document.getElementById("preview").src = URL.createObjectURL(file);
   });
 }
 
@@ -203,19 +198,10 @@ let caloriesChart;
 function drawCaloriesRing(consumed,target){
   const ctx = document.getElementById('caloriesRing').getContext('2d');
   if(caloriesChart) caloriesChart.destroy();
-
   caloriesChart = new Chart(ctx,{
     type:'doughnut',
-    data:{
-      labels:['Consumed','Remaining'],
-      datasets:[{data:[consumed,Math.max(target-consumed,0)],backgroundColor:['#FF6B4A','#EEEEEE'],borderWidth:0}]
-    },
-    options:{
-      cutout:'70%',
-      plugins:{legend:{display:false},tooltip:{enabled:false}},
-      responsive:false,
-      maintainAspectRatio:false
-    }
+    data:{labels:['Consumed','Remaining'],datasets:[{data:[consumed,Math.max(target-consumed,0)],backgroundColor:['#FF6B4A','#EEEEEE'],borderWidth:0}]},
+    options:{cutout:'70%',plugins:{legend:{display:false},tooltip:{enabled:false}},responsive:false,maintainAspectRatio:false}
   });
 }
 
@@ -224,17 +210,7 @@ function drawMacroPie(id,consumed,target,color){
   const ctx = document.getElementById(id).getContext('2d');
   const data = [consumed,Math.max(target-consumed,0)];
   const bg = [color,'#EEEEEE'];
-
-  new Chart(ctx,{
-    type:'doughnut',
-    data:{labels:['Consumed','Remaining'],datasets:[{data:data,backgroundColor:bg,borderWidth:0}]},
-    options:{
-      cutout:'70%',
-      plugins:{legend:{display:false},tooltip:{enabled:false}},
-      responsive:false,
-      maintainAspectRatio:false
-    }
-  });
+  new Chart(ctx,{type:'doughnut',data:{labels:['Consumed','Remaining'],datasets:[{data:data,backgroundColor:bg,borderWidth:0}]},options:{cutout:'70%',plugins:{legend:{display:false},tooltip:{enabled:false}},responsive:false,maintainAspectRatio:false}});
 }
 
 // ---------- DAILY RESET TIMER ----------
