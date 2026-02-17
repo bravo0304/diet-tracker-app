@@ -128,21 +128,30 @@ async function loadCalories() {
   const carbsG = Math.round((targetCalories * macroPercent.carbs) / 4);
 
   // ---------- FETCH TODAY'S MEALS ----------
-  const mealsRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&created_at=gte.${todayISO}&select=calories,protein,fat,carbs,title`,
-    {
-      headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${token}`
-      }
-    }
-  );
+ // ---------- FETCH TODAY'S MEALS ----------
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const todayStr = today.toISOString().split("T")[0];
 
-  const meals = await mealsRes.json();
-  if (!Array.isArray(meals)) {
+const mealsRes = await fetch(
+  `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&created_at=gte.${todayStr}&select=calories,protein,fat,carbs,title`,
+  {
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${token}`
+    }
+  }
+);
+
+console.log("Meals status:", mealsRes.status);
+
+const meals = await mealsRes.json();
+
+if (!Array.isArray(meals)) {
   console.error("Meals error:", meals);
   return;
 }
+
 
   let eatenCalories = 0, eatenProtein = 0, eatenFat = 0, eatenCarbs = 0;
 
