@@ -30,24 +30,24 @@
 <div class="step" id="step-2" style="display:none">
   <h2>Your goal</h2>
 
-  <select id="goal" onchange="toggleWeightLossOptions()">
-    <option value="weight_loss">Lose weight</option>
-    <option value="fitness">Build muscle</option>
-    <option value="health">General health</option>
-  </select>
+ <select id="goal" onchange="toggleWeightLossOptions()">
+  <option value="weight_loss">Lose weight</option>
+  <option value="fitness">Build muscle</option>
+  <option value="health">General health</option>
+</select>
+
 
   <!-- Weight loss speed (hidden by default) -->
-  <div id="weightloss_box" style="display:none; margin-top:20px;">
-    <p>How fast do you want to lose weight?</p>
+<div id="weightloss_box" style="display:none; margin-top:20px;">
+  <p>How fast do you want to lose weight?</p>
 
-    <select id="weight_loss_speed">
-      <option value="slow">Slow & sustainable</option>
-      <option value="moderate" selected>Balanced</option>
-      <option value="aggressive">Fast cut</option>
-    </select>
+  <select id="weight_loss_speed">
+    <option value="slow">Slow & sustainable</option>
+    <option value="moderate" selected>Balanced</option>
+    <option value="aggressive">Fast cut</option>
+  </select>
+</div>
 
-    <small>Faster = harder to stick to</small>
-  </div>
 
   <button onclick="nextStep(3)">Next</button>
 </div>
