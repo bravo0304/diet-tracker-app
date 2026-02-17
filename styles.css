@@ -165,5 +165,11 @@ body.loading main {
   display: block;
 }
 
+#caloriesRing {
+  width: 160px;
+  height: 160px;
+  display: block;
+  margin: 0 auto;
+}
 
 
