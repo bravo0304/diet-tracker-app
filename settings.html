@@ -4,43 +4,76 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Settings</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    label { display: block; margin-top: 15px; }
-    button { margin-top: 20px; padding: 8px 15px; }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <header class="navbar">
+    <h1>Settings</h1>
+    <a href="dashboard.html" class="primary-btn">Back</a>
+  </header>
 
-<h2>Settings</h2>
+  <main class="container">
+    <div class="card">
+      <form id="settingsForm">
 
-<form id="settingsForm">
+        <!-- Units -->
+        <h3>Units</h3>
+        <select id="unitSelect">
+          <option value="metric">kg / cm</option>
+          <option value="imperial">lb / ft</option>
+        </select>
 
-  <!-- Units -->
-  <label>Units:</label>
-  <select id="unitSelect">
-    <option value="metric">kg / cm</option>
-    <option value="imperial">lb / ft</option>
-  </select>
+        <!-- Goal Toggles -->
+        <h3>Goals</h3>
+        <label class="toggle">
+          <input type="checkbox" id="deficitToggle">
+          <span>Weight Loss Calorie Deficit</span>
+        </label>
 
-  <!-- Goal Toggles -->
-  <label>Weight Loss Calorie Deficit:</label>
-  <input type="checkbox" id="deficitToggle" checked>
+        <label class="toggle">
+          <input type="checkbox" id="surplusToggle">
+          <span>Muscle Gain Calorie Surplus</span>
+        </label>
 
-  <label>Muscle Gain Calorie Surplus:</label>
-  <input type="checkbox" id="surplusToggle" checked>
+        <!-- Expert Macro Override -->
+        <h3>Expert Options</h3>
+        <label class="toggle">
+          <input type="checkbox" id="expertToggle">
+          <span>Enable Expert Macro Override</span>
+        </label>
 
-  <!-- Expert Macro Override -->
-  <label>Enable Expert Macro Override:</label>
-  <input type="checkbox" id="expertToggle">
+        <!-- Apply / Save -->
+        <button type="submit" class="primary-btn">Apply</button>
 
-  <!-- Apply / Save -->
-  <button type="submit">Apply</button>
+      </form>
+    </div>
+  </main>
 
-</form>
+  <script src="settings.js"></script>
+  <script>
+    // ---------- LOAD SAVED SETTINGS ----------
+    document.addEventListener("DOMContentLoaded", () => {
+      const saved = JSON.parse(localStorage.getItem("userSettings")) || {};
 
-<!-- Link to the JS that handles saving/loading settings -->
-<script src="settings.js"></script>
+      if(saved.units) document.getElementById("unitSelect").value = saved.units;
+      document.getElementById("deficitToggle").checked = saved.weightLossDeficit ?? true;
+      document.getElementById("surplusToggle").checked = saved.muscleGainSurplus ?? true;
+      document.getElementById("expertToggle").checked = saved.expertMacroOverride ?? false;
+    });
 
+    // ---------- SAVE SETTINGS ----------
+    const form = document.getElementById("settingsForm");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const settings = {
+        units: document.getElementById("unitSelect").value,
+        weightLossDeficit: document.getElementById("deficitToggle").checked,
+        muscleGainSurplus: document.getElementById("surplusToggle").checked,
+        expertMacroOverride: document.getElementById("expertToggle").checked
+      };
+      localStorage.setItem("userSettings", JSON.stringify(settings));
+      alert("Settings saved!");
+    });
+  </script>
 </body>
 </html>
