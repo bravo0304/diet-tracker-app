@@ -169,9 +169,11 @@ async function loadCalories() {
   remainingEl.innerText = `${eatenCalories} / ${targetCalories} kcal`;
 
   // Update mini macro text
-  document.getElementById("protein").innerText = `${eatenProtein} / ${proteinG} g`;
-  document.getElementById("fat").innerText = `${eatenFat} / ${fatG} g`;
-  document.getElementById("carbs").innerText = `${eatenCarbs} / ${carbsG} g`;
+// ---------- Update macro text (always show X / Y) ----------
+document.getElementById("protein").innerText = `${eatenProtein} / ${proteinG} g`;
+document.getElementById("fat").innerText = `${eatenFat} / ${fatG} g`;
+document.getElementById("carbs").innerText = `${eatenCarbs} / ${carbsG} g`;
+
 
   // Update charts if drawing functions exist
   if(typeof drawCaloriesRing === "function") drawCaloriesRing(remaining, targetCalories);
