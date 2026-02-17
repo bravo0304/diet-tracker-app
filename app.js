@@ -146,21 +146,34 @@ async function loadCalories() {
   const foodList = document.getElementById("foodEntries");
   foodList.innerHTML = ""; // clear previous entries
 
-  meals.forEach((m, i) => {
-    eatenCalories += m.calories;
-    eatenProtein += m.protein;
-    eatenFat += m.fat;
-    eatenCarbs += m.carbs;
-
+  if(meals.length === 0){
     const li = document.createElement("li");
-    li.innerText = `${i+1}. ${m.title || "Entry"} - ${m.calories} Cal | P:${m.protein}g F:${m.fat}g C:${m.carbs}g`;
+    li.style.color = "#666";
+    li.innerText = "No meals logged today";
     foodList.appendChild(li);
-  });
+  } else {
+    meals.forEach((m, i) => {
+      eatenCalories += m.calories;
+      eatenProtein += m.protein;
+      eatenFat += m.fat;
+      eatenCarbs += m.carbs;
 
+      const li = document.createElement("li");
+      li.innerText = `${i+1}. ${m.title || "Entry"} - ${m.calories} Cal | P:${m.protein}g F:${m.fat}g C:${m.carbs}g`;
+      foodList.appendChild(li);
+    });
+  }
+
+  // ---------- UPDATE DASHBOARD ----------
   const remaining = targetCalories - eatenCalories;
-  remainingEl.innerText = remaining + " kcal";
+  remainingEl.innerText = `${eatenCalories} / ${targetCalories} kcal`;
 
-  // Update charts
+  // Update mini macro text
+  document.getElementById("protein").innerText = `${eatenProtein} / ${proteinG} g`;
+  document.getElementById("fat").innerText = `${eatenFat} / ${fatG} g`;
+  document.getElementById("carbs").innerText = `${eatenCarbs} / ${carbsG} g`;
+
+  // Update charts if drawing functions exist
   if(typeof drawCaloriesRing === "function") drawCaloriesRing(remaining, targetCalories);
   if(typeof drawMacroPie === "function"){
     drawMacroPie('proteinPie', eatenProtein, proteinG, '#FF6B4A');
