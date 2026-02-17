@@ -62,7 +62,10 @@ async function loadCalories() {
   const user_id = user.sub;
   console.log("JWT user_id:", user_id);
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const todayISO = today.toISOString();
+
 
   // ---------- SETTINGS ----------
   const userSettings = JSON.parse(localStorage.getItem("userSettings")) || {};
@@ -126,7 +129,7 @@ async function loadCalories() {
 
   // ---------- FETCH TODAY'S MEALS ----------
   const mealsRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&created_at=gte.${today}&select=calories,protein,fat,carbs,title`,
+    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&created_at=gte.${todayISO}&select=calories,protein,fat,carbs,title`,
     {
       headers: {
         "apikey": SUPABASE_KEY,
@@ -136,6 +139,11 @@ async function loadCalories() {
   );
 
   const meals = await mealsRes.json();
+  if (!Array.isArray(meals)) {
+  console.error("Meals error:", meals);
+  return;
+}
+
   let eatenCalories = 0, eatenProtein = 0, eatenFat = 0, eatenCarbs = 0;
 
   const foodList = document.getElementById("foodEntries");
@@ -196,7 +204,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 });
 
 // ---------- DRAW CALORIES RING ----------
-let caloriesChart;
+var caloriesChart;
 function drawCaloriesRing(consumed,target){
   const ctx = document.getElementById('caloriesRing').getContext('2d');
   if(caloriesChart) caloriesChart.destroy();
