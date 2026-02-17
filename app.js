@@ -180,8 +180,8 @@ function drawCaloriesRing(consumed, target) {
     options: {
       cutout: "75%",
       plugins: { legend: { display: false } },
-      responsive: true,
-      maintainAspectRatio: true
+      responsive: false,
+      maintainAspectRatio: false
 
     }
   });
