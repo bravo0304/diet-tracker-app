@@ -112,6 +112,16 @@ body {
 }
 
 
+#macro-charts {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 120px;
+  margin: 60px auto;
+  max-width: 900px;
+}
+
+
 /* ========== DAILY LOG ========== */
 
 #daily-log h3 {
