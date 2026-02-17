@@ -1,29 +1,23 @@
-// Get references
-const form = document.getElementById("settingsForm");
-const unitSelect = document.getElementById("unitSelect");
-const deficitToggle = document.getElementById("deficitToggle");
-const surplusToggle = document.getElementById("surplusToggle");
-const expertToggle = document.getElementById("expertToggle");
-
-// Load saved settings (from localStorage)
+// ---------- LOAD SAVED SETTINGS ----------
 document.addEventListener("DOMContentLoaded", () => {
   const saved = JSON.parse(localStorage.getItem("userSettings")) || {};
-  
-  if(saved.units) unitSelect.value = saved.units;
-  deficitToggle.checked = saved.weightLossDeficit ?? true;
-  surplusToggle.checked = saved.muscleGainSurplus ?? true;
-  expertToggle.checked = saved.expertMacroOverride ?? false;
+
+  if(saved.units) document.getElementById("unitSelect").value = saved.units;
+  document.getElementById("deficitToggle").checked = saved.weightLossDeficit ?? true;
+  document.getElementById("surplusToggle").checked = saved.muscleGainSurplus ?? true;
+  document.getElementById("expertToggle").checked = saved.expertMacroOverride ?? false;
 });
 
-// Save settings on submit
+// ---------- SAVE SETTINGS ----------
+const form = document.getElementById("settingsForm");
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
   const settings = {
-    units: unitSelect.value,
-    weightLossDeficit: deficitToggle.checked,
-    muscleGainSurplus: surplusToggle.checked,
-    expertMacroOverride: expertToggle.checked
+    units: document.getElementById("unitSelect").value,
+    weightLossDeficit: document.getElementById("deficitToggle").checked,
+    muscleGainSurplus: document.getElementById("surplusToggle").checked,
+    expertMacroOverride: document.getElementById("expertToggle").checked
   };
 
   localStorage.setItem("userSettings", JSON.stringify(settings));
