@@ -4,66 +4,11 @@
   <title>Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
- <script>
-// keep session alive
-setInterval(() => {
-  const token = localStorage.getItem("token");
-  if(!token) window.location.href="/";
-}, 3000);
-
-
-   
-const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
-const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
-const DAILY_GOAL = 1900;
-
-function parseJwt (token) {
-  const base64Url = token.split('.')[1];
-  const base64 = atob(base64Url);
-  return JSON.parse(base64);
-}
-
-async function loadCalories() {
-
-  const token = localStorage.getItem("token");
-  if(!token){
-    window.location.href="/";
-    return;
-  }
-
-  const user = parseJwt(token);
-  const user_id = user.sub;
-
-  const today = new Date().toISOString().split("T")[0];
-
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&created_at=gte.${today}&select=calories`,
-    {
-      headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${token}`
-      }
-    }
-  );
-
-  const meals = await res.json();
-
-  let eaten = 0;
-  meals.forEach(m => eaten += m.calories);
-
-  document.getElementById("remaining").innerText = (DAILY_GOAL - eaten) + " kcal";
-}
-
-window.onload = loadCalories;
-</script>
-
-
-
-  
   <style>
     body {font-family: Arial;background:#0f172a;color:white;margin:0;padding:20px;}
     .box {background:#1e293b;padding:20px;border-radius:16px;margin-bottom:15px;}
     button {width:100%;padding:15px;margin-top:10px;border:none;border-radius:12px;background:#22c55e;color:white;font-size:16px;cursor:pointer;}
+    #preview {width:100%;margin-top:15px;border-radius:12px;}
   </style>
 </head>
 
@@ -76,10 +21,11 @@ window.onload = loadCalories;
   </div>
 
   <div class="box">
-   <button onclick="openCamera()">📸 Log Meal</button>
-<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+    <button onclick="openCamera()">📸 Log Meal</button>
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+    <img id="preview"/>
+  </div>
 
-
-      
-
-      
+<script src="app.js"></script>
+</body>
+</html>
