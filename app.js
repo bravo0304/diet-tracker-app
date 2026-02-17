@@ -157,26 +157,33 @@ var caloriesChart;
 
 function drawCaloriesRing(consumed, target) {
   const ctx = document.getElementById("caloriesRing").getContext("2d");
+
   if (caloriesChart) caloriesChart.destroy();
+
+  const remaining = Math.max(target - consumed, 0);
 
   caloriesChart = new Chart(ctx, {
     type: "doughnut",
     data: {
-      labels: ["Consumed", "Remaining"],
       datasets: [{
-        data: [consumed, Math.max(target - consumed, 0)],
-        backgroundColor: ["#FF6B4A", "#EEEEEE"],
+        data: consumed === 0
+          ? [1]                       // show empty ring cleanly
+          : [consumed, remaining],
+        backgroundColor: consumed === 0
+          ? ["#EEEEEE"]
+          : ["#FF6B4A", "#EEEEEE"],
         borderWidth: 0
       }]
     },
     options: {
-      cutout: "70%",
+      cutout: "75%",
       plugins: { legend: { display: false } },
       responsive: false,
       maintainAspectRatio: false
     }
   });
 }
+
 
 function drawMacroPie(id, consumed, target, color) {
   const ctx = document.getElementById(id).getContext("2d");
