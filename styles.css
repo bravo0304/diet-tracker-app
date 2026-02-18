@@ -55,13 +55,24 @@ body {
 
 .ring-wrapper {
   position: relative;
-  width: 260px;
-  height: 260px;
+  width: 220px;
+  height: 220px;
 }
 
 #caloriesRing {
-  width: 260px;
-  height: 260px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: conic-gradient(#FF6B4A 0%, #E5E5E5 0%);
+  position: relative;
+}
+
+#caloriesRing::after {
+  content: "";
+  position: absolute;
+  inset: 25px;
+  background: white;
+  border-radius: 50%;
 }
 
 .calories-text {
@@ -69,10 +80,12 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 700;
   text-align: center;
+  z-index: 2;
 }
+
 
 .macro-bars {
   width: 400px;
@@ -217,3 +230,39 @@ body {
   color: #FF6B4A;
 }
 
+
+
+.date-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin: 30px 0 20px 0;
+}
+
+.date-center {
+  text-align: center;
+}
+
+.date-arrow {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+  padding: 4px 8px;
+}
+
+.date-arrow:hover {
+  color: #FF6B4A;
+}
+
+#currentDateLabel {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.reset-timer {
+  font-size: 13px;
+  color: #777;
+}
