@@ -222,8 +222,8 @@ const todayStr = activeDate.toISOString().split("T")[0];
 
 
 // ==================== Week strip ============
+
 export function renderWeekStrip() {
- export function renderWeekStrip() {
   const container = document.getElementById("weekStrip");
   if (!container) return;
 
@@ -259,6 +259,7 @@ export function renderWeekStrip() {
     container.appendChild(el);
   });
 }
+
 
 
 
