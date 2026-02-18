@@ -2,7 +2,11 @@ const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
 
 
+import { getToken, getUserIdFromToken } from "./auth.js";
+
+
 // ================= LOGIN =================
+
 
 async function login() {
   const email = document.getElementById("email")?.value;
@@ -38,21 +42,6 @@ async function login() {
 
 
 // ================= UTIL =================
-
-function parseJwt(token) {
-  return JSON.parse(atob(token.split('.')[1]));
-}
-
-function getToken() {
-  return localStorage.getItem("token");
-}
-
-function getUserIdFromToken() {
-  const token = getToken();
-  if (!token) return null;
-  const user = parseJwt(token);
-  return user.sub;
-}
 
 function getTodayString() {
   const today = new Date();
