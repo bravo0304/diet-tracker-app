@@ -1,3 +1,25 @@
+:root {
+  --protein-color: #e05d52;
+  --fat-color: #4f7bd9;
+  --carbs-color: #3ca374;
+}
+
+
+.macro-protein {
+  color: var(--protein-color);
+}
+
+.macro-fat {
+  color: var(--fat-color);
+}
+
+.macro-carbs {
+  color: var(--carbs-color);
+}
+
+
+
+
 /* ===== BASE ===== */
 
 body {
