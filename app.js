@@ -168,13 +168,14 @@ async function loadDashboard() {
     li.classList.add("meal-row");
 
     li.innerHTML = `
-      <div class="meal-left">
-        <div class="meal-name">${m.food_name}</div>
-        <div class="meal-macros">
-          <span style="color:#e0564a;">P ${m.protein}g</span> • 
-          <span style="color:#3b82f6;">F ${m.fat}g</span> • 
-          <span style="color:#10b981;">C ${m.carbs}g</span>
-        </div>
+     <li class="meal-row">
+  <div class="meal-left">
+    <div class="meal-name">${m.food_name}</div>
+    <div class="meal-macros">
+      <span class="macro-protein">P ${m.protein}g</span> • 
+      <span class="macro-fat">F ${m.fat}g</span> • 
+      <span class="macro-carbs">C ${m.carbs}g</span>
+    </div>
       </div>
       <div class="meal-right">
         <div class="meal-calories">${m.calories} kcal</div>
