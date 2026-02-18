@@ -4,14 +4,7 @@ import { getToken, getUserIdFromToken } from "./js/auth.js";
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
 
-
-
-
-
-
 // ================= UTIL =================
-
-
 
 function getTodayString() {
   const today = new Date();
@@ -298,6 +291,27 @@ function startDailyTimer() {
 
 document.addEventListener("DOMContentLoaded", () => {
 
+
+const sheet = document.getElementById("mealSheet");
+const overlay = document.getElementById("sheetOverlay");
+const openBtn = document.getElementById("newEntryBtn");
+const cancelBtn = document.getElementById("cancelMeal");
+
+openBtn.addEventListener("click", () => {
+  sheet.classList.add("active");
+  overlay.classList.add("active");
+});
+
+function closeSheet() {
+  sheet.classList.remove("active");
+  overlay.classList.remove("active");
+}
+
+overlay.addEventListener("click", closeSheet);
+cancelBtn.addEventListener("click", closeSheet);
+
+
+  
   if (document.getElementById("caloriesLabel")) {
     loadDashboard();
     startDailyTimer();
