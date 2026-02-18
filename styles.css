@@ -197,3 +197,23 @@ body {
   position: relative;
 }
 
+
+.meal-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.delete-btn:hover {
+  color: #FF6B4A;
+}
+
