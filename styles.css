@@ -118,12 +118,14 @@ body {
 
 .week-strip {
   display: flex;
+  width: 100%;
   overflow-x: auto;
+
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
 
-  width: 100%;
-  margin-bottom: 20px;
+  margin: 20px 0 30px;
+  padding: 0;
 
   scrollbar-width: none;
 }
@@ -141,8 +143,9 @@ body {
   align-items: center;
   justify-content: center;
 
-  padding: 12px 0;
-  border-radius: 16px;
+  padding: 14px 0;
+
+  border-radius: 18px;
   border: 1px solid var(--border);
   background: var(--card-bg);
 
@@ -151,32 +154,27 @@ body {
 }
 
 
-.week-day.clickable {
-  cursor: pointer;
-}
-
 .week-day.clickable:hover {
-  background: var(--bg);
-  border-color: var(--primary);
+  background: #f8fafc;
 }
 
 .week-day.selected {
   background: var(--primary);
   color: white;
   border: none;
-  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.25);
+  box-shadow: 0 6px 18px rgba(15,118,110,0.25);
 }
 
 .week-day.today:not(.selected) {
-  background: var(--primary-light);
   border: 2px solid var(--primary);
+  background: var(--primary-light);
 }
 
 .week-day.locked {
   opacity: 0.35;
   pointer-events: none;
-  background: var(--bg);
 }
+
 
 .weekday-label {
   font-size: 12px;
