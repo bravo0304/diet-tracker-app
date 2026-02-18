@@ -21,6 +21,12 @@
 .fat-fill { background: var(--fat-color); }
 .carbs-fill { background: var(--carbs-color); }
 
+.protein-fill,
+.fat-fill,
+.carbs-fill {
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
 
 
 
