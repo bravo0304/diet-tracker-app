@@ -1,6 +1,8 @@
 import { getToken, getUserIdFromToken } from "./js/auth.js";
 console.log("APP LOADED");
 
+console.log("APP START");
+
 
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
