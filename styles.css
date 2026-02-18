@@ -188,3 +188,12 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
+
+.ring {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: conic-gradient(#FF6B4A 0%, #E5E5E5 0%);
+  position: relative;
+}
+
