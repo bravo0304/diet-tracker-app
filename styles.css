@@ -119,23 +119,25 @@ body {
 .week-strip {
   display: flex;
   width: 100%;
-  overflow-x: auto;
+  gap: 6px;
 
+  overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
 
   margin: 20px 0 30px;
   padding: 0;
 
-  scrollbar-width: none;
+  scrollbar-width: none;       /* Firefox */
 }
 
 .week-strip::-webkit-scrollbar {
-  display: none;
+  display: none;               /* Chrome / Safari */
 }
 
+
 .week-day {
-  flex: 0 0 calc(100% / 7);
+  flex: 0 0 calc((100% - 36px) / 7); /* 6 gaps × 6px = 36px */
   scroll-snap-align: start;
 
   display: flex;
@@ -143,7 +145,7 @@ body {
   align-items: center;
   justify-content: center;
 
-  padding: 12px 4px;   /* slightly tighter horizontal padding */
+  padding: 12px 4px;
 
   border-radius: 18px;
   border: 1px solid var(--border);
@@ -152,6 +154,8 @@ body {
   font-weight: 500;
   transition: all 0.2s ease;
 }
+
+
 
 
 
