@@ -279,12 +279,14 @@ function updateBar(id, consumed, target) {
 
 function startDailyTimer() {
   const timerEl = document.getElementById("timerText");
+  const dateLabel = document.getElementById("currentDateLabel");
   if (!timerEl) return;
 
   function updateTimer() {
     const now = new Date();
     const midnight = new Date();
     midnight.setHours(24, 0, 0, 0);
+
     const diff = midnight - now;
 
     const hours = String(Math.floor(diff / 3600000)).padStart(2, "0");
@@ -292,6 +294,14 @@ function startDailyTimer() {
     const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, "0");
 
     timerEl.innerText = `Reset in ${hours}:${minutes}:${seconds}`;
+
+    if (dateLabel) {
+      dateLabel.innerText = "Today";
+    }
+
+    if (diff <= 0) {
+      location.reload();
+    }
   }
 
   updateTimer();
