@@ -1,76 +1,5 @@
+import { saveMeal, deleteMeal, getTodayString } from "./js/api.js";
 import { getToken, getUserIdFromToken } from "./js/auth.js";
-
-import { saveMeal, deleteMeal, getTodayString } from "./api.js";
-import { getToken, getUserIdFromToken } from "./auth.js";
-
-
-// ================= UTIL =================
-
-function getTodayString() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return today.toISOString().split("T")[0];
-}
-
-// ================= API =================
-
-async function saveMeal(meal) {
-  const token = getToken();
-  const user_id = getUserIdFromToken();
-
-  if (!token || !user_id) {
-    window.location.href = "/";
-    return;
-  }
-
-  const today = getTodayString();
-
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/meals`, {
-    method: "POST",
-    headers: {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json",
-      "Prefer": "return=minimal"
-    },
-    body: JSON.stringify({
-      user_id,
-      food_name: meal.food_name,
-      calories: meal.calories,
-      protein: meal.protein,
-      carbs: meal.carbs,
-      fat: meal.fat,
-      meal_type: "general",
-      date: today
-    })
-  });
-
-  if (!res.ok) {
-    alert("Error saving meal.");
-  }
-}
-
-async function deleteMeal(id) {
-  const token = getToken();
-
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/meals?id=eq.${id}`,
-    {
-      method: "DELETE",
-      headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${token}`
-      }
-    }
-  );
-
-  if (!res.ok) {
-    alert("Failed to delete meal.");
-    return;
-  }
-
-  loadDashboard();
-}
 
 // ================= RING =================
 
@@ -108,11 +37,11 @@ async function loadDashboard() {
 
   // PROFILE
   const profileRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/profiles?id=eq.${user_id}&select=*`,
+    `https://rvwozaxippmuwwekubbn.supabase.co/rest/v1/profiles?id=eq.${user_id}&select=*`,
     {
       headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${token}`
+        apikey: "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM",
+        Authorization: `Bearer ${token}`
       }
     }
   );
@@ -140,11 +69,11 @@ async function loadDashboard() {
 
   // MEALS
   const mealsRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&date=eq.${todayStr}&select=*`,
+    `https://rvwozaxippmuwwekubbn.supabase.co/rest/v1/meals?user_id=eq.${user_id}&date=eq.${todayStr}&select=*`,
     {
       headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${token}`
+        apikey: "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM",
+        Authorization: `Bearer ${token}`
       }
     }
   );
@@ -169,13 +98,13 @@ async function loadDashboard() {
     li.classList.add("meal-row");
 
     li.innerHTML = `
-  <div class="meal-left">
-    <div class="meal-name">${m.food_name}</div>
-    <div class="meal-macros">
-      <span class="macro-protein">P ${m.protein}g</span> • 
-      <span class="macro-fat">F ${m.fat}g</span> • 
-      <span class="macro-carbs">C ${m.carbs}g</span>
-    </div>
+      <div class="meal-left">
+        <div class="meal-name">${m.food_name}</div>
+        <div class="meal-macros">
+          <span class="macro-protein">P ${m.protein}g</span>
+          <span class="macro-fat">F ${m.fat}g</span>
+          <span class="macro-carbs">C ${m.carbs}g</span>
+        </div>
       </div>
       <div class="meal-right">
         <div class="meal-calories">${m.calories} kcal</div>
@@ -187,10 +116,9 @@ async function loadDashboard() {
   });
 
   document.querySelectorAll(".delete-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       await deleteMeal(btn.getAttribute("data-id"));
-loadDashboard();
-
+      loadDashboard();
     });
   });
 
@@ -299,5 +227,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loadDashboard();
   startDailyTimer();
-
 });
