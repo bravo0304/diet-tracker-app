@@ -235,16 +235,27 @@ async function loadCalories() {
     li.innerText = "No meals logged today";
     foodList.appendChild(li);
   } else {
-    meals.forEach((m, i) => {
+    meals.forEach((m) => {
       eatenCalories += m.calories || 0;
       eatenProtein += m.protein || 0;
       eatenFat += m.fat || 0;
       eatenCarbs += m.carbs || 0;
 
       const li = document.createElement("li");
-      li.innerText =
-        `${i + 1}. ${m.food_name} - ${m.calories} Cal | ` +
-        `P:${m.protein}g F:${m.fat}g C:${m.carbs}g`;
+      li.classList.add("meal-row");
+
+      li.innerHTML = `
+        <div class="meal-left">
+          <div class="meal-name">${m.food_name}</div>
+          <div class="meal-macros">
+            P ${m.protein}g • F ${m.fat}g • C ${m.carbs}g
+          </div>
+        </div>
+        <div class="meal-calories">
+          ${m.calories} kcal
+        </div>
+      `;
+
       foodList.appendChild(li);
     });
   }
