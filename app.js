@@ -1,4 +1,5 @@
 import { getToken, getUserIdFromToken } from "./js/auth.js";
+console.log("APP LOADED");
 
 
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
