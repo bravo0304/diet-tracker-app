@@ -1,34 +1,43 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+  const form = document.getElementById("settingsForm");
+  const unitSelect = document.getElementById("unitSelect");
+  const deficitToggle = document.getElementById("deficitToggle");
+  const surplusToggle = document.getElementById("surplusToggle");
+  const expertToggle = document.getElementById("expertToggle");
+
+  // ---------- LOAD SAVED SETTINGS ----------
   const saved = JSON.parse(localStorage.getItem("userSettings")) || {};
 
-  if (saved.units)
-    document.getElementById("unitSelect").value = saved.units;
+  if (saved.units) unitSelect.value = saved.units;
 
-  document.getElementById("deficitToggle").checked =
-    saved.weightLossDeficit ?? true;
+  deficitToggle.checked = saved.weightLossDeficit ?? true;
+  surplusToggle.checked = saved.muscleGainSurplus ?? true;
+  expertToggle.checked = saved.expertMacroOverride ?? false;
 
-  document.getElementById("surplusToggle").checked =
-    saved.muscleGainSurplus ?? true;
-
-  document.getElementById("expertToggle").checked =
-    saved.expertMacroOverride ?? false;
-
-  const form = document.getElementById("settingsForm");
-
+  // ---------- SAVE SETTINGS ----------
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
     const settings = {
-      units: document.getElementById("unitSelect").value,
-      weightLossDeficit: document.getElementById("deficitToggle").checked,
-      muscleGainSurplus: document.getElementById("surplusToggle").checked,
-      expertMacroOverride: document.getElementById("expertToggle").checked
+      units: unitSelect.value,
+      weightLossDeficit: deficitToggle.checked,
+      muscleGainSurplus: surplusToggle.checked,
+      expertMacroOverride: expertToggle.checked
     };
 
     localStorage.setItem("userSettings", JSON.stringify(settings));
 
-    alert("Settings saved!");
+    const btn = form.querySelector("button[type='submit']");
+    const originalText = btn.innerText;
+
+    btn.innerText = "Saved ✓";
+    btn.disabled = true;
+
+    setTimeout(() => {
+      btn.innerText = originalText;
+      btn.disabled = false;
+    }, 1500);
   });
 
 });
