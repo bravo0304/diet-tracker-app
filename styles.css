@@ -86,16 +86,15 @@ body {
 
 .week-strip {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
   gap: 10px;
-  margin: 20px 0 30px;
-    scrollbar-width: none;      /* Firefox */
+  overflow-x: auto;      /* allow horizontal scroll */
   padding: 0 4px 8px;
+  margin: 20px 0 30px;
+  scrollbar-width: none; /* Firefox */
 }
 
 .week-strip::-webkit-scrollbar {
-  display: none;              /* Chrome/Safari */
+  display: none;         /* Chrome/Safari */
 }
 
 
@@ -104,13 +103,15 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
+ flex: 0 0 auto;   /* prevents shrinking */
   min-width: 56px;
   padding: 10px 8px;
   border-radius: 16px;
   transition: all 0.2s ease;
   font-weight: 500;
 }
+
+
 
 /* Clickable */
 .week-day.clickable {
