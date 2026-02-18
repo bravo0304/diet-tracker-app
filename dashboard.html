@@ -19,20 +19,9 @@
 
   <main class="container">
 
-    <!-- DATE + TIMER -->
-    <div class="date-row">
-      <button class="date-arrow" id="prevDay">←</button>
-      <div class="date-center">
-        <div id="currentDateLabel">Today</div>
-        <div id="resetTimer" class="reset-timer">Reset in --:--</div>
-      </div>
-      <button class="date-arrow" id="nextDay">→</button>
-    </div>
-
     <!-- DAILY OVERVIEW -->
     <section class="card daily-overview">
 
-      <!-- CALORIES RING -->
       <div class="ring-wrapper">
         <canvas id="caloriesRing"></canvas>
         <div class="calories-text">
@@ -40,9 +29,9 @@
         </div>
       </div>
 
-      <!-- MACRO BARS -->
       <div class="macro-bars">
 
+        <!-- Protein -->
         <div class="macro-bar">
           <div class="macro-header">
             <span>Protein</span>
@@ -53,6 +42,7 @@
           </div>
         </div>
 
+        <!-- Fat -->
         <div class="macro-bar">
           <div class="macro-header">
             <span>Fat</span>
@@ -63,6 +53,7 @@
           </div>
         </div>
 
+        <!-- Carbs -->
         <div class="macro-bar">
           <div class="macro-header">
             <span>Carbs</span>
@@ -77,8 +68,8 @@
 
     </section>
 
-    <!-- DAILY FOOD LOG -->
-    <section id="daily-log" class="card">
+    <!-- DAILY LOG -->
+    <section class="card" id="daily-log">
       <h3>Daily Food Log</h3>
       <ul id="foodEntries"></ul>
       <button id="newEntryBtn" class="primary-btn">New Entry</button>
