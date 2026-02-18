@@ -116,8 +116,6 @@ async function saveMeal(meal) {
 }
 
 
-// ================= DASHBOARD =================
-
 async function loadDashboard() {
 
   const token = getToken();
@@ -162,7 +160,6 @@ async function loadDashboard() {
   const fatTarget = Math.round((targetCalories * 0.25) / 9);
   const carbsTarget = Math.round((targetCalories * 0.45) / 4);
 
-
   // ---- FETCH MEALS ----
   const mealsRes = await fetch(
     `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&date=eq.${todayStr}&select=*`,
@@ -185,7 +182,9 @@ async function loadDashboard() {
   if (foodList) foodList.innerHTML = "";
 
   if (Array.isArray(meals)) {
+
     meals.forEach((m) => {
+
       eatenCalories += m.calories || 0;
       eatenProtein += m.protein || 0;
       eatenFat += m.fat || 0;
@@ -194,6 +193,7 @@ async function loadDashboard() {
       if (foodList) {
         const li = document.createElement("li");
         li.classList.add("meal-row");
+
         li.innerHTML = `
           <div class="meal-left">
             <div class="meal-name">${m.food_name}</div>
@@ -201,13 +201,24 @@ async function loadDashboard() {
               P ${m.protein}g • F ${m.fat}g • C ${m.carbs}g
             </div>
           </div>
-          <div class="meal-calories">
-            ${m.calories} kcal
+
+          <div class="meal-right">
+            <div class="meal-calories">${m.calories} kcal</div>
+            <button class="delete-btn" data-id="${m.id}">✕</button>
           </div>
         `;
+
         foodList.appendChild(li);
       }
     });
+
+    // Attach delete listeners AFTER list built
+    document.querySelectorAll(".delete-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        deleteMeal(btn.getAttribute("data-id"));
+      });
+    });
+
   }
 
   // ---- UPDATE RING ----
@@ -237,6 +248,29 @@ async function loadDashboard() {
   document.getElementById("carbsLabel").innerText =
     `${eatenCarbs} / ${carbsTarget} g`;
 }
+
+async function deleteMeal(id) {
+  const token = getToken();
+
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/meals?id=eq.${id}`,
+    {
+      method: "DELETE",
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${token}`
+      }
+    }
+  );
+
+  if (!res.ok) {
+    alert("Failed to delete meal.");
+    return;
+  }
+
+  loadDashboard();
+}
+
 
 
 function updateBar(id, consumed, target) {
