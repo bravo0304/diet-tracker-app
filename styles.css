@@ -244,3 +244,11 @@ body {
 #saveMealBtn:hover {
   background: #e85c3d;
 }
+
+
+.macro-input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+/* ---------- MODAL  End ---------- */
