@@ -1,13 +1,20 @@
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
 
-// ---------- LOGIN ----------
+
+// ================= LOGIN =================
+
 async function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = document.getElementById("email")?.value;
+  const password = document.getElementById("password")?.value;
   const status = document.getElementById("status");
 
-  status.innerText = "Logging in...";
+  if (!email || !password) {
+    if (status) status.innerText = "Enter email and password";
+    return;
+  }
+
+  if (status) status.innerText = "Logging in...";
 
   const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
     method: "POST",
@@ -21,7 +28,7 @@ async function login() {
   const data = await res.json();
 
   if (!data.access_token) {
-    status.innerText = "Login failed";
+    if (status) status.innerText = "Login failed";
     return;
   }
 
@@ -29,7 +36,9 @@ async function login() {
   window.location.href = "/dashboard.html";
 }
 
-// ---------- UTIL ----------
+
+// ================= UTIL =================
+
 function parseJwt(token) {
   return JSON.parse(atob(token.split('.')[1]));
 }
@@ -51,7 +60,9 @@ function getTodayString() {
   return today.toISOString().split("T")[0];
 }
 
-// ---------- ADD MEAL MODAL ----------
+
+// ================= MODAL =================
+
 function openMealModal() {
   document.getElementById("mealModal")?.classList.remove("hidden");
 }
@@ -59,6 +70,9 @@ function openMealModal() {
 function closeMealModal() {
   document.getElementById("mealModal")?.classList.add("hidden");
 }
+
+
+// ================= SAVE MEAL =================
 
 async function saveMeal(meal) {
   const token = getToken();
@@ -93,70 +107,68 @@ async function saveMeal(meal) {
   });
 
   if (!res.ok) {
-    const err = await res.text();
-    console.error("Insert error:", err);
     alert("Error saving meal.");
     return;
   }
 
   closeMealModal();
-  loadCalories();
+  loadDashboard();
 }
 
-// ---------- DASHBOARD ----------
-var caloriesChart;
 
-function drawCaloriesRing(consumed, target) {
-  const ctx = document.getElementById("caloriesRing")?.getContext("2d");
-  if (!ctx) return;
+// ================= DELETE MEAL =================
 
-  if (caloriesChart) caloriesChart.destroy();
+async function deleteMeal(id) {
+  const token = getToken();
 
-  const remaining = Math.max(target - consumed, 0);
-
-  caloriesChart = new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      datasets: [{
-        data: consumed === 0 ? [1] : [consumed, remaining],
-        backgroundColor: consumed === 0 ? ["#EEEEEE"] : ["#FF6B4A", "#EEEEEE"],
-        borderWidth: 0
-      }]
-    },
-    options: {
-      cutout: "75%",
-      plugins: { legend: { display: false } },
-      responsive: false,
-      maintainAspectRatio: false
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/meals?id=eq.${id}`,
+    {
+      method: "DELETE",
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${token}`
+      }
     }
-  });
+  );
+
+  if (!res.ok) {
+    alert("Failed to delete meal.");
+    return;
+  }
+
+  loadDashboard();
 }
 
-function drawMacroPie(id, consumed, target, color) {
-  const ctx = document.getElementById(id)?.getContext("2d");
-  if (!ctx) return;
 
-  new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      datasets: [{
-        data: [consumed, Math.max(target - consumed, 0)],
-        backgroundColor: [color, "#EEEEEE"],
-        borderWidth: 0
-      }]
-    },
-    options: {
-      cutout: "70%",
-      plugins: { legend: { display: false } },
-      responsive: false,
-      maintainAspectRatio: false
+// ================= RING ANIMATION =================
+
+function animateRing(ring, targetPercent) {
+  let current = 0;
+  const step = targetPercent / 30;
+
+  function update() {
+    current += step;
+
+    if (current >= targetPercent) {
+      current = targetPercent;
     }
-  });
+
+    ring.style.background =
+      `conic-gradient(#FF6B4A ${current}%, #E5E5E5 ${current}%)`;
+
+    if (current < targetPercent) {
+      requestAnimationFrame(update);
+    }
+  }
+
+  requestAnimationFrame(update);
 }
 
-async function loadCalories() {
-  const caloriesLabel = document.getElementById("caloriesLabel");
-  if (!caloriesLabel) return;
+
+// ================= DASHBOARD =================
+
+async function loadDashboard() {
 
   const token = getToken();
   const user_id = getUserIdFromToken();
@@ -168,7 +180,7 @@ async function loadCalories() {
 
   const todayStr = getTodayString();
 
-  // ---------- FETCH PROFILE ----------
+  // ---- FETCH PROFILE ----
   const profileRes = await fetch(
     `${SUPABASE_URL}/rest/v1/profiles?id=eq.${user_id}&select=*`,
     {
@@ -180,10 +192,7 @@ async function loadCalories() {
   );
 
   const profiles = await profileRes.json();
-  if (!Array.isArray(profiles) || profiles.length === 0) {
-    console.error("Profile not found");
-    return;
-  }
+  if (!profiles || !profiles.length) return;
 
   const profile = profiles[0];
 
@@ -199,11 +208,12 @@ async function loadCalories() {
   const tdee = bmr * 1.4;
   const targetCalories = Math.round(tdee);
 
-  const proteinG = Math.round((targetCalories * 0.3) / 4);
-  const fatG = Math.round((targetCalories * 0.25) / 9);
-  const carbsG = Math.round((targetCalories * 0.45) / 4);
+  const proteinTarget = Math.round((targetCalories * 0.3) / 4);
+  const fatTarget = Math.round((targetCalories * 0.25) / 9);
+  const carbsTarget = Math.round((targetCalories * 0.45) / 4);
 
-  // ---------- FETCH MEALS ----------
+
+  // ---- FETCH MEALS ----
   const mealsRes = await fetch(
     `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&date=eq.${todayStr}&select=*`,
     {
@@ -216,67 +226,91 @@ async function loadCalories() {
 
   const meals = await mealsRes.json();
 
-  if (!Array.isArray(meals)) {
-    console.error("Meals error:", meals);
-    return;
-  }
-
-  let eatenCalories = 0,
-      eatenProtein = 0,
-      eatenFat = 0,
-      eatenCarbs = 0;
+  let eatenCalories = 0;
+  let eatenProtein = 0;
+  let eatenFat = 0;
+  let eatenCarbs = 0;
 
   const foodList = document.getElementById("foodEntries");
-  foodList.innerHTML = "";
+  if (foodList) foodList.innerHTML = "";
 
-  if (meals.length === 0) {
-    const li = document.createElement("li");
-    li.style.color = "#666";
-    li.innerText = "No meals logged today";
-    foodList.appendChild(li);
-  } else {
+  if (Array.isArray(meals)) {
+
     meals.forEach((m) => {
+
       eatenCalories += m.calories || 0;
       eatenProtein += m.protein || 0;
       eatenFat += m.fat || 0;
       eatenCarbs += m.carbs || 0;
 
-      const li = document.createElement("li");
-      li.classList.add("meal-row");
+      if (foodList) {
+        const li = document.createElement("li");
+        li.classList.add("meal-row");
 
-      li.innerHTML = `
-        <div class="meal-left">
-          <div class="meal-name">${m.food_name}</div>
-          <div class="meal-macros">
-            P ${m.protein}g • F ${m.fat}g • C ${m.carbs}g
+        li.innerHTML = `
+          <div class="meal-left">
+            <div class="meal-name">${m.food_name}</div>
+            <div class="meal-macros">
+              P ${m.protein}g • F ${m.fat}g • C ${m.carbs}g
+            </div>
           </div>
-        </div>
-        <div class="meal-calories">
-          ${m.calories} kcal
-        </div>
-      `;
 
-      foodList.appendChild(li);
+          <div class="meal-right">
+            <div class="meal-calories">${m.calories} kcal</div>
+            <button class="delete-btn" data-id="${m.id}">✕</button>
+          </div>
+        `;
+
+        foodList.appendChild(li);
+      }
+    });
+
+    document.querySelectorAll(".delete-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        deleteMeal(btn.getAttribute("data-id"));
+      });
     });
   }
 
-  caloriesLabel.innerText = `${eatenCalories} / ${targetCalories} kcal`;
-  document.getElementById("proteinLabel").innerText =
-    `Protein: ${eatenProtein} / ${proteinG} g`;
-  document.getElementById("fatLabel").innerText =
-    `Fat: ${eatenFat} / ${fatG} g`;
-  document.getElementById("carbsLabel").innerText =
-    `Carbs: ${eatenCarbs} / ${carbsG} g`;
+  // ---- UPDATE RING ----
+  const caloriesLabel = document.getElementById("caloriesLabel");
+  if (caloriesLabel) {
+    caloriesLabel.innerText = `${eatenCalories} / ${targetCalories} kcal`;
+  }
 
-  drawCaloriesRing(eatenCalories, targetCalories);
-  drawMacroPie("proteinPie", eatenProtein, proteinG, "#FF6B4A");
-  drawMacroPie("fatPie", eatenFat, fatG, "#4ABEFF");
-  drawMacroPie("carbsPie", eatenCarbs, carbsG, "#28A745");
+  const percent = Math.min((eatenCalories / targetCalories) * 100, 100);
+  const ring = document.getElementById("caloriesRing");
+  if (ring) {
+    animateRing(ring, percent);
+  }
+
+  // ---- UPDATE BARS ----
+  updateBar("proteinBar", eatenProtein, proteinTarget);
+  updateBar("fatBar", eatenFat, fatTarget);
+  updateBar("carbsBar", eatenCarbs, carbsTarget);
+
+  document.getElementById("proteinLabel").innerText =
+    `${eatenProtein} / ${proteinTarget} g`;
+
+  document.getElementById("fatLabel").innerText =
+    `${eatenFat} / ${fatTarget} g`;
+
+  document.getElementById("carbsLabel").innerText =
+    `${eatenCarbs} / ${carbsTarget} g`;
 }
 
 
+// ================= UPDATE BAR =================
+
+function updateBar(id, consumed, target) {
+  const bar = document.getElementById(id);
+  if (!bar) return;
+  const percent = Math.min((consumed / target) * 100, 100);
+  bar.style.width = percent + "%";
+}
 
 
+// ================= TIMER =================
 
 function startDailyTimer() {
   const timerEl = document.getElementById("timerText");
@@ -289,15 +323,11 @@ function startDailyTimer() {
 
     const diff = midnight - now;
 
-    const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
-    const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, "0");
+    const hours = String(Math.floor(diff / 3600000)).padStart(2, "0");
+    const minutes = String(Math.floor((diff / 60000) % 60)).padStart(2, "0");
     const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, "0");
 
-    timerEl.innerText = `Time to reset: ${hours}:${minutes}:${seconds}`;
-
-    if (diff <= 0) {
-      location.reload();
-    }
+    timerEl.innerText = `Reset in ${hours}:${minutes}:${seconds}`;
   }
 
   updateTimer();
@@ -305,17 +335,16 @@ function startDailyTimer() {
 }
 
 
+// ================= INIT =================
 
-// ---------- INIT ----------
 document.addEventListener("DOMContentLoaded", () => {
-  loadCalories();  
-  startDailyTimer();
 
-  const newEntryBtn = document.getElementById("newEntryBtn");
-  if (newEntryBtn) {
-    newEntryBtn.addEventListener("click", openMealModal);
+  if (document.getElementById("caloriesLabel")) {
+    loadDashboard();
+    startDailyTimer();
   }
 
+  document.getElementById("newEntryBtn")?.addEventListener("click", openMealModal);
   document.getElementById("cancelMeal")?.addEventListener("click", closeMealModal);
 
   document.getElementById("saveMealBtn")?.addEventListener("click", async () => {
@@ -332,4 +361,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     await saveMeal({ food_name, calories, protein, carbs, fat });
   });
+
 });
