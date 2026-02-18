@@ -156,6 +156,38 @@ body {
   border-bottom: 1px solid #eee;
 }
 
+
+.meal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.meal-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meal-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.meal-macros {
+  font-size: 13px;
+  color: #777;
+}
+
+.meal-calories {
+  font-weight: 600;
+  color: #333;
+}
+
+
+
 /* ---------- MODAL ---------- */
 
 .modal {
