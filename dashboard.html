@@ -3,89 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Diet Tracker - Dashboard</title>
+
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
+
+  <!-- NAVBAR -->
   <header class="navbar">
-    <h1>My Diet Tracker - Dashboard</h1>
+    <h1>My Diet Tracker</h1>
     <a href="settings.html" class="primary-btn">Settings</a>
   </header>
 
   <main class="container">
 
-    <!-- Top Summary: Calories Ring -->
-   <div id="top-summary" class="card">
-  <canvas id="caloriesRing"></canvas>
+    <!-- DATE ROW -->
+    <div class="date-row">
+      <button class="date-arrow" id="prevDay">←</button>
 
-  <div class="calories-text">
-    <span id="caloriesLabel">Loading...</span>
-  </div>
+      <div class="date-center">
+        <div id="currentDateLabel">Today</div>
+        <div id="resetTimer" class="reset-timer">Reset in --:--</div>
+      </div>
 
-     <div id="timerText" class="timer-text"></div>
-
-</div>
-
-
-<!-- DATE ROW -->
-<div class="date-row">
-  <button class="date-arrow" id="prevDay">←</button>
-  <div class="date-center">
-    <div id="currentDateLabel">Today</div>
-    <div id="resetTimer" class="reset-timer">Reset in --:--</div>
-  </div>
-  <button class="date-arrow" id="nextDay">→</button>
-</div>
-
-<!-- CALORIES RING -->
-<section id="top-summary" class="card">
-  <canvas id="caloriesRing" width="200" height="200"></canvas>
-  <div class="calories-text" id="caloriesLabel">0 / 0 kcal</div>
-</section>
-
-<!-- MACRO BARS -->
-<section class="macro-bars card">
-  <div class="macro-bar">
-    <div class="macro-header">
-      <span>Protein</span>
-      <span id="proteinLabel">0 / 0 g</span>
+      <button class="date-arrow" id="nextDay">→</button>
     </div>
-    <div class="bar-bg">
-      <div class="bar-fill protein-fill" id="proteinBar"></div>
-    </div>
-  </div>
 
-  <div class="macro-bar">
-    <div class="macro-header">
-      <span>Fat</span>
-      <span id="fatLabel">0 / 0 g</span>
-    </div>
-    <div class="bar-bg">
-      <div class="bar-fill fat-fill" id="fatBar"></div>
-    </div>
-  </div>
+    <!-- BIG CALORIES RING -->
+    <div id="top-summary" class="card">
+      <canvas id="caloriesRing"></canvas>
 
-  <div class="macro-bar">
-    <div class="macro-header">
-      <span>Carbs</span>
-      <span id="carbsLabel">0 / 0 g</span>
+      <div class="calories-text">
+        <span id="caloriesLabel">Loading...</span>
+      </div>
     </div>
-    <div class="bar-bg">
-      <div class="bar-fill carbs-fill" id="carbsBar"></div>
-    </div>
-  </div>
-</section>
 
+    <!-- MACRO BARS -->
+    <section class="macro-bars card">
 
+      <!-- PROTEIN -->
+      <div class="macro-bar">
+        <div class="macro-header">
+          <span>Protein</span>
+          <span id="proteinLabel">0 / 0 g</span>
+        </div>
+        <div class="bar-bg">
+          <div class="bar-fill protein-fill" id="proteinBar"></div>
+        </div>
+      </div>
 
-    <!-- Daily Food Log -->
+      <!-- FAT -->
+      <div class="macro-bar">
+        <div class="macro-header">
+          <span>Fat</span>
+          <span id="fatLabel">0 / 0 g</span>
+        </div>
+        <div class="bar-bg">
+          <div class="bar-fill fat-fill" id="fatBar"></div>
+        </div>
+      </div>
+
+      <!-- CARBS -->
+      <div class="macro-bar">
+        <div class="macro-header">
+          <span>Carbs</span>
+          <span id="carbsLabel">0 / 0 g</span>
+        </div>
+        <div class="bar-bg">
+          <div class="bar-fill carbs-fill" id="carbsBar"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- DAILY FOOD LOG -->
     <div id="daily-log" class="card">
       <h3>Daily Food Log</h3>
       <ul id="foodEntries"></ul>
+
+      <!-- This will later become floating + -->
       <button id="newEntryBtn" class="primary-btn">New Entry</button>
     </div>
-
-  </main>
 
   </main>
 
@@ -96,13 +96,12 @@
 
       <input id="mealName" placeholder="Food name" />
 
-<div class="macro-input-grid">
-  <input id="mealCalories" type="number" placeholder="Calories" />
-  <input id="mealProtein" type="number" placeholder="Protein (g)" />
-  <input id="mealCarbs" type="number" placeholder="Carbs (g)" />
-  <input id="mealFat" type="number" placeholder="Fat (g)" />
-</div>
-
+      <div class="macro-input-grid">
+        <input id="mealCalories" type="number" placeholder="Calories" />
+        <input id="mealProtein" type="number" placeholder="Protein (g)" />
+        <input id="mealCarbs" type="number" placeholder="Carbs (g)" />
+        <input id="mealFat" type="number" placeholder="Fat (g)" />
+      </div>
 
       <div class="modal-actions">
         <button id="cancelMeal">Cancel</button>
@@ -112,12 +111,6 @@
   </div>
 
   <script src="app.js"></script>
-</body>
-</html>
 
-
-
-  
-  <script src="app.js"></script>
 </body>
 </html>
