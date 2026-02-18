@@ -350,3 +350,17 @@ body {
   background: rgba(0,0,0,0.05);
 }
 
+.week-day.selected {
+  background: #077a7d;
+  color: white;
+}
+
+.week-day.selected .weekday-label {
+  opacity: 0.8;
+}
+
+.week-day.today:not(.selected) {
+  border: 2px solid #077a7d;
+}
+
+
