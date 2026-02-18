@@ -17,9 +17,10 @@
   color: var(--carbs-color);
 }
 
-.protein-fill { background: #e05d52; }
-.fat-fill { background: #4f7bd9; }
-.carbs-fill { background: #3ca374; }
+.protein-fill { background: var(--protein-color); }
+.fat-fill { background: var(--fat-color); }
+.carbs-fill { background: var(--carbs-color); }
+
 
 
 
