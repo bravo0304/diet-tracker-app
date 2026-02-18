@@ -1,6 +1,7 @@
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
 
+
 // ================= LOGIN =================
 
 async function login() {
@@ -35,6 +36,7 @@ async function login() {
   window.location.href = "/dashboard.html";
 }
 
+
 // ================= UTIL =================
 
 function parseJwt(token) {
@@ -58,6 +60,7 @@ function getTodayString() {
   return today.toISOString().split("T")[0];
 }
 
+
 // ================= MODAL =================
 
 function openMealModal() {
@@ -67,6 +70,7 @@ function openMealModal() {
 function closeMealModal() {
   document.getElementById("mealModal")?.classList.add("hidden");
 }
+
 
 // ================= SAVE MEAL =================
 
@@ -111,6 +115,7 @@ async function saveMeal(meal) {
   loadDashboard();
 }
 
+
 // ================= DELETE MEAL =================
 
 async function deleteMeal(id) {
@@ -134,6 +139,32 @@ async function deleteMeal(id) {
 
   loadDashboard();
 }
+
+
+// ================= RING ANIMATION =================
+
+function animateRing(ring, targetPercent) {
+  let current = 0;
+  const step = targetPercent / 30;
+
+  function update() {
+    current += step;
+
+    if (current >= targetPercent) {
+      current = targetPercent;
+    }
+
+    ring.style.background =
+      `conic-gradient(#FF6B4A ${current}%, #E5E5E5 ${current}%)`;
+
+    if (current < targetPercent) {
+      requestAnimationFrame(update);
+    }
+  }
+
+  requestAnimationFrame(update);
+}
+
 
 // ================= DASHBOARD =================
 
@@ -180,6 +211,7 @@ async function loadDashboard() {
   const proteinTarget = Math.round((targetCalories * 0.3) / 4);
   const fatTarget = Math.round((targetCalories * 0.25) / 9);
   const carbsTarget = Math.round((targetCalories * 0.45) / 4);
+
 
   // ---- FETCH MEALS ----
   const mealsRes = await fetch(
@@ -249,8 +281,7 @@ async function loadDashboard() {
   const percent = Math.min((eatenCalories / targetCalories) * 100, 100);
   const ring = document.getElementById("caloriesRing");
   if (ring) {
-    ring.style.background =
-      `conic-gradient(#FF6B4A ${percent}%, #E5E5E5 ${percent}%)`;
+    animateRing(ring, percent);
   }
 
   // ---- UPDATE BARS ----
@@ -268,6 +299,9 @@ async function loadDashboard() {
     `${eatenCarbs} / ${carbsTarget} g`;
 }
 
+
+// ================= UPDATE BAR =================
+
 function updateBar(id, consumed, target) {
   const bar = document.getElementById(id);
   if (!bar) return;
@@ -275,11 +309,11 @@ function updateBar(id, consumed, target) {
   bar.style.width = percent + "%";
 }
 
+
 // ================= TIMER =================
 
 function startDailyTimer() {
   const timerEl = document.getElementById("timerText");
-  const dateLabel = document.getElementById("currentDateLabel");
   if (!timerEl) return;
 
   function updateTimer() {
@@ -294,19 +328,12 @@ function startDailyTimer() {
     const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, "0");
 
     timerEl.innerText = `Reset in ${hours}:${minutes}:${seconds}`;
-
-    if (dateLabel) {
-      dateLabel.innerText = "Today";
-    }
-
-    if (diff <= 0) {
-      location.reload();
-    }
   }
 
   updateTimer();
   setInterval(updateTimer, 1000);
 }
+
 
 // ================= INIT =================
 
@@ -317,11 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
     startDailyTimer();
   }
 
-  const newEntryBtn = document.getElementById("newEntryBtn");
-  if (newEntryBtn) {
-    newEntryBtn.addEventListener("click", openMealModal);
-  }
-
+  document.getElementById("newEntryBtn")?.addEventListener("click", openMealModal);
   document.getElementById("cancelMeal")?.addEventListener("click", closeMealModal);
 
   document.getElementById("saveMealBtn")?.addEventListener("click", async () => {
