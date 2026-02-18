@@ -219,6 +219,32 @@ const todayStr = activeDate.toISOString().split("T")[0];
     `${eatenCarbs} / ${carbsTarget} g`;
 }
 
+
+
+// ==================== Week strip ============
+export function renderWeekStrip() {
+  const container = document.getElementById("weekStrip");
+  if (!container) return;
+
+  const weekDays = getCurrentWeekDays();
+
+  container.innerHTML = "";
+
+  weekDays.forEach(day => {
+    const el = document.createElement("div");
+    el.classList.add("week-day");
+    el.dataset.date = day.iso;
+
+    el.innerHTML = `
+      <span class="weekday-label">${day.weekDay}</span>
+      <span class="weekday-number">${day.dayNumber}</span>
+    `;
+
+    container.appendChild(el);
+  });
+}
+
+
 // ================= TIMER =================
 
 export function startDailyTimer() {
