@@ -65,7 +65,7 @@ body {
   border-radius: 50%;
   background: conic-gradient(#FF6B4A 0%, #E5E5E5 0%);
   position: relative;
-   transition: background 0.6s ease;
+  transition: background 0.6s ease;
 }
 
 
