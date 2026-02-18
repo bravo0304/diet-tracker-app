@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Diet Tracker - Dashboard</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diet Tracker</title>
+
+  <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
 
-  <!-- CONTEXT BAR -->
-  <header class="context-bar">
-    <div class="app-title">My Diet Tracker</div>
+  <!-- TOP CONTEXT BAR -->
+  <header class="top-bar">
+    <div class="top-left">Diet Tracker</div>
     <a href="settings.html" class="settings-link">Settings</a>
   </header>
 
@@ -33,7 +34,7 @@
     <section class="card daily-overview">
 
       <div class="ring-wrapper">
-        <div id="caloriesRing"></div>
+        <div id="caloriesRing" class="ring"></div>
         <div class="calories-text">
           <span id="caloriesLabel">0 / 0 kcal</span>
         </div>
@@ -41,6 +42,7 @@
 
       <div class="macro-bars">
 
+        <!-- Protein -->
         <div class="macro-bar">
           <div class="macro-header">
             <span>Protein</span>
@@ -51,6 +53,7 @@
           </div>
         </div>
 
+        <!-- Fat -->
         <div class="macro-bar">
           <div class="macro-header">
             <span>Fat</span>
@@ -61,6 +64,7 @@
           </div>
         </div>
 
+        <!-- Carbs -->
         <div class="macro-bar">
           <div class="macro-header">
             <span>Carbs</span>
@@ -72,10 +76,11 @@
         </div>
 
       </div>
+
     </section>
 
     <!-- DAILY LOG -->
-    <section class="card" id="daily-log">
+    <section class="card">
       <h3>Daily Food Log</h3>
       <ul id="foodEntries"></ul>
       <button id="newEntryBtn" class="primary-btn">Add Meal</button>
@@ -88,7 +93,6 @@
 
   <!-- BOTTOM SHEET -->
   <div id="mealSheet" class="bottom-sheet">
-
     <div class="sheet-handle"></div>
 
     <div class="sheet-content">
