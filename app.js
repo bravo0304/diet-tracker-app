@@ -168,7 +168,6 @@ async function loadDashboard() {
     li.classList.add("meal-row");
 
     li.innerHTML = `
-     <li class="meal-row">
   <div class="meal-left">
     <div class="meal-name">${m.food_name}</div>
     <div class="meal-macros">
