@@ -17,9 +17,42 @@ export function setSelectedDate(date) {
   selectedDate.setHours(0, 0, 0, 0);
 }
 
-// ================= End =================
+// ================= WEEK STATE =================
 
+let currentWeekStart = getMonday(selectedDate);
 
+function getMonday(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+export function setCurrentWeekStart(date) {
+  currentWeekStart = getMonday(date);
+}
+
+export function getCurrentWeekDays() {
+  const days = [];
+
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(currentWeekStart);
+    day.setDate(currentWeekStart.getDate() + i);
+
+    days.push({
+      date: new Date(day),
+      iso: day.toISOString().split("T")[0],
+      dayNumber: day.getDate(),
+      weekDay: day.toLocaleDateString("en-US", { weekday: "short" })
+    });
+  }
+
+  return days;
+}
+
+// ================= SUPABASE =================
 
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
@@ -62,16 +95,11 @@ export async function loadDashboard(dateOverride = null) {
     return;
   }
 
-  const activeDate = dateOverride 
-  ? new Date(dateOverride) 
-  : selectedDate;
+  const activeDate = dateOverride ? new Date(dateOverride) : selectedDate;
+  activeDate.setHours(0, 0, 0, 0);
 
-activeDate.setHours(0, 0, 0, 0);
+  const dateStr = activeDate.toISOString().split("T")[0];
 
-const todayStr = activeDate.toISOString().split("T")[0];
-
-
-  // PROFILE
   const profileRes = await fetch(
     `${SUPABASE_URL}/rest/v1/profiles?id=eq.${user_id}&select=*`,
     {
@@ -103,9 +131,8 @@ const todayStr = activeDate.toISOString().split("T")[0];
   const fatTarget = Math.round((targetCalories * 0.25) / 9);
   const carbsTarget = Math.round((targetCalories * 0.45) / 4);
 
-  // MEALS
   const mealsRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&date=eq.${todayStr}&select=*`,
+    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&date=eq.${dateStr}&select=*`,
     {
       headers: {
         apikey: SUPABASE_KEY,
@@ -154,7 +181,7 @@ const todayStr = activeDate.toISOString().split("T")[0];
   document.querySelectorAll(".delete-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
       await deleteMeal(btn.getAttribute("data-id"));
-      loadDashboard();
+      loadDashboard(activeDate);
     });
   });
 
@@ -174,6 +201,60 @@ const todayStr = activeDate.toISOString().split("T")[0];
     `${eatenFat} / ${fatTarget} g`;
   document.getElementById("carbsLabel").innerText =
     `${eatenCarbs} / ${carbsTarget} g`;
+}
+
+// ================= WEEK STRIP =================
+
+export function renderWeekStrip() {
+  const container = document.getElementById("weekStrip");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  const weekDays = getCurrentWeekDays();
+  const todayISO = todayDate.toISOString().split("T")[0];
+  const selectedISO = selectedDate.toISOString().split("T")[0];
+
+  weekDays.forEach(day => {
+    const el = document.createElement("div");
+    el.classList.add("week-day");
+
+    const diffDays = Math.floor(
+      (todayDate - day.date) / (1000 * 60 * 60 * 24)
+    );
+
+    const isFuture = diffDays < 0;
+    const isLocked = diffDays > 3;
+    const isToday = day.iso === todayISO;
+    const isSelected = day.iso === selectedISO;
+
+    if (isSelected) {
+      el.classList.add("selected");
+    } else if (isLocked || isFuture) {
+      el.classList.add("locked");
+    } else {
+      el.classList.add("clickable");
+    }
+
+    if (isToday && !isSelected) {
+      el.classList.add("today");
+    }
+
+    el.innerHTML = `
+      <span class="weekday-label">${day.weekDay}</span>
+      <span class="weekday-number">${day.dayNumber}</span>
+    `;
+
+    if (!isLocked && !isFuture) {
+      el.addEventListener("click", () => {
+        setSelectedDate(day.date);
+        renderWeekStrip();
+        loadDashboard(day.date);
+      });
+    }
+
+    container.appendChild(el);
+  });
 }
 
 // ================= TIMER =================

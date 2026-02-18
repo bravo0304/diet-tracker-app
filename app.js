@@ -1,5 +1,7 @@
 import { saveMeal } from "./js/api.js";
-import { loadDashboard, startDailyTimer } from "./js/dashboard.js";
+import { loadDashboard, startDailyTimer, renderWeekStrip, getSelectedDate } from "./js/dashboard.js";
+
+
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -40,7 +42,14 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    await saveMeal({ food_name, calories, protein, carbs, fat });
+    const selectedDateObj = getSelectedDate();
+    const dateString = selectedDateObj.toISOString().split("T")[0];
+
+    await saveMeal(
+      { food_name, calories, protein, carbs, fat },
+      dateString
+    );
+
 
     closeSheet();
     loadDashboard();
@@ -54,6 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     saveBtn.dataset.loading = "false";
   });
 
+  renderWeekStrip();
   loadDashboard();
   startDailyTimer();
 });
