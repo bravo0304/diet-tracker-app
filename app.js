@@ -1,4 +1,4 @@
-import { getToken, getUserIdFromToken } from "/js/auth.js";
+import { getToken, getUserIdFromToken } from "./js/auth.js";
 
 
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
