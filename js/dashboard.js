@@ -223,6 +223,7 @@ const todayStr = activeDate.toISOString().split("T")[0];
 
 // ==================== Week strip ============
 export function renderWeekStrip() {
+ export function renderWeekStrip() {
   const container = document.getElementById("weekStrip");
   if (!container) return;
 
@@ -235,14 +236,30 @@ export function renderWeekStrip() {
     el.classList.add("week-day");
     el.dataset.date = day.iso;
 
+    const isToday =
+      day.iso === todayDate.toISOString().split("T")[0];
+
+    const isSelected =
+      day.iso === selectedDate.toISOString().split("T")[0];
+
+    if (isToday) el.classList.add("today");
+    if (isSelected) el.classList.add("selected");
+
     el.innerHTML = `
       <span class="weekday-label">${day.weekDay}</span>
       <span class="weekday-number">${day.dayNumber}</span>
     `;
 
+    el.addEventListener("click", () => {
+      setSelectedDate(day.date);
+      renderWeekStrip();
+      loadDashboard(day.date);
+    });
+
     container.appendChild(el);
   });
 }
+
 
 
 // ================= TIMER =================
