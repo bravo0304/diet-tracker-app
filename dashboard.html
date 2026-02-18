@@ -1,38 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Diet Tracker - Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
 
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
 
-  <!-- NAVBAR -->
-  <header class="navbar">
-    <h1>My Diet Tracker</h1>
-    <a href="settings.html" class="primary-btn">Settings</a>
+  <!-- TOP CONTEXT BAR -->
+  <header class="top-bar">
+    <div class="top-left">Dashboard - Daily Goal</div>
+    <a href="settings.html" class="settings-link">Settings</a>
   </header>
 
   <main class="container">
 
-<!-- DATE ROW -->
-<div class="date-row">
-  <button class="date-arrow" id="prevDay">←</button>
+    <!-- DATE ROW -->
+    <div class="date-row">
+      <button class="date-arrow" id="prevDay">←</button>
 
-  <div class="date-center">
-    <div id="currentDateLabel">Today</div>
-    <div id="timerText" class="reset-timer">Reset in --:--:--</div>
-  </div>
+      <div class="date-center">
+        <div id="currentDateLabel">Today</div>
+        <div id="timerText" class="reset-timer">Reset in --:--:--</div>
+      </div>
 
-  <button class="date-arrow" id="nextDay">→</button>
-</div>
+      <button class="date-arrow" id="nextDay">→</button>
+    </div>
 
-
-    
     <!-- DAILY OVERVIEW -->
     <section class="card daily-overview">
 
@@ -83,17 +80,22 @@
     </section>
 
     <!-- DAILY LOG -->
-    <section class="card" id="daily-log">
+    <section class="card">
       <h3>Daily Food Log</h3>
       <ul id="foodEntries"></ul>
-      <button id="newEntryBtn" class="primary-btn">New Entry</button>
+      <button id="newEntryBtn" class="primary-btn">Add Meal</button>
     </section>
 
   </main>
 
-  <!-- ADD MEAL MODAL -->
-  <div id="mealModal" class="modal hidden">
-    <div class="modal-content">
+  <!-- OVERLAY -->
+  <div id="sheetOverlay" class="sheet-overlay"></div>
+
+  <!-- BOTTOM SHEET -->
+  <div id="mealSheet" class="bottom-sheet">
+    <div class="sheet-handle"></div>
+
+    <div class="sheet-content">
       <h3>Add Meal</h3>
 
       <input id="mealName" placeholder="Food name" />
@@ -105,14 +107,14 @@
         <input id="mealFat" type="number" placeholder="Fat (g)" />
       </div>
 
-      <div class="modal-actions">
-        <button id="cancelMeal">Cancel</button>
+      <div class="sheet-actions">
+        <button id="cancelMeal" class="secondary-btn">Cancel</button>
         <button id="saveMealBtn" class="primary-btn">Save</button>
       </div>
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script type="module" src="app.js"></script>
 
 </body>
 </html>
