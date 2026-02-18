@@ -115,30 +115,18 @@ body {
 /* ========================================
    WEEK STRIP
 ======================================== */
-
 .week-strip {
   display: flex;
   width: 100%;
   gap: 6px;
 
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-
   margin: 20px 0 30px;
   padding: 0;
-
-  scrollbar-width: none;       /* Firefox */
 }
-
-.week-strip::-webkit-scrollbar {
-  display: none;               /* Chrome / Safari */
-}
-
 
 .week-day {
-  flex: 0 0 calc((100% - 36px) / 7); /* 6 gaps × 6px = 36px */
-  scroll-snap-align: start;
+  flex: 1;                 /* equal width for 7 items */
+  min-width: 0;            /* prevents overflow issues */
 
   display: flex;
   flex-direction: column;
@@ -154,6 +142,13 @@ body {
   font-weight: 500;
   transition: all 0.2s ease;
 }
+
+
+.week-strip::-webkit-scrollbar {
+  display: none;               /* Chrome / Safari */
+}
+
+
 
 
 
