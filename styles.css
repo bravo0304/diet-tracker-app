@@ -70,7 +70,7 @@ body {
 #caloriesRing::after {
   content: "";
   position: absolute;
-  inset: 25px;
+  inset: 35px;
   background: white;
   border-radius: 50%;
 }
