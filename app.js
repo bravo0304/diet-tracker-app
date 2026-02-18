@@ -275,6 +275,18 @@ async function loadCalories() {
 }
 
 
+// ---- UPDATE MACRO BARS ----
+
+const proteinPercent = Math.min((eatenProtein / proteinG) * 100, 100);
+const fatPercent = Math.min((eatenFat / fatG) * 100, 100);
+const carbsPercent = Math.min((eatenCarbs / carbsG) * 100, 100);
+
+document.getElementById("proteinBar").style.width = proteinPercent + "%";
+document.getElementById("fatBar").style.width = fatPercent + "%";
+document.getElementById("carbsBar").style.width = carbsPercent + "%";
+
+
+
 
 
 
