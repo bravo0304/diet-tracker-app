@@ -1,7 +1,6 @@
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
 
-
 // ================= LOGIN =================
 
 async function login() {
@@ -36,7 +35,6 @@ async function login() {
   window.location.href = "/dashboard.html";
 }
 
-
 // ================= UTIL =================
 
 function parseJwt(token) {
@@ -60,7 +58,6 @@ function getTodayString() {
   return today.toISOString().split("T")[0];
 }
 
-
 // ================= MODAL =================
 
 function openMealModal() {
@@ -70,7 +67,6 @@ function openMealModal() {
 function closeMealModal() {
   document.getElementById("mealModal")?.classList.add("hidden");
 }
-
 
 // ================= SAVE MEAL =================
 
@@ -115,6 +111,31 @@ async function saveMeal(meal) {
   loadDashboard();
 }
 
+// ================= DELETE MEAL =================
+
+async function deleteMeal(id) {
+  const token = getToken();
+
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/meals?id=eq.${id}`,
+    {
+      method: "DELETE",
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${token}`
+      }
+    }
+  );
+
+  if (!res.ok) {
+    alert("Failed to delete meal.");
+    return;
+  }
+
+  loadDashboard();
+}
+
+// ================= DASHBOARD =================
 
 async function loadDashboard() {
 
@@ -212,13 +233,11 @@ async function loadDashboard() {
       }
     });
 
-    // Attach delete listeners AFTER list built
     document.querySelectorAll(".delete-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         deleteMeal(btn.getAttribute("data-id"));
       });
     });
-
   }
 
   // ---- UPDATE RING ----
@@ -249,37 +268,12 @@ async function loadDashboard() {
     `${eatenCarbs} / ${carbsTarget} g`;
 }
 
-async function deleteMeal(id) {
-  const token = getToken();
-
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/meals?id=eq.${id}`,
-    {
-      method: "DELETE",
-      headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${token}`
-      }
-    }
-  );
-
-  if (!res.ok) {
-    alert("Failed to delete meal.");
-    return;
-  }
-
-  loadDashboard();
-}
-
-
-
 function updateBar(id, consumed, target) {
   const bar = document.getElementById(id);
   if (!bar) return;
   const percent = Math.min((consumed / target) * 100, 100);
   bar.style.width = percent + "%";
 }
-
 
 // ================= TIMER =================
 
@@ -304,12 +298,10 @@ function startDailyTimer() {
   setInterval(updateTimer, 1000);
 }
 
-
 // ================= INIT =================
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // Dashboard only runs if caloriesLabel exists
   if (document.getElementById("caloriesLabel")) {
     loadDashboard();
     startDailyTimer();
