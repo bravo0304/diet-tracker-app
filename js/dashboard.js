@@ -1,6 +1,5 @@
 import { deleteMeal } from "./api.js";
 import { getToken, getUserIdFromToken } from "./auth.js";
-import { getTodayString } from "./api.js";
 
 // ================= DATE STATE =================
 
@@ -18,7 +17,7 @@ export function setSelectedDate(date) {
   selectedDate.setHours(0, 0, 0, 0);
 }
 
-// ================= DATE STATE =================
+// ================= End =================
 
 
 
@@ -54,7 +53,7 @@ function updateBar(id, consumed, target) {
 
 // ================= DASHBOARD =================
 
-export async function loadDashboard() {
+export async function loadDashboard(dateOverride = null) {
   const token = getToken();
   const user_id = getUserIdFromToken();
 
@@ -63,7 +62,14 @@ export async function loadDashboard() {
     return;
   }
 
-  const todayStr = getTodayString();
+  const activeDate = dateOverride 
+  ? new Date(dateOverride) 
+  : selectedDate;
+
+activeDate.setHours(0, 0, 0, 0);
+
+const todayStr = activeDate.toISOString().split("T")[0];
+
 
   // PROFILE
   const profileRes = await fetch(
