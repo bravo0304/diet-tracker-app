@@ -284,33 +284,31 @@ function startDailyTimer() {
 
 document.addEventListener("DOMContentLoaded", () => {
 
+  console.log("DOM READY");
 
-const sheet = document.getElementById("mealSheet");
-const overlay = document.getElementById("sheetOverlay");
-const cancelBtn = document.getElementById("cancelMeal");
+  const sheet = document.getElementById("mealSheet");
+  const overlay = document.getElementById("sheetOverlay");
+  const openBtn = document.getElementById("newEntryBtn");
+  const cancelBtn = document.getElementById("cancelMeal");
 
-openBtn.addEventListener("click", () => {
-  sheet.classList.add("active");
-  overlay.classList.add("active");
-});
+  function openSheet() {
+    sheet?.classList.add("active");
+    overlay?.classList.add("active");
+  }
 
-function closeSheet() {
-  sheet.classList.remove("active");
-  overlay.classList.remove("active");
-}
+  function closeSheet() {
+    sheet?.classList.remove("active");
+    overlay?.classList.remove("active");
+  }
 
-overlay.addEventListener("click", closeSheet);
-cancelBtn.addEventListener("click", closeSheet);
+  openBtn?.addEventListener("click", openSheet);
+  cancelBtn?.addEventListener("click", closeSheet);
+  overlay?.addEventListener("click", closeSheet);
 
-
-  
   if (document.getElementById("caloriesLabel")) {
     loadDashboard();
     startDailyTimer();
   }
-
-  document.getElementById("newEntryBtn")?.addEventListener("click", openMealModal);
-  document.getElementById("cancelMeal")?.addEventListener("click", closeMealModal);
 
   document.getElementById("saveMealBtn")?.addEventListener("click", async () => {
     const food_name = document.getElementById("mealName").value;
@@ -325,6 +323,7 @@ cancelBtn.addEventListener("click", closeSheet);
     }
 
     await saveMeal({ food_name, calories, protein, carbs, fat });
+    closeSheet();
   });
 
 });
