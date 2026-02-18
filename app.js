@@ -1,7 +1,8 @@
 import { getToken, getUserIdFromToken } from "./js/auth.js";
 
-const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
-const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
+import { saveMeal, deleteMeal, getTodayString } from "./api.js";
+import { getToken, getUserIdFromToken } from "./auth.js";
+
 
 // ================= UTIL =================
 
@@ -187,7 +188,9 @@ async function loadDashboard() {
 
   document.querySelectorAll(".delete-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      deleteMeal(btn.getAttribute("data-id"));
+      await deleteMeal(btn.getAttribute("data-id"));
+loadDashboard();
+
     });
   });
 
