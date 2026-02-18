@@ -13,16 +13,6 @@ function getTodayString() {
 }
 
 
-// ================= MODAL =================
-
-function openMealModal() {
-  document.getElementById("mealModal")?.classList.remove("hidden");
-}
-
-function closeMealModal() {
-  document.getElementById("mealModal")?.classList.add("hidden");
-}
-
 
 // ================= SAVE MEAL =================
 
@@ -294,7 +284,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const sheet = document.getElementById("mealSheet");
 const overlay = document.getElementById("sheetOverlay");
-const openBtn = document.getElementById("newEntryBtn");
 const cancelBtn = document.getElementById("cancelMeal");
 
 openBtn.addEventListener("click", () => {
