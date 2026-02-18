@@ -224,41 +224,30 @@ const todayStr = activeDate.toISOString().split("T")[0];
 // ==================== Week strip ============
 
 export function renderWeekStrip() {
-  const container = document.getElementById("weekStrip");
-  if (!container) return;
+ const todayISO = todayDate.toISOString().split("T")[0];
+const selectedISO = selectedDate.toISOString().split("T")[0];
 
-  const weekDays = getCurrentWeekDays();
+const diffDays = Math.floor(
+  (todayDate - day.date) / (1000 * 60 * 60 * 24)
+);
 
-  container.innerHTML = "";
+const isFuture = diffDays < 0;
+const isLocked = diffDays > 3;
+const isToday = day.iso === todayISO;
+const isSelected = day.iso === selectedISO;
 
-  weekDays.forEach(day => {
-    const el = document.createElement("div");
-    el.classList.add("week-day");
-    el.dataset.date = day.iso;
-
-    const isToday =
-      day.iso === todayDate.toISOString().split("T")[0];
-
-    const isSelected =
-      day.iso === selectedDate.toISOString().split("T")[0];
-
-    if (isToday) el.classList.add("today");
-    if (isSelected) el.classList.add("selected");
-
-    el.innerHTML = `
-      <span class="weekday-label">${day.weekDay}</span>
-      <span class="weekday-number">${day.dayNumber}</span>
-    `;
-
-    el.addEventListener("click", () => {
-      setSelectedDate(day.date);
-      renderWeekStrip();
-      loadDashboard(day.date);
-    });
-
-    container.appendChild(el);
-  });
+if (isSelected) {
+  el.classList.add("selected");
+} else if (isLocked || isFuture) {
+  el.classList.add("locked");
+} else {
+  el.classList.add("clickable");
 }
+
+if (isToday && !isSelected) {
+  el.classList.add("today");
+}
+
 
 
 
