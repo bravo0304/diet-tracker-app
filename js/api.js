@@ -13,7 +13,7 @@ export function getTodayString() {
 
 // ===== API =====
 
-export async function saveMeal(meal) {
+export async function saveMeal(meal, dateString) {
   const token = getToken();
   const user_id = getUserIdFromToken();
 
@@ -21,8 +21,6 @@ export async function saveMeal(meal) {
     window.location.href = "/";
     return;
   }
-
-  const today = getTodayString();
 
   const res = await fetch(`${SUPABASE_URL}/rest/v1/meals`, {
     method: "POST",
@@ -40,7 +38,7 @@ export async function saveMeal(meal) {
       carbs: meal.carbs,
       fat: meal.fat,
       meal_type: "general",
-      date: today
+      date: dateString
     })
   });
 
@@ -48,6 +46,7 @@ export async function saveMeal(meal) {
     alert("Error saving meal.");
   }
 }
+
 
 export async function deleteMeal(id) {
   const token = getToken();
