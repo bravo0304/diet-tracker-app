@@ -224,7 +224,7 @@ body {
 .ring::after {
   content: "";
   position: absolute;
-  inset: 35px;
+  inset: 12px;
   background: var(--card-bg);
   border-radius: 50%;
 }
