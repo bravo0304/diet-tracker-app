@@ -19,64 +19,64 @@
 
   <main class="container">
 
-    <!-- DATE ROW -->
-    <div class="date-row">
-      <button class="date-arrow" id="prevDay">←</button>
+   <!-- DAILY OVERVIEW CARD -->
+<section class="card daily-overview">
 
-      <div class="date-center">
-        <div id="currentDateLabel">Today</div>
-        <div id="resetTimer" class="reset-timer">Reset in --:--</div>
+  <!-- DATE + TIMER -->
+  <div class="date-row">
+    <button class="date-arrow" id="prevDay">←</button>
+    <div class="date-center">
+      <div id="currentDateLabel">Today</div>
+      <div id="resetTimer" class="reset-timer">Reset in --:--</div>
+    </div>
+    <button class="date-arrow" id="nextDay">→</button>
+  </div>
+
+  <!-- BIG CALORIES RING -->
+  <div class="ring-wrapper">
+    <canvas id="caloriesRing" width="220" height="220"></canvas>
+    <div class="calories-text">
+      <span id="caloriesLabel">0 / 0 kcal</span>
+    </div>
+  </div>
+
+  <!-- MACRO BARS -->
+  <div class="macro-bars">
+
+    <div class="macro-bar">
+      <div class="macro-header">
+        <span>Protein</span>
+        <span id="proteinLabel">0 / 0 g</span>
       </div>
-
-      <button class="date-arrow" id="nextDay">→</button>
+      <div class="bar-bg">
+        <div class="bar-fill protein-fill" id="proteinBar"></div>
+      </div>
     </div>
 
-    <!-- BIG CALORIES RING -->
-    <div id="top-summary" class="card">
-      <canvas id="caloriesRing"></canvas>
-
-      <div class="calories-text">
-        <span id="caloriesLabel">Loading...</span>
+    <div class="macro-bar">
+      <div class="macro-header">
+        <span>Fat</span>
+        <span id="fatLabel">0 / 0 g</span>
+      </div>
+      <div class="bar-bg">
+        <div class="bar-fill fat-fill" id="fatBar"></div>
       </div>
     </div>
 
-    <!-- MACRO BARS -->
-    <section class="macro-bars card">
-
-      <!-- PROTEIN -->
-      <div class="macro-bar">
-        <div class="macro-header">
-          <span>Protein</span>
-          <span id="proteinLabel">0 / 0 g</span>
-        </div>
-        <div class="bar-bg">
-          <div class="bar-fill protein-fill" id="proteinBar"></div>
-        </div>
+    <div class="macro-bar">
+      <div class="macro-header">
+        <span>Carbs</span>
+        <span id="carbsLabel">0 / 0 g</span>
       </div>
-
-      <!-- FAT -->
-      <div class="macro-bar">
-        <div class="macro-header">
-          <span>Fat</span>
-          <span id="fatLabel">0 / 0 g</span>
-        </div>
-        <div class="bar-bg">
-          <div class="bar-fill fat-fill" id="fatBar"></div>
-        </div>
+      <div class="bar-bg">
+        <div class="bar-fill carbs-fill" id="carbsBar"></div>
       </div>
+    </div>
 
-      <!-- CARBS -->
-      <div class="macro-bar">
-        <div class="macro-header">
-          <span>Carbs</span>
-          <span id="carbsLabel">0 / 0 g</span>
-        </div>
-        <div class="bar-bg">
-          <div class="bar-fill carbs-fill" id="carbsBar"></div>
-        </div>
-      </div>
+  </div>
 
-    </section>
+</section>
+
 
     <!-- DAILY FOOD LOG -->
     <div id="daily-log" class="card">
