@@ -88,9 +88,16 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   margin: 20px 0 30px;
+    scrollbar-width: none;      /* Firefox */
+  padding: 0 4px 8px;
 }
+
+.week-strip::-webkit-scrollbar {
+  display: none;              /* Chrome/Safari */
+}
+
 
 .week-day {
   display: flex;
