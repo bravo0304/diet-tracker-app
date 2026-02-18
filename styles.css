@@ -312,3 +312,41 @@ body {
   justify-content: flex-end;
   gap: 10px;
 }
+
+
+
+
+/* === weeks  ===  */
+
+.week-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 16px 0 24px 0;
+  padding: 0 4px;
+}
+
+.week-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.weekday-label {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.weekday-number {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.week-day:hover {
+  background: rgba(0,0,0,0.05);
+}
+
