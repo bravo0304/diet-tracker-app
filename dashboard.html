@@ -19,30 +19,17 @@
 
   <main class="container">
 
-   <!-- DAILY OVERVIEW CARD -->
-<section class="card daily-overview">
+  <section class="card daily-overview">
 
-  <!-- DATE + TIMER -->
-  <div class="date-row">
-    <button class="date-arrow" id="prevDay">←</button>
-    <div class="date-center">
-      <div id="currentDateLabel">Today</div>
-      <div id="resetTimer" class="reset-timer">Reset in --:--</div>
-    </div>
-    <button class="date-arrow" id="nextDay">→</button>
-  </div>
-
-  <!-- BIG CALORIES RING -->
   <div class="ring-wrapper">
-    <canvas id="caloriesRing" width="220" height="220"></canvas>
+    <canvas id="caloriesRing"></canvas>
     <div class="calories-text">
       <span id="caloriesLabel">0 / 0 kcal</span>
     </div>
   </div>
 
-  <!-- MACRO BARS -->
   <div class="macro-bars">
-
+    <!-- Protein -->
     <div class="macro-bar">
       <div class="macro-header">
         <span>Protein</span>
@@ -53,6 +40,7 @@
       </div>
     </div>
 
+    <!-- Fat -->
     <div class="macro-bar">
       <div class="macro-header">
         <span>Fat</span>
@@ -63,6 +51,7 @@
       </div>
     </div>
 
+    <!-- Carbs -->
     <div class="macro-bar">
       <div class="macro-header">
         <span>Carbs</span>
@@ -77,15 +66,6 @@
 
 </section>
 
-
-    <!-- DAILY FOOD LOG -->
-    <div id="daily-log" class="card">
-      <h3>Daily Food Log</h3>
-      <ul id="foodEntries"></ul>
-
-      <!-- This will later become floating + -->
-      <button id="newEntryBtn" class="primary-btn">New Entry</button>
-    </div>
 
   </main>
 
