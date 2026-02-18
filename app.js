@@ -1,5 +1,8 @@
 import { saveMeal } from "./js/api.js";
-import { loadDashboard, startDailyTimer } from "./js/dashboard.js";
+import { loadDashboard, startDailyTimer, renderWeekStrip } from "./js/dashboard.js";
+
+
+
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -54,6 +57,8 @@ document.addEventListener("DOMContentLoaded", () => {
     saveBtn.dataset.loading = "false";
   });
 
+  renderWeekStrip();
   loadDashboard();
   startDailyTimer();
+});
 });
