@@ -19,6 +19,49 @@ export function setSelectedDate(date) {
 
 // ================= End =================
 
+// ================= WEEK STATE =================
+
+let currentWeekStart = getMonday(selectedDate);
+
+function getMonday(date) {
+  const d = new Date(date);
+  const day = d.getDay(); // 0 (Sun) - 6 (Sat)
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+export function getCurrentWeekStart() {
+  return currentWeekStart;
+}
+
+export function setCurrentWeekStart(date) {
+  currentWeekStart = getMonday(date);
+}
+
+
+
+export function getCurrentWeekDays() {
+  const days = [];
+
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(currentWeekStart);
+    day.setDate(currentWeekStart.getDate() + i);
+
+    days.push({
+      date: new Date(day),
+      iso: day.toISOString().split("T")[0],
+      dayNumber: day.getDate(),
+      weekDay: day.toLocaleDateString("en-US", { weekday: "short" })
+    });
+  }
+
+  return days;
+}
+
+// ================= End =================
+
 
 
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
