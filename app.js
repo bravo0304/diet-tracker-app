@@ -39,20 +39,7 @@ async function login() {
 
 // ================= UTIL =================
 
-function parseJwt(token) {
-  return JSON.parse(atob(token.split('.')[1]));
-}
 
-function getToken() {
-  return localStorage.getItem("token");
-}
-
-function getUserIdFromToken() {
-  const token = getToken();
-  if (!token) return null;
-  const user = parseJwt(token);
-  return user.sub;
-}
 
 function getTodayString() {
   const today = new Date();
