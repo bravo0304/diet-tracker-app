@@ -2,6 +2,26 @@ import { deleteMeal } from "./api.js";
 import { getToken, getUserIdFromToken } from "./auth.js";
 import { getTodayString } from "./api.js";
 
+// ================= DATE STATE =================
+
+let todayDate = new Date();
+todayDate.setHours(0, 0, 0, 0);
+
+let selectedDate = new Date(todayDate);
+
+export function getSelectedDate() {
+  return selectedDate;
+}
+
+export function setSelectedDate(date) {
+  selectedDate = new Date(date);
+  selectedDate.setHours(0, 0, 0, 0);
+}
+
+// ================= DATE STATE =================
+
+
+
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
 
