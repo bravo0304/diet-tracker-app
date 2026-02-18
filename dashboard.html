@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <header class="navbar">
-    <h1>My Diet Tracker</h1>
+    <h1>My Diet Tracker - Dashboard</h1>
     <a href="settings.html" class="primary-btn">Settings</a>
   </header>
 
@@ -22,7 +21,9 @@
   <div class="calories-text">
     <span id="caloriesLabel">Loading...</span>
   </div>
-  <div id="reset-timer" class="timer-text">Time to reset: 00:00:00</div>
+
+     <div id="timerText" class="timer-text"></div>
+
 </div>
 
 
@@ -54,6 +55,37 @@
 
   </main>
 
+  </main>
+
+  <!-- ADD MEAL MODAL -->
+  <div id="mealModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Add Meal</h3>
+
+      <input id="mealName" placeholder="Food name" />
+
+<div class="macro-input-grid">
+  <input id="mealCalories" type="number" placeholder="Calories" />
+  <input id="mealProtein" type="number" placeholder="Protein (g)" />
+  <input id="mealCarbs" type="number" placeholder="Carbs (g)" />
+  <input id="mealFat" type="number" placeholder="Fat (g)" />
+</div>
+
+
+      <div class="modal-actions">
+        <button id="cancelMeal">Cancel</button>
+        <button id="saveMealBtn" class="primary-btn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
+
+
+  
   <script src="app.js"></script>
 </body>
 </html>

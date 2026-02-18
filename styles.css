@@ -156,3 +156,131 @@ body {
   border-bottom: 1px solid #eee;
 }
 
+
+.meal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.meal-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meal-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.meal-macros {
+  font-size: 13px;
+  color: #777;
+}
+
+.meal-calories {
+  font-weight: 600;
+  color: #333;
+}
+
+
+
+/* ---------- MODAL ---------- */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  width: 380px;
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+  animation: fadeInScale 0.15s ease-out;
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-content h3 {
+  margin: 0 0 6px 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.modal-content input {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e5e5;
+  font-size: 14px;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modal-content input:focus {
+  outline: none;
+  border-color: #FF6B4A;
+  box-shadow: 0 0 0 3px rgba(255,107,74,0.15);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+#cancelMeal {
+  background: #f1f1f1;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+#cancelMeal:hover {
+  background: #e5e5e5;
+}
+
+#saveMealBtn {
+  background: #FF6B4A;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#saveMealBtn:hover {
+  background: #e85c3d;
+}
+
+
+.macro-input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+/* ---------- MODAL  End ---------- */
