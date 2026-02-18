@@ -84,31 +84,26 @@ body {
 
 /* ================= WEEK STRIP ================= */
 
+
 .week-strip {
   display: flex;
   gap: 10px;
-  overflow-x: auto;      /* allow horizontal scroll */
+  overflow-x: auto;
   padding: 0 4px 8px;
   margin: 20px 0 30px;
-  scrollbar-width: none; /* Firefox */
+
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
 }
 
 .week-strip::-webkit-scrollbar {
-  display: none;         /* Chrome/Safari */
+  display: none;
 }
 
-
 .week-day {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
- flex: 0 0 auto;   /* prevents shrinking */
-  min-width: 56px;
-  padding: 10px 8px;
-  border-radius: 16px;
-  transition: all 0.2s ease;
-  font-weight: 500;
+  flex: 0 0 auto;
+  min-width: 50px;
+  scroll-snap-align: center;
 }
 
 
