@@ -1,7 +1,9 @@
 import { deleteMeal } from "./api.js";
 import { getToken, getUserIdFromToken } from "./auth.js";
 
-// ================= DATE STATE =================
+/* ===========================
+   DATE STATE
+=========================== */
 
 let todayDate = new Date();
 todayDate.setHours(0, 0, 0, 0);
@@ -17,7 +19,9 @@ export function setSelectedDate(date) {
   selectedDate.setHours(0, 0, 0, 0);
 }
 
-// ================= WEEK STATE =================
+/* ===========================
+   WEEK SYSTEM
+=========================== */
 
 let currentWeekStart = getMonday(selectedDate);
 
@@ -28,10 +32,6 @@ function getMonday(date) {
   d.setDate(d.getDate() + diff);
   d.setHours(0, 0, 0, 0);
   return d;
-}
-
-export function setCurrentWeekStart(date) {
-  currentWeekStart = getMonday(date);
 }
 
 export function getCurrentWeekDays() {
@@ -52,30 +52,60 @@ export function getCurrentWeekDays() {
   return days;
 }
 
-// ================= SUPABASE =================
+export function renderWeekStrip() {
+
+  const container = document.getElementById("weekStrip");
+  container.innerHTML = "";
+
+  const weekDays = getCurrentWeekDays();
+  const todayISO = todayDate.toISOString().split("T")[0];
+  const selectedISO = selectedDate.toISOString().split("T")[0];
+
+  weekDays.forEach(day => {
+
+    const el = document.createElement("div");
+    el.classList.add("week-day");
+
+    const diffDays = Math.floor((todayDate - day.date) / 86400000);
+    const isFuture = diffDays < 0;
+    const isLocked = diffDays > 3;
+    const isSelected = day.iso === selectedISO;
+
+    if (isSelected) el.classList.add("selected");
+    else if (isLocked || isFuture) el.classList.add("locked");
+    else el.classList.add("clickable");
+
+    el.innerHTML = `
+      <span>${day.weekDay}</span>
+      <span>${day.dayNumber}</span>
+    `;
+
+    if (!isLocked && !isFuture) {
+      el.addEventListener("click", () => {
+        setSelectedDate(day.date);
+        renderWeekStrip();
+        loadDashboard(day.date);
+      });
+    }
+
+    container.appendChild(el);
+  });
+}
+
+/* ===========================
+   SUPABASE CONFIG
+=========================== */
 
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
 
-// ================= RING =================
+/* ===========================
+   UI HELPERS
+=========================== */
 
 function animateRing(ring, targetPercent) {
-  let current = 0;
-  const step = targetPercent / 30;
-
-  function update() {
-    current += step;
-    if (current >= targetPercent) current = targetPercent;
-
-    ring.style.background =
-      `conic-gradient(#077a7d ${current}%, #e5e7eb ${current}%)`;
-
-    if (current < targetPercent) {
-      requestAnimationFrame(update);
-    }
-  }
-
-  requestAnimationFrame(update);
+  ring.style.background =
+    `conic-gradient(#077a7d ${targetPercent}%, #e5e7eb ${targetPercent}%)`;
 }
 
 function updateBar(id, consumed, target) {
@@ -84,9 +114,46 @@ function updateBar(id, consumed, target) {
   bar.style.width = percent + "%";
 }
 
-// ================= DASHBOARD =================
+/* ===========================
+   TIMER (TODAY ONLY)
+=========================== */
+
+let timerInterval = null;
+
+function startDailyTimer() {
+
+  const sub = document.getElementById("goalSubtext");
+  if (!sub) return;
+
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  function update() {
+    const now = new Date();
+    const midnight = new Date();
+    midnight.setHours(24, 0, 0, 0);
+
+    const diff = midnight - now;
+
+    const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
+    const m = String(Math.floor((diff / 60000) % 60)).padStart(2, "0");
+    const s = String(Math.floor((diff / 1000) % 60)).padStart(2, "0");
+
+    sub.innerText = `Resets in ${h}:${m}:${s}`;
+  }
+
+  update();
+  timerInterval = setInterval(update, 1000);
+}
+
+/* ===========================
+   MAIN DASHBOARD LOAD
+=========================== */
 
 export async function loadDashboard(dateOverride = null) {
+
   const token = getToken();
   const user_id = getUserIdFromToken();
 
@@ -97,9 +164,11 @@ export async function loadDashboard(dateOverride = null) {
 
   const activeDate = dateOverride ? new Date(dateOverride) : selectedDate;
   activeDate.setHours(0, 0, 0, 0);
+  selectedDate = activeDate;
 
   const dateStr = activeDate.toISOString().split("T")[0];
 
+  // PROFILE
   const profileRes = await fetch(
     `${SUPABASE_URL}/rest/v1/profiles?id=eq.${user_id}&select=*`,
     {
@@ -131,6 +200,7 @@ export async function loadDashboard(dateOverride = null) {
   const fatTarget = Math.round((targetCalories * 0.25) / 9);
   const carbsTarget = Math.round((targetCalories * 0.45) / 4);
 
+  // MEALS
   const mealsRes = await fetch(
     `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&date=eq.${dateStr}&select=*`,
     {
@@ -152,6 +222,7 @@ export async function loadDashboard(dateOverride = null) {
   foodList.innerHTML = "";
 
   meals.forEach((m) => {
+
     eatenCalories += m.calories || 0;
     eatenProtein += m.protein || 0;
     eatenFat += m.fat || 0;
@@ -185,6 +256,7 @@ export async function loadDashboard(dateOverride = null) {
     });
   });
 
+  // UPDATE RING + MACROS
   document.getElementById("caloriesLabel").innerText =
     `${eatenCalories} / ${targetCalories} kcal`;
 
@@ -201,82 +273,58 @@ export async function loadDashboard(dateOverride = null) {
     `${eatenFat} / ${fatTarget} g`;
   document.getElementById("carbsLabel").innerText =
     `${eatenCarbs} / ${carbsTarget} g`;
+
+  // SUMMARY LOGIC (NEW BIG NUMBER STYLE)
+
+const goalBigNumber = document.getElementById("goalBigNumber");
+const goalLabel = document.getElementById("goalLabel");
+const goalSubtext = document.getElementById("goalSubtext");
+
+const todayISO = todayDate.toISOString().split("T")[0];
+const diff = targetCalories - eatenCalories;
+
+if (timerInterval) {
+  clearInterval(timerInterval);
+  timerInterval = null;
 }
 
-// ================= WEEK STRIP =================
+if (dateStr === todayISO) {
 
-export function renderWeekStrip() {
-  const container = document.getElementById("weekStrip");
-  if (!container) return;
+  // TODAY VIEW
+  goalBigNumber.innerText = Math.abs(diff);
 
-  container.innerHTML = "";
-
-  const weekDays = getCurrentWeekDays();
-  const todayISO = todayDate.toISOString().split("T")[0];
-  const selectedISO = selectedDate.toISOString().split("T")[0];
-
-  weekDays.forEach(day => {
-    const el = document.createElement("div");
-    el.classList.add("week-day");
-
-    const diffDays = Math.floor(
-      (todayDate - day.date) / (1000 * 60 * 60 * 24)
-    );
-
-    const isFuture = diffDays < 0;
-    const isLocked = diffDays > 3;
-    const isToday = day.iso === todayISO;
-    const isSelected = day.iso === selectedISO;
-
-    if (isSelected) {
-      el.classList.add("selected");
-    } else if (isLocked || isFuture) {
-      el.classList.add("locked");
-    } else {
-      el.classList.add("clickable");
-    }
-
-    if (isToday && !isSelected) {
-      el.classList.add("today");
-    }
-
-    el.innerHTML = `
-      <span class="weekday-label">${day.weekDay}</span>
-      <span class="weekday-number">${day.dayNumber}</span>
-    `;
-
-    if (!isLocked && !isFuture) {
-      el.addEventListener("click", () => {
-        setSelectedDate(day.date);
-        renderWeekStrip();
-        loadDashboard(day.date);
-      });
-    }
-
-    container.appendChild(el);
-  });
-}
-
-// ================= TIMER =================
-
-export function startDailyTimer() {
-  const timerEl = document.getElementById("timerText");
-  if (!timerEl) return;
-
-  function updateTimer() {
-    const now = new Date();
-    const midnight = new Date();
-    midnight.setHours(24, 0, 0, 0);
-
-    const diff = midnight - now;
-
-    const hours = String(Math.floor(diff / 3600000)).padStart(2, "0");
-    const minutes = String(Math.floor((diff / 60000) % 60)).padStart(2, "0");
-    const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, "0");
-
-    timerEl.innerText = `Reset in ${hours}:${minutes}:${seconds}`;
+  if (eatenCalories === 0) {
+    goalLabel.innerText = "Calories left";
+  } else if (diff > 0) {
+    goalLabel.innerText = "Calories left";
+  } else if (diff < 0) {
+    goalLabel.innerText = "Calories over";
+  } else {
+    goalLabel.innerText = "Goal met exactly";
   }
 
-  updateTimer();
-  setInterval(updateTimer, 1000);
+  startDailyTimer();
+
+} else {
+
+  // PAST DAY VIEW
+  const weekday = activeDate.toLocaleDateString("en-US", { weekday: "long" });
+
+  if (eatenCalories === 0) {
+    goalBigNumber.innerText = "—";
+    goalLabel.innerText = "No entries logged";
+  } else if (diff > 0) {
+    goalBigNumber.innerText = Math.abs(diff);
+    goalLabel.innerText = "Under goal";
+  } else if (diff < 0) {
+    goalBigNumber.innerText = Math.abs(diff);
+    goalLabel.innerText = "Over goal";
+  } else {
+    goalBigNumber.innerText = 0;
+    goalLabel.innerText = "Goal met exactly";
+  }
+
+  goalSubtext.innerText = `${weekday} summary`;
+}
+
 }
