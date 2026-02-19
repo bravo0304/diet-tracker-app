@@ -71,11 +71,23 @@ export function renderWeekStrip() {
     const el = document.createElement("div");
     el.classList.add("week-day");
 
-    if (day.iso === selectedISO) {
-      el.classList.add("selected");
-    } else {
-      el.classList.add("clickable");
-    }
+   const diffDays = Math.floor((todayDate - day.date) / 86400000);
+const isFuture = diffDays < 0;
+const isEditable = diffDays >= 0 && diffDays <= 3;
+
+if (day.iso === selectedISO) {
+  el.classList.add("selected");
+} else {
+  el.classList.add("clickable");
+}
+
+if (!isEditable && !isFuture) {
+  el.classList.add("view-only");
+}
+
+if (isFuture) {
+  el.classList.add("future");
+}
 
     el.innerHTML = `
       <span>${day.weekDay}</span>
@@ -180,7 +192,7 @@ export async function loadDashboard(dateOverride = null) {
   const diffDays = Math.floor((todayDate - activeDate) / 86400000);
 
   const isFuture = diffDays < 0;
-  const isEditable = diffDays >= 0 && diffDays <= 2;
+  const isEditable = diffDays >= 0 && diffDays <= 3;
 
 
 if (isFuture) {
