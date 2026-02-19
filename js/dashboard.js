@@ -57,7 +57,6 @@ export function renderWeekStrip() {
   container.innerHTML = "";
 
   const weekDays = getCurrentWeekDays();
-  const todayISO = todayDate.toISOString().split("T")[0];
   const selectedISO = selectedDate.toISOString().split("T")[0];
 
   weekDays.forEach(day => {
@@ -113,14 +112,10 @@ function updateBar(id, consumed, target) {
 let timerInterval = null;
 
 function startDailyTimer() {
-
   const sub = document.getElementById("goalSubtext");
   if (!sub) return;
 
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
+  if (timerInterval) clearInterval(timerInterval);
 
   function update() {
     const now = new Date();
@@ -159,15 +154,15 @@ export async function loadDashboard(dateOverride = null) {
 
   /* ===== PROFILE ===== */
 
-  const { data: profiles, error: profileError } = await supabase
+  const { data: profiles } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user_id);
 
   if (!profiles || profiles.length === 0) {
-  window.location.href = "/onboarding.html";
-  return;
-}
+    window.location.href = "/onboarding.html";
+    return;
+  }
 
   const profile = profiles[0];
 
@@ -175,27 +170,49 @@ export async function loadDashboard(dateOverride = null) {
   const H = profile.height_cm || 170;
   const A = profile.age || 30;
   const sex = profile.sex || "male";
+  const goal = profile.goal || "maintain";
+  const multiplier = profile.activity_multiplier || 1.4;
+
+  /* ===== BMR ===== */
 
   let bmr = sex === "male"
     ? 10 * W + 6.25 * H - 5 * A + 5
     : 10 * W + 6.25 * H - 5 * A - 161;
 
-  const tdee = bmr * 1.4;
-  const targetCalories = Math.round(tdee);
+  const tdee = bmr * multiplier;
 
-  const proteinTarget = Math.round((targetCalories * 0.3) / 4);
-  const fatTarget = Math.round((targetCalories * 0.25) / 9);
-  const carbsTarget = Math.round((targetCalories * 0.45) / 4);
+  /* ===== GOAL ENGINE ===== */
+
+  let calorieMultiplier = 1;
+
+  if (goal === "lose") calorieMultiplier = 0.85;
+  if (goal === "gain") calorieMultiplier = 1.08;
+  if (goal === "maintain") calorieMultiplier = 1;
+
+  const targetCalories = Math.round(tdee * calorieMultiplier);
+
+  /* ===== MACROS ===== */
+
+  let proteinPerKg = 1.8;
+  if (goal === "lose") proteinPerKg = 2.0;
+
+  const proteinTarget = Math.round(W * proteinPerKg);
+
+  const fatCalories = targetCalories * 0.25;
+  const fatTarget = Math.round(fatCalories / 9);
+
+  const remainingCalories =
+    targetCalories - (proteinTarget * 4) - (fatTarget * 9);
+
+  const carbsTarget = Math.max(0, Math.round(remainingCalories / 4));
 
   /* ===== MEALS ===== */
 
-  const { data: meals, error: mealsError } = await supabase
+  const { data: meals } = await supabase
     .from("meals")
     .select("*")
     .eq("user_id", user_id)
     .eq("date", dateStr);
-
-  if (mealsError) return;
 
   let eatenCalories = 0;
   let eatenProtein = 0;
@@ -205,7 +222,7 @@ export async function loadDashboard(dateOverride = null) {
   const foodList = document.getElementById("foodEntries");
   foodList.innerHTML = "";
 
-  meals.forEach((m) => {
+  meals?.forEach((m) => {
 
     eatenCalories += m.calories || 0;
     eatenProtein += m.protein || 0;
@@ -268,22 +285,15 @@ export async function loadDashboard(dateOverride = null) {
   const todayISO = todayDate.toISOString().split("T")[0];
   const diff = targetCalories - eatenCalories;
 
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
+  if (timerInterval) clearInterval(timerInterval);
 
   if (dateStr === todayISO) {
 
     goalBigNumber.innerText = Math.abs(diff);
 
-    if (diff > 0) {
-      goalLabel.innerText = "Calories left";
-    } else if (diff < 0) {
-      goalLabel.innerText = "Calories over";
-    } else {
-      goalLabel.innerText = "Goal met exactly";
-    }
+    if (diff > 0) goalLabel.innerText = "Calories left";
+    else if (diff < 0) goalLabel.innerText = "Calories over";
+    else goalLabel.innerText = "Goal met exactly";
 
     startDailyTimer();
 

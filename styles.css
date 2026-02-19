@@ -575,3 +575,22 @@ box-sizing: border-box;
   height: 56px;
   font-size: 18px;
 }
+
+
+
+/* Onboarding specific layout */
+.onboarding-header {
+  justify-content: center;
+  font-weight: 700;
+}
+
+#onboardingForm {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.step input,
+.step select {
+  width: 100%;
+  box-sizing: border-box;
+}

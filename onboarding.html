@@ -40,11 +40,23 @@
         <div class="step" id="step-2" style="display:none;">
           <h3>Body Info</h3>
 
-          <label>Height (ft / in)</label>
-          <input type="text" id="height" placeholder="e.g., 5'7&quot;" required>
+          <label>Height (cm)</label>
+          <input type="number" id="height" placeholder="e.g., 170" required>
+  
 
-          <label>Weight (lb)</label>
-          <input type="number" id="weight" required>
+         <label>Weight (kg)</label>
+        <input type="number" id="weight" required>
+
+          
+          
+          <label>Activity Level</label>
+          <select id="activityMultiplier">
+            <option value="1.2">Sedentary</option>
+            <option value="1.35">Light Activity</option>
+            <option value="1.55">Moderate</option>
+            <option value="1.75">Very Active</option>
+          </select>
+          
 
           <button type="button" onclick="nextStep(3)" class="primary-btn">Next</button>
         </div>
@@ -53,9 +65,10 @@
         <div class="step" id="step-3" style="display:none;">
           <h3>Your Goal</h3>
           <select id="goal">
-            <option value="weight_loss">Lose weight</option>
-            <option value="fitness">Build muscle</option>
-            <option value="health">General health</option>
+           <option value="lose">Lose weight</option>
+            <option value="maintain">Maintain weight</option>
+            <option value="gain">Gain weight</option>
+
           </select>
 
           <div id="weightloss_box" style="display:none;">
