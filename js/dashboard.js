@@ -20,10 +20,10 @@ export function setSelectedDate(date) {
 }
 
 /* ===========================
-   WEEK SYSTEM
+   WEEK SYSTEM (STABLE VERSION)
 =========================== */
 
-let currentWeekStart = getMonday(selectedDate);
+let currentAnchorDate = new Date(selectedDate);
 
 function getMonday(date) {
   const d = new Date(date);
@@ -34,12 +34,19 @@ function getMonday(date) {
   return d;
 }
 
+function shiftWeek(direction) {
+  currentAnchorDate.setDate(currentAnchorDate.getDate() + direction * 7);
+  renderWeekStrip();
+}
+
 export function getCurrentWeekDays() {
+  const weekStart = getMonday(currentAnchorDate);
   const days = [];
 
+   
   for (let i = 0; i < 7; i++) {
-    const day = new Date(currentWeekStart);
-    day.setDate(currentWeekStart.getDate() + i);
+    const day = new Date(weekStart);
+    day.setDate(weekStart.getDate() + i);
 
     days.push({
       date: new Date(day),
@@ -64,32 +71,67 @@ export function renderWeekStrip() {
     const el = document.createElement("div");
     el.classList.add("week-day");
 
-    const diffDays = Math.floor((todayDate - day.date) / 86400000);
-    const isFuture = diffDays < 0;
-    const isLocked = diffDays > 3;
-    const isSelected = day.iso === selectedISO;
+const diffDays = Math.floor((todayDate - day.date) / 86400000);
+const isFuture = diffDays < 0;
+const isEditable = diffDays >= 0 && diffDays <= 3;
+const isToday = day.iso === todayDate.toISOString().split("T")[0];
+const isSelected = day.iso === selectedISO;
 
-    if (isSelected) el.classList.add("selected");
-    else if (isLocked || isFuture) el.classList.add("locked");
-    else el.classList.add("clickable");
+if (isSelected) {
+  el.classList.add("selected");
+} else {
+  el.classList.add("clickable");
+}
+
+if (isToday && !isSelected) {
+  el.classList.add("today-outline");
+}
+
+if (!isEditable && !isFuture) {
+  el.classList.add("view-only");
+}
+
+if (isFuture) {
+  el.classList.add("future");
+}
 
     el.innerHTML = `
       <span>${day.weekDay}</span>
       <span>${day.dayNumber}</span>
     `;
 
-    if (!isLocked && !isFuture) {
-      el.addEventListener("click", () => {
-        setSelectedDate(day.date);
-        renderWeekStrip();
-        loadDashboard(day.date);
-      });
-    }
+    el.addEventListener("click", () => {
+      setSelectedDate(day.date);
+      currentAnchorDate = new Date(day.date);
+      renderWeekStrip();
+      loadDashboard(day.date);
+    });
 
     container.appendChild(el);
   });
+
+  /* Swipe Support */
+
+  let touchStartX = null;
+
+  container.ontouchstart = (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  };
+
+  container.ontouchend = (e) => {
+    if (touchStartX === null) return;
+
+    const touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+
+    if (Math.abs(diff) > 50) {
+  if (diff > 0) shiftWeek(1);   // swipe left → next week
+  else shiftWeek(-1);           // swipe right → previous week
 }
 
+    touchStartX = null;
+  };
+}
 /* ===========================
    UI HELPERS
 =========================== */
@@ -101,7 +143,9 @@ function animateRing(ring, targetPercent) {
 
 function updateBar(id, consumed, target) {
   const bar = document.getElementById(id);
-  const percent = Math.min((consumed / target) * 100, 100);
+  const percent = target > 0
+    ? Math.min((consumed / target) * 100, 100)
+    : 0;
   bar.style.width = percent + "%";
 }
 
@@ -151,8 +195,40 @@ export async function loadDashboard(dateOverride = null) {
   selectedDate = activeDate;
 
   const dateStr = activeDate.toISOString().split("T")[0];
+  const diffDays = Math.floor((todayDate - activeDate) / 86400000);
 
-  /* ===== PROFILE ===== */
+  const isFuture = diffDays < 0;
+  const isEditable = diffDays >= 0 && diffDays <= 3;
+
+
+if (isFuture) {
+  // Clear food list
+  const foodList = document.getElementById("foodEntries");
+  if (foodList) foodList.innerHTML = "";
+
+  // Hide add button
+  const addBtn = document.getElementById("newEntryBtn");
+  if (addBtn) addBtn.style.display = "none";
+
+  // Reset summary display
+  document.getElementById("caloriesLabel").innerText = `0 / 0 Calories`;
+  document.getElementById("proteinLabel").innerText = `0 / 0 g`;
+  document.getElementById("fatLabel").innerText = `0 / 0 g`;
+  document.getElementById("carbsLabel").innerText = `0 / 0 g`;
+
+  animateRing(document.getElementById("caloriesRing"), 0);
+  updateBar("proteinBar", 0, 1);
+  updateBar("fatBar", 0, 1);
+  updateBar("carbsBar", 0, 1);
+
+  document.getElementById("goalBigNumber").innerText = "—";
+  document.getElementById("goalLabel").innerText = "Future day";
+  document.getElementById("goalSubtext").innerText = "No data yet";
+
+  return;
+}
+
+  /* PROFILE */
 
   const { data: profiles } = await supabase
     .from("profiles")
@@ -173,40 +249,26 @@ export async function loadDashboard(dateOverride = null) {
   const goal = profile.goal || "maintain";
   const multiplier = profile.activity_multiplier || 1.4;
 
-  /* ===== BMR ===== */
-
   let bmr = sex === "male"
     ? 10 * W + 6.25 * H - 5 * A + 5
     : 10 * W + 6.25 * H - 5 * A - 161;
 
   const tdee = bmr * multiplier;
 
-  /* ===== GOAL ENGINE ===== */
-
   let calorieMultiplier = 1;
-
   if (goal === "lose") calorieMultiplier = 0.85;
   if (goal === "gain") calorieMultiplier = 1.08;
-  if (goal === "maintain") calorieMultiplier = 1;
 
   const targetCalories = Math.round(tdee * calorieMultiplier);
 
-  /* ===== MACROS ===== */
+  const proteinTarget = Math.round(W * (goal === "lose" ? 2.0 : 1.8));
+  const fatTarget = Math.round((targetCalories * 0.25) / 9);
+  const carbsTarget = Math.max(
+    0,
+    Math.round((targetCalories - (proteinTarget * 4) - (fatTarget * 9)) / 4)
+  );
 
-  let proteinPerKg = 1.8;
-  if (goal === "lose") proteinPerKg = 2.0;
-
-  const proteinTarget = Math.round(W * proteinPerKg);
-
-  const fatCalories = targetCalories * 0.25;
-  const fatTarget = Math.round(fatCalories / 9);
-
-  const remainingCalories =
-    targetCalories - (proteinTarget * 4) - (fatTarget * 9);
-
-  const carbsTarget = Math.max(0, Math.round(remainingCalories / 4));
-
-  /* ===== MEALS ===== */
+  /* MEALS */
 
   const { data: meals } = await supabase
     .from("meals")
@@ -235,35 +297,46 @@ export async function loadDashboard(dateOverride = null) {
     li.innerHTML = `
       <div class="meal-left">
         <div class="meal-name">${m.food_name}</div>
-        <div class="meal-macros">
-          <span class="macro-protein">P ${m.protein}g</span>
-          <span class="macro-fat">F ${m.fat}g</span>
-          <span class="macro-carbs">C ${m.carbs}g</span>
-        </div>
+         <div class="meal-macros">
+           <span class="macro-protein">P ${m.protein}g</span>
+           <span class="macro-fat">F ${m.fat}g</span>
+           <span class="macro-carbs">C ${m.carbs}g</span>
+         </div>
       </div>
       <div class="meal-right">
-        <div class="meal-calories">${m.calories} kcal</div>
-        <button class="delete-btn" data-id="${m.id}">✕</button>
+        <div class="meal-calories">${m.calories} Calories</div>
+        ${isEditable ? `<button class="delete-btn" data-id="${m.id}">✕</button>` : ""}
       </div>
     `;
 
     foodList.appendChild(li);
   });
 
-  document.querySelectorAll(".delete-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      await deleteMeal(btn.getAttribute("data-id"));
-      loadDashboard(activeDate);
+  if (isEditable) {
+    document.querySelectorAll(".delete-btn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        await deleteMeal(btn.getAttribute("data-id"));
+        loadDashboard(activeDate);
+      });
     });
-  });
+  }
 
-  /* ===== UPDATE UI ===== */
+  const addBtn = document.getElementById("newEntryBtn");
+  if (addBtn) {
+    addBtn.style.display = isEditable ? "block" : "none";
+  }
 
-  document.getElementById("caloriesLabel").innerText =
-    `${eatenCalories} / ${targetCalories} kcal`;
+  /* UPDATE UI */
 
-  const percent = Math.min((eatenCalories / targetCalories) * 100, 100);
-  animateRing(document.getElementById("caloriesRing"), percent);
+const ringNumber = document.getElementById("ringNumber");
+if (ringNumber) {
+  ringNumber.innerText = `${eatenCalories} / ${targetCalories}`;
+}
+
+  animateRing(
+    document.getElementById("caloriesRing"),
+    Math.min((eatenCalories / targetCalories) * 100, 100)
+  );
 
   updateBar("proteinBar", eatenProtein, proteinTarget);
   updateBar("fatBar", eatenFat, fatTarget);
@@ -276,45 +349,43 @@ export async function loadDashboard(dateOverride = null) {
   document.getElementById("carbsLabel").innerText =
     `${eatenCarbs} / ${carbsTarget} g`;
 
-  /* ===== SUMMARY ===== */
-
   const goalBigNumber = document.getElementById("goalBigNumber");
   const goalLabel = document.getElementById("goalLabel");
   const goalSubtext = document.getElementById("goalSubtext");
 
-  const todayISO = todayDate.toISOString().split("T")[0];
   const diff = targetCalories - eatenCalories;
 
   if (timerInterval) clearInterval(timerInterval);
 
-  if (dateStr === todayISO) {
-
+  if (diffDays === 0) {
     goalBigNumber.innerText = Math.abs(diff);
-
-    if (diff > 0) goalLabel.innerText = "Calories left";
-    else if (diff < 0) goalLabel.innerText = "Calories over";
-    else goalLabel.innerText = "Goal met exactly";
-
+    goalLabel.innerText =
+      diff > 0 ? "Calories left"
+      : diff < 0 ? "Calories over"
+      : "Goal met exactly";
     startDailyTimer();
-
   } else {
-
     const weekday = activeDate.toLocaleDateString("en-US", { weekday: "long" });
-
-    if (eatenCalories === 0) {
-      goalBigNumber.innerText = "—";
-      goalLabel.innerText = "No entries logged";
-    } else if (diff > 0) {
-      goalBigNumber.innerText = Math.abs(diff);
-      goalLabel.innerText = "Under goal";
-    } else if (diff < 0) {
-      goalBigNumber.innerText = Math.abs(diff);
-      goalLabel.innerText = "Over goal";
-    } else {
-      goalBigNumber.innerText = 0;
-      goalLabel.innerText = "Goal met exactly";
-    }
-
+    goalBigNumber.innerText = eatenCalories === 0 ? "—" : Math.abs(diff);
+    goalLabel.innerText =
+      eatenCalories === 0 ? "No entries logged"
+      : diff > 0 ? "Under goal"
+      : diff < 0 ? "Over goal"
+      : "Goal met exactly";
     goalSubtext.innerText = `${weekday} summary`;
   }
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const prevBtn = document.getElementById("prevWeekBtn");
+  const nextBtn = document.getElementById("nextWeekBtn");
+
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => shiftWeek(-1));
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => shiftWeek(1));
+  }
+});
