@@ -619,3 +619,13 @@ box-sizing: border-box;
     display: none;
   }
 }
+
+
+.week-day.view-only {
+  opacity: 0.5;
+}
+
+.week-day.future {
+  opacity: 0.3;
+  pointer-events: none;
+}
