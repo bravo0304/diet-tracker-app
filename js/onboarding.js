@@ -22,21 +22,28 @@ async function finishOnboarding(){
 
   const user_id = session.user.id;
 
-  const firstName = document.getElementById("firstName").value;
-  const lastName = document.getElementById("lastName").value;
+  const firstName = document.getElementById("firstName").value.trim();
+  const lastName = document.getElementById("lastName").value.trim();
   const age = parseInt(document.getElementById("age").value);
   const sex = document.getElementById("sex").value;
 
-  const heightInput = document.getElementById("height").value.split("'");
-  const heightFt = parseInt(heightInput[0]);
-  const heightIn = parseInt(heightInput[1]);
-  const height_cm = heightFt*30.48 + heightIn*2.54;
+  // ✅ Now using direct metric values
+  const height_cm = parseFloat(document.getElementById("height").value);
+  const weight_kg = parseFloat(document.getElementById("weight").value);
 
-  const weight_lb = parseFloat(document.getElementById("weight").value);
-  const weight_kg = weight_lb * 0.453592;
+  const activityMultiplier = parseFloat(
+    document.getElementById("activityMultiplier").value
+  );
 
   const goal = document.getElementById("goal").value;
-  const weight_loss_speed = document.getElementById("weightLossSpeed")?.value || null;
+  const weight_loss_speed =
+    document.getElementById("weightLossSpeed")?.value || null;
+
+  // Basic validation
+  if (!height_cm || !weight_kg || !age) {
+    alert("Please complete all required fields.");
+    return;
+  }
 
   const { error } = await supabase
     .from("profiles")
@@ -49,7 +56,8 @@ async function finishOnboarding(){
         sex,
         height_cm,
         weight_kg,
-        goal: goal,
+        activity_multiplier: activityMultiplier,
+        goal,
         weight_loss_speed
       }
     ]);
