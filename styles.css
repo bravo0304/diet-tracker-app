@@ -439,3 +439,36 @@ body {
   font-weight: 600;
 }
 
+/* ================= TOP SECTION LAYOUT ================= */
+
+.top-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 60px;
+  padding: 40px;
+}
+
+.top-section .daily-overview {
+  flex: 1;
+}
+
+.goal-summary {
+  flex: 1;
+}
+
+.goal-summary h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+#goalStatus {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+#goalSubtext {
+  font-size: 14px;
+  color: var(--text-muted);
+}
