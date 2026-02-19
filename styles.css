@@ -492,166 +492,108 @@ body {
 }
 
 
-/* ================= CLEAN TOP DESIGN ================= */
+/* ========================================
+   CLEAN DASHBOARD TOP LAYOUT (FINAL)
+======================================== */
+
+/* TOP CARD */
 
 .top-section {
-  padding: 40px;
+  padding: 50px;
 }
+
+/* ROW: BIG NUMBER + RING */
 
 .top-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
+  gap: 60px;
+  margin-bottom: 50px;
 }
+
+/* LEFT SIDE (BIG CALORIES) */
 
 .goal-main {
-  display: flex;
-  flex-direction: column;
-}
-
-.goal-big {
-  font-size: 64px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.goal-label {
-  font-size: 20px;
-  color: var(--text-muted);
-  margin-top: 8px;
-}
-
-.goal-reset {
-  font-size: 16px;
-  margin-top: 10px;
-  color: var(--text-muted);
-}
-
-.macro-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-/* MOBILE */
-@media (max-width: 900px) {
-
-  .top-row {
-    flex-direction: column;
-    gap: 30px;
-  }
-
-  .goal-big {
-    font-size: 48px;
-  }
-
-  .goal-main {
-    align-items: center;
-    text-align: center;
-  }
-
-}
-
-
-/* =========================
-   TOP SECTION LAYOUT
-========================= */
-
-.top-section {
-  padding: 40px;
-}
-
-.top-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 40px;
-  margin-bottom: 40px;
-}
-
-/* LEFT SIDE (BIG NUMBER) */
-
-.goal-main {
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .goal-big {
-  font-size: 72px;
+  font-size: 84px;
   font-weight: 800;
   line-height: 1;
+  letter-spacing: -2px;
 }
 
 .goal-label {
-  font-size: 22px;
-  color: #6b7280;
-  margin-top: 10px;
+  font-size: 26px;
+  margin-top: 14px;
+  color: var(--text-muted);
 }
 
 .goal-reset {
   font-size: 18px;
+  margin-top: 10px;
   color: #9ca3af;
-  margin-top: 6px;
 }
 
 /* RIGHT SIDE (RING) */
 
-.ring-wrapper {
-  position: relative;
-  width: 220px;
-  height: 220px;
+.top-row .ring-wrapper {
+  width: 250px;
+  height: 250px;
   flex-shrink: 0;
 }
 
-.ring {
+.top-row .ring {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
-  background: conic-gradient(#077a7d 0%, #e5e7eb 0%);
 }
 
-.calories-text {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 18px;
+.top-row .calories-text {
+  font-size: 22px;
 }
 
-/* =========================
-   MACROS BELOW
-========================= */
+/* MACROS BELOW */
 
-.macro-bars {
+.top-section .macro-bars {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 30px;
 }
 
-/* =========================
-   MOBILE FIX
-========================= */
+/* ========================================
+   RESPONSIVE FIX
+======================================== */
 
 @media (max-width: 768px) {
 
   .top-row {
     flex-direction: column;
-    align-items: center;
     text-align: center;
-  }
-
-  .ring-wrapper {
-    width: 180px;
-    height: 180px;
+    gap: 35px;
   }
 
   .goal-big {
-    font-size: 56px;
+    font-size: 64px;
+  }
+
+  .goal-label {
+    font-size: 22px;
+  }
+
+  .goal-reset {
+    font-size: 16px;
+  }
+
+  .top-row .ring-wrapper {
+    width: 200px;
+    height: 200px;
   }
 
 }
+
 
