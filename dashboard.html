@@ -23,58 +23,63 @@
   <!-- TOP SECTION (Circle + Summary Side by Side) -->
   <div class="top-section card">
 
-    <!-- LEFT: Daily Overview (Circle + Macros) -->
-    <div class="daily-overview">
+    <!-- TOP ROW -->
+<div class="top-row">
 
-      <div class="ring-wrapper">
-        <div id="caloriesRing" class="ring"></div>
-        <div class="calories-text">
-          <span id="caloriesLabel">0 / 0 kcal</span>
-        </div>
-      </div>
+  <!-- LEFT: Big Goal Info -->
+  <div class="goal-main">
+    <div id="goalBigNumber" class="goal-big">0</div>
+    <div id="goalLabel" class="goal-label">Calories left</div>
+    <div id="goalSubtext" class="goal-reset">Resets in 00:00:00</div>
+  </div>
 
-      <div class="macro-bars">
-
-        <div class="macro-bar">
-          <div class="macro-header">
-            <span>Protein</span>
-            <span id="proteinLabel">0 / 0 g</span>
-          </div>
-          <div class="bar-bg">
-            <div class="bar-fill protein-fill" id="proteinBar"></div>
-          </div>
-        </div>
-
-        <div class="macro-bar">
-          <div class="macro-header">
-            <span>Fat</span>
-            <span id="fatLabel">0 / 0 g</span>
-          </div>
-          <div class="bar-bg">
-            <div class="bar-fill fat-fill" id="fatBar"></div>
-          </div>
-        </div>
-
-        <div class="macro-bar">
-          <div class="macro-header">
-            <span>Carbs</span>
-            <span id="carbsLabel">0 / 0 g</span>
-          </div>
-          <div class="bar-bg">
-            <div class="bar-fill carbs-fill" id="carbsBar"></div>
-          </div>
-        </div>
-
-      </div>
-
+  <!-- RIGHT: Ring -->
+  <div class="ring-wrapper">
+    <div id="caloriesRing" class="ring"></div>
+    <div class="calories-text">
+      <span id="caloriesLabel">0 / 0 kcal</span>
     </div>
+  </div>
 
-    <!-- RIGHT: Goal Summary -->
-    <div class="goal-summary">
-      <h2 id="goalTitle"></h2>
-      <div id="goalStatus"></div>
-      <div id="goalSubtext"></div>
+</div>
+
+<!-- MACROS BELOW -->
+<div class="macro-bars">
+
+  <div class="macro-bar">
+    <div class="macro-header">
+      <span>Protein</span>
+      <span id="proteinLabel">0 / 0 g</span>
     </div>
+    <div class="bar-bg">
+      <div class="bar-fill protein-fill" id="proteinBar"></div>
+    </div>
+  </div>
+
+  <div class="macro-bar">
+    <div class="macro-header">
+      <span>Fat</span>
+      <span id="fatLabel">0 / 0 g</span>
+    </div>
+    <div class="bar-bg">
+      <div class="bar-fill fat-fill" id="fatBar"></div>
+    </div>
+  </div>
+
+  <div class="macro-bar">
+    <div class="macro-header">
+      <span>Carbs</span>
+      <span id="carbsLabel">0 / 0 g</span>
+    </div>
+    <div class="bar-bg">
+      <div class="bar-fill carbs-fill" id="carbsBar"></div>
+    </div>
+  </div>
+
+</div>
+
+
+  
 
   </div>
 
