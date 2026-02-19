@@ -686,3 +686,34 @@ box-sizing: border-box;
   font-size: 12px;
   opacity: 0.6;
 }
+
+
+
+.ring {
+  position: relative;   /* IMPORTANT */
+  width: 160px;         /* or whatever size you're using */
+  height: 160px;
+  border-radius: 50%;
+}
+
+.ring-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.ring-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dashboard-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
