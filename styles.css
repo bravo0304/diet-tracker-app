@@ -207,7 +207,7 @@ body {
 }
 
 /* ========================================
-   RING (FIXED)
+   RING (REFINED PREMIUM)
 ======================================== */
 
 .ring-wrapper {
@@ -228,10 +228,10 @@ body {
 .ring::after {
   content: "";
   position: absolute;
-  inset: 18px;
+  inset: 28px;   /* ⬅ thinner ring (was 18px) */
   background: var(--card-bg);
   border-radius: 50%;
-  z-index: 1;   /* WHITE CIRCLE */
+  z-index: 1;
 }
 
 .ring-inner {
@@ -241,20 +241,22 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 2;   /* TEXT ABOVE WHITE */
+  z-index: 2;
   text-align: center;
 }
 
 .ring-number {
   font-weight: 700;
-  font-size: 22px;
+  font-size: 24px;   /* slightly larger now that there's room */
 }
 
 .ring-label {
   font-size: 14px;
   opacity: 0.6;
-  margin-top: 4px;
+  margin-top: 6px;
 }
+
+
 .calories-text {
   position: absolute;
   inset: 0;
