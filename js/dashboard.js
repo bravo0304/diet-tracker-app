@@ -23,7 +23,7 @@ export function setSelectedDate(date) {
    WEEK SYSTEM
 =========================== */
 
-let currentWeekStart = getMonday(selectedDate);
+let weekOffset = 0;
 
 function getMonday(date) {
   const d = new Date(date);
@@ -34,17 +34,24 @@ function getMonday(date) {
   return d;
 }
 
-function shiftWeek(days) {
-  currentWeekStart.setDate(currentWeekStart.getDate() + days);
+function getCurrentWeekStart() {
+  const base = new Date(todayDate);
+  base.setDate(base.getDate() + weekOffset * 7);
+  return getMonday(base);
+}
+
+function shiftWeek(direction) {
+  weekOffset += direction;
   renderWeekStrip();
 }
 
 export function getCurrentWeekDays() {
+  const weekStart = getCurrentWeekStart();
   const days = [];
 
   for (let i = 0; i < 7; i++) {
-    const day = new Date(currentWeekStart);
-    day.setDate(currentWeekStart.getDate() + i);
+    const day = new Date(weekStart);
+    day.setDate(weekStart.getDate() + i);
 
     days.push({
       date: new Date(day),
@@ -108,10 +115,10 @@ export function renderWeekStrip() {
     const touchEndX = e.changedTouches[0].screenX;
     const diff = touchStartX - touchEndX;
 
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) shiftWeek(-7);
-      else shiftWeek(7);
-    }
+  if (Math.abs(diff) > 50) {
+  if (diff > 0) shiftWeek(-1);  // previous week
+  else shiftWeek(1);            // next week
+}
 
     touchStartX = null;
   };
