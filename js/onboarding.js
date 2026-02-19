@@ -1,8 +1,10 @@
+import { supabase, requireAuth } from "./auth.js";
+
 function nextStep(step){
   document.querySelectorAll(".step").forEach(s => s.style.display="none");
   document.getElementById("step-" + step).style.display = "block";
 
-  if(step === 2){
+  if(step === 3){
     toggleWeightLossOptions();
   }
 }
@@ -14,8 +16,11 @@ function toggleWeightLossOptions(){
 }
 
 async function finishOnboarding(){
-  const token = localStorage.getItem("token");
-  if(!token) return;
+
+  const session = await requireAuth();
+  if(!session) return;
+
+  const user_id = session.user.id;
 
   const firstName = document.getElementById("firstName").value;
   const lastName = document.getElementById("lastName").value;
@@ -33,26 +38,30 @@ async function finishOnboarding(){
   const goal = document.getElementById("goal").value;
   const weight_loss_speed = document.getElementById("weightLossSpeed")?.value || null;
 
-  const profile = {
-    first_name: firstName,
-    last_name: lastName,
-    age: age,
-    sex: sex,
-    height_cm: height_cm,
-    weight_kg: weight_kg,
-    goal: goal,
-    weight_loss_speed: weight_loss_speed
-  };
+  const { error } = await supabase
+    .from("profiles")
+    .insert([
+      {
+        id: user_id,
+        first_name: firstName,
+        last_name: lastName,
+        age,
+        sex,
+        height_cm,
+        weight_kg,
+        goal: goal,
+        weight_loss_speed
+      }
+    ]);
 
-  await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
-    method: "POST",
-    headers: {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(profile)
-  });
+  if(error){
+    console.error(error);
+    alert("Error saving profile.");
+    return;
+  }
 
   window.location.href = "/dashboard.html";
 }
+
+window.nextStep = nextStep;
+window.finishOnboarding = finishOnboarding;

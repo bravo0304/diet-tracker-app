@@ -3,30 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
+  <title>Calorie Tracker</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <header class="navbar">
-    <h1>Login / Sign up</h1>
-  </header>
 
-  <main class="container">
-    <div class="card">
-      <h2>Login</h2>
-      <form id="loginForm">
-        <label>Email</label>
-        <input type="email" id="email" required>
+<body class="auth-page">
 
-        <label>Password</label>
-        <input type="password" id="password" required>
+  <main class="auth-container">
+    <div class="auth-card">
 
-        <button type="button" onclick="login()" class="primary-btn">Login</button>
+      <h1 class="auth-title">Calorie Tracker</h1>
+      <p class="auth-sub">Track your daily nutrition goals</p>
+
+      <form onsubmit="event.preventDefault(); login();">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+
+        <button class="primary-btn" type="submit">Login</button>
       </form>
-      <div id="status" style="margin-top:10px;color:#FF6B4A;"></div>
+
+      <button onclick="signup()" class="secondary-btn signup-btn">
+        Create Account
+      </button>
+
+      <div id="status" class="auth-status"></div>
+
     </div>
   </main>
 
-<script src="js/login.js"></script>
+<script type="module" src="./js/login.js"></script>
 </body>
 </html>
