@@ -558,3 +558,22 @@ body {
 .secondary-btn {
   height: 58px;
 }
+
+/* Improve form spacing */
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.auth-card .primary-btn {
+  margin-top: 15px;
+}
+
+.auth-link {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
