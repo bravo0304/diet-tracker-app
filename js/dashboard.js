@@ -1,5 +1,5 @@
 import { deleteMeal } from "./api.js";
-import { getToken, getUserIdFromToken } from "./auth.js";
+import { supabase, requireAuth } from "./auth.js";
 
 /* ===========================
    DATE STATE
