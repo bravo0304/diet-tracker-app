@@ -1,7 +1,9 @@
 import { deleteMeal } from "./api.js";
 import { getToken, getUserIdFromToken } from "./auth.js";
 
-// ================= DATE STATE =================
+/* ===========================
+   DATE STATE
+=========================== */
 
 let todayDate = new Date();
 todayDate.setHours(0, 0, 0, 0);
@@ -17,7 +19,9 @@ export function setSelectedDate(date) {
   selectedDate.setHours(0, 0, 0, 0);
 }
 
-// ================= WEEK STATE =================
+/* ===========================
+   WEEK SYSTEM
+=========================== */
 
 let currentWeekStart = getMonday(selectedDate);
 
@@ -28,10 +32,6 @@ function getMonday(date) {
   d.setDate(d.getDate() + diff);
   d.setHours(0, 0, 0, 0);
   return d;
-}
-
-export function setCurrentWeekStart(date) {
-  currentWeekStart = getMonday(date);
 }
 
 export function getCurrentWeekDays() {
@@ -52,30 +52,60 @@ export function getCurrentWeekDays() {
   return days;
 }
 
-// ================= SUPABASE =================
+export function renderWeekStrip() {
+
+  const container = document.getElementById("weekStrip");
+  container.innerHTML = "";
+
+  const weekDays = getCurrentWeekDays();
+  const todayISO = todayDate.toISOString().split("T")[0];
+  const selectedISO = selectedDate.toISOString().split("T")[0];
+
+  weekDays.forEach(day => {
+
+    const el = document.createElement("div");
+    el.classList.add("week-day");
+
+    const diffDays = Math.floor((todayDate - day.date) / 86400000);
+    const isFuture = diffDays < 0;
+    const isLocked = diffDays > 3;
+    const isSelected = day.iso === selectedISO;
+
+    if (isSelected) el.classList.add("selected");
+    else if (isLocked || isFuture) el.classList.add("locked");
+    else el.classList.add("clickable");
+
+    el.innerHTML = `
+      <span>${day.weekDay}</span>
+      <span>${day.dayNumber}</span>
+    `;
+
+    if (!isLocked && !isFuture) {
+      el.addEventListener("click", () => {
+        setSelectedDate(day.date);
+        renderWeekStrip();
+        loadDashboard(day.date);
+      });
+    }
+
+    container.appendChild(el);
+  });
+}
+
+/* ===========================
+   SUPABASE CONFIG
+=========================== */
 
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
 
-// ================= RING =================
+/* ===========================
+   UI HELPERS
+=========================== */
 
 function animateRing(ring, targetPercent) {
-  let current = 0;
-  const step = targetPercent / 30;
-
-  function update() {
-    current += step;
-    if (current >= targetPercent) current = targetPercent;
-
-    ring.style.background =
-      `conic-gradient(#077a7d ${current}%, #e5e7eb ${current}%)`;
-
-    if (current < targetPercent) {
-      requestAnimationFrame(update);
-    }
-  }
-
-  requestAnimationFrame(update);
+  ring.style.background =
+    `conic-gradient(#077a7d ${targetPercent}%, #e5e7eb ${targetPercent}%)`;
 }
 
 function updateBar(id, consumed, target) {
@@ -84,7 +114,9 @@ function updateBar(id, consumed, target) {
   bar.style.width = percent + "%";
 }
 
-// ================= TIMER =================
+/* ===========================
+   TIMER (TODAY ONLY)
+=========================== */
 
 let timerInterval = null;
 
@@ -116,7 +148,9 @@ function startDailyTimer() {
   timerInterval = setInterval(update, 1000);
 }
 
-// ================= DASHBOARD =================
+/* ===========================
+   MAIN DASHBOARD LOAD
+=========================== */
 
 export async function loadDashboard(dateOverride = null) {
 
@@ -134,8 +168,7 @@ export async function loadDashboard(dateOverride = null) {
 
   const dateStr = activeDate.toISOString().split("T")[0];
 
-  // -------- PROFILE --------
-
+  // PROFILE
   const profileRes = await fetch(
     `${SUPABASE_URL}/rest/v1/profiles?id=eq.${user_id}&select=*`,
     {
@@ -167,8 +200,7 @@ export async function loadDashboard(dateOverride = null) {
   const fatTarget = Math.round((targetCalories * 0.25) / 9);
   const carbsTarget = Math.round((targetCalories * 0.45) / 4);
 
-  // -------- MEALS --------
-
+  // MEALS
   const mealsRes = await fetch(
     `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&date=eq.${dateStr}&select=*`,
     {
@@ -190,6 +222,7 @@ export async function loadDashboard(dateOverride = null) {
   foodList.innerHTML = "";
 
   meals.forEach((m) => {
+
     eatenCalories += m.calories || 0;
     eatenProtein += m.protein || 0;
     eatenFat += m.fat || 0;
@@ -223,8 +256,7 @@ export async function loadDashboard(dateOverride = null) {
     });
   });
 
-  // -------- UPDATE UI --------
-
+  // UPDATE RING + MACROS
   document.getElementById("caloriesLabel").innerText =
     `${eatenCalories} / ${targetCalories} kcal`;
 
@@ -242,23 +274,20 @@ export async function loadDashboard(dateOverride = null) {
   document.getElementById("carbsLabel").innerText =
     `${eatenCarbs} / ${carbsTarget} g`;
 
-  // -------- SUMMARY LOGIC --------
-
+  // SUMMARY LOGIC
   const goalTitle = document.getElementById("goalTitle");
   const goalStatus = document.getElementById("goalStatus");
   const goalSubtext = document.getElementById("goalSubtext");
 
   const todayISO = todayDate.toISOString().split("T")[0];
-  const activeISO = dateStr;
   const diff = targetCalories - eatenCalories;
 
-  // Always stop timer first
   if (timerInterval) {
     clearInterval(timerInterval);
     timerInterval = null;
   }
 
-  if (activeISO === todayISO) {
+  if (dateStr === todayISO) {
 
     goalTitle.innerText = "Today’s Goal";
 
