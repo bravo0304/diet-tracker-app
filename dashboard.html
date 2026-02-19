@@ -17,18 +17,14 @@
 
   <main class="container">
 
-    <!-- NEW GOAL SUMMARY -->
-    <div class="goal-summary">
-      <h2 id="goalTitle"></h2>
-      <div id="goalStatus"></div>
-      <div id="goalSubtext"></div>
-    </div>
+  <!-- WEEK STRIP -->
+  <div id="weekStrip" class="week-strip"></div>
 
-    <!-- WEEK STRIP -->
-    <div id="weekStrip" class="week-strip"></div>
+  <!-- TOP SECTION (Circle + Summary Side by Side) -->
+  <div class="top-section card">
 
-    <!-- DAILY OVERVIEW -->
-    <section class="card daily-overview">
+    <!-- LEFT: Daily Overview (Circle + Macros) -->
+    <div class="daily-overview">
 
       <div class="ring-wrapper">
         <div id="caloriesRing" class="ring"></div>
@@ -71,16 +67,26 @@
 
       </div>
 
-    </section>
+    </div>
 
-    <!-- DAILY LOG -->
-    <section class="card">
-      <h3>Daily Food Log</h3>
-      <ul id="foodEntries"></ul>
-      <button id="newEntryBtn" class="primary-btn">Add Meal</button>
-    </section>
+    <!-- RIGHT: Goal Summary -->
+    <div class="goal-summary">
+      <h2 id="goalTitle"></h2>
+      <div id="goalStatus"></div>
+      <div id="goalSubtext"></div>
+    </div>
 
-  </main>
+  </div>
+
+  <!-- DAILY LOG -->
+  <section class="card">
+    <h3>Daily Food Log</h3>
+    <ul id="foodEntries"></ul>
+    <button id="newEntryBtn" class="primary-btn">Add Meal</button>
+  </section>
+
+</main>
+
 
   <div id="sheetOverlay" class="sheet-overlay"></div>
 
