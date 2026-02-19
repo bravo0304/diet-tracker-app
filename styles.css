@@ -584,3 +584,6 @@ body {
   display: block;
 }
 
+.header-logo {
+  height: 32px;
+}
