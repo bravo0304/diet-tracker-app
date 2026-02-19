@@ -469,3 +469,35 @@ body {
 
   .calories-text { font-size: 14px; }
 }
+
+
+/* ========================================
+   BOTTOM SHEET
+======================================== */
+
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 50;
+}
+
+.sheet-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.bottom-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--card-bg);
+  border-radius: 24px 24px 0 0;
+  padding: 25px;
+  transform: translateY(100%);
+  trans
