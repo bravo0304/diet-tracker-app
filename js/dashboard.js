@@ -143,7 +143,7 @@ export async function loadDashboard(dateOverride = null) {
         </div>
       </div>
       <div class="meal-right">
-        <div>${m.calories} kcal</div>
+        <div>${m.calories} Calories</div>
         <button class="delete-btn" data-id="${m.id}">✕</button>
       </div>`;
     foodList.appendChild(li);
