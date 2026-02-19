@@ -472,17 +472,17 @@ body {
 
 
 /* ========================================
-   BOTTOM SHEET
+   BOTTOM SHEET (PREMIUM CLEAN)
 ======================================== */
 
 .sheet-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(8px);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.25s ease;
   z-index: 100;
 }
 
@@ -497,10 +497,10 @@ body {
   right: 0;
   bottom: 0;
   background: white;
-  border-radius: 24px 24px 0 0;
-  padding: 30px;
+  border-radius: 28px 28px 0 0;
+  padding: 28px 24px 32px;
   transform: translateY(100%);
-  transition: transform 0.35s ease;
+  transition: transform 0.35s cubic-bezier(.22,1,.36,1);
   z-index: 200;
 }
 
@@ -511,11 +511,59 @@ body {
 .sheet-handle {
   width: 50px;
   height: 5px;
-  background: var(--border);
+  background: #d1d5db;
   border-radius: 10px;
   margin: 0 auto 20px;
 }
 
 .sheet-content h3 {
-  margin-top: 0;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* INPUTS */
+
+.bottom-sheet input {
+  width: 100%;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  font-size: 16px;
+  background: #fafafa;
+}
+
+.bottom-sheet input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(15,118,110,0.08);
+}
+
+/* Macro grid cleaner */
+
+.macro-input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+/* Buttons */
+
+.sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.sheet-actions .secondary-btn {
+  height: 52px;
+  font-weight: 500;
+}
+
+.sheet-actions .primary-btn {
+  height: 56px;
+  font-size: 18px;
 }
