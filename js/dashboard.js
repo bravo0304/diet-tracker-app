@@ -137,9 +137,9 @@ export async function loadDashboard(dateOverride = null) {
       <div class="meal-left">
         <div class="meal-name">${m.food_name}</div>
         <div class="meal-macros">
-          <span>P ${m.protein}g</span>
-          <span>F ${m.fat}g</span>
-          <span>C ${m.carbs}g</span>
+          <span class="macro-protein">P ${m.protein}g</span>
+          <span class="macro-fat">F ${m.fat}g</span>
+          <span class="macro-carbs">C ${m.carbs}g</span>
         </div>
       </div>
       <div class="meal-right">
