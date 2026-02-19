@@ -65,5 +65,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderWeekStrip();
   loadDashboard();
-  startDailyTimer();
 });
