@@ -207,33 +207,31 @@ body {
 }
 
 /* ========================================
-   RING
+   RING (FIXED)
 ======================================== */
 
 .ring-wrapper {
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 160px;
-  height: 160px;
+  width: 250px;
+  height: 250px;
+  flex-shrink: 0;
 }
 
 .ring {
   position: relative;
-  width: 160px;
-  height: 160px;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   background: conic-gradient(var(--primary) 0%, var(--border) 0%);
-  transition: background 0.6s ease;
 }
 
 .ring::after {
   content: "";
   position: absolute;
-  inset: 14px;
+  inset: 18px;
   background: var(--card-bg);
   border-radius: 50%;
+  z-index: 1;   /* WHITE CIRCLE */
 }
 
 .ring-inner {
@@ -243,19 +241,20 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  z-index: 2;   /* TEXT ABOVE WHITE */
   text-align: center;
 }
 
 .ring-number {
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: 700;
+  font-size: 22px;
 }
 
 .ring-label {
-  font-size: 12px;
+  font-size: 14px;
   opacity: 0.6;
+  margin-top: 4px;
 }
-
 .calories-text {
   position: absolute;
   inset: 0;
