@@ -577,3 +577,10 @@ body {
   border-top: 1px solid var(--border);
 }
 
+
+.auth-logo {
+  width: 140px;
+  margin: 0 auto 10px auto;
+  display: block;
+}
+
