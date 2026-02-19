@@ -629,3 +629,7 @@ box-sizing: border-box;
   opacity: 0.3;
   pointer-events: none;
 }
+
+.week-day.selected {
+  opacity: 1;
+}
