@@ -49,7 +49,7 @@ async function finishOnboarding(){
         sex,
         height_cm,
         weight_kg,
-        goal_type: goal,
+        goal: goal,
         weight_loss_speed
       }
     ]);
