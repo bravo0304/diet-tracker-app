@@ -1,9 +1,8 @@
-import { getToken, getUserIdFromToken } from "./auth.js";
+import { supabase, requireAuth } from "./auth.js";
 
-export const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
-export const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
-
-// ===== UTIL =====
+/* ===========================
+   UTIL
+=========================== */
 
 export function getTodayString() {
   const today = new Date();
@@ -11,60 +10,57 @@ export function getTodayString() {
   return today.toISOString().split("T")[0];
 }
 
-// ===== API =====
+/* ===========================
+   SAVE MEAL
+=========================== */
 
 export async function saveMeal(meal, dateString) {
-  const token = getToken();
-  const user_id = getUserIdFromToken();
 
-  if (!token || !user_id) {
-    window.location.href = "/";
-    return;
-  }
+  const session = await requireAuth();
+  if (!session) return;
 
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/meals`, {
-    method: "POST",
-    headers: {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json",
-      "Prefer": "return=minimal"
-    },
-    body: JSON.stringify({
-      user_id,
-      food_name: meal.food_name,
-      calories: meal.calories,
-      protein: meal.protein,
-      carbs: meal.carbs,
-      fat: meal.fat,
-      meal_type: "general",
-      date: dateString
-    })
-  });
+  const user_id = session.user.id;
 
-  if (!res.ok) {
+  const { error } = await supabase
+    .from("meals")
+    .insert([
+      {
+        user_id,
+        food_name: meal.food_name,
+        calories: meal.calories,
+        protein: meal.protein,
+        carbs: meal.carbs,
+        fat: meal.fat,
+        meal_type: "general",
+        date: dateString
+      }
+    ]);
+
+  if (error) {
     alert("Error saving meal.");
+    console.error(error.message);
   }
 }
 
+/* ===========================
+   DELETE MEAL
+=========================== */
 
 export async function deleteMeal(id) {
-  const token = getToken();
 
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/meals?id=eq.${id}`,
-    {
-      method: "DELETE",
-      headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${token}`
-      }
-    }
-  );
+  const session = await requireAuth();
+  if (!session) return;
 
-  if (!res.ok) {
+  const user_id = session.user.id;
+
+  const { error } = await supabase
+    .from("meals")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user_id);
+
+  if (error) {
     alert("Failed to delete meal.");
-    return;
+    console.error(error.message);
   }
 }
-
