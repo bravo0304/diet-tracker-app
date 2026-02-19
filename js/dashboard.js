@@ -1,6 +1,8 @@
 import { deleteMeal } from "./api.js";
 import { getToken, getUserIdFromToken } from "./auth.js";
 
+// ================= DATE STATE =================
+
 let todayDate = new Date();
 todayDate.setHours(0, 0, 0, 0);
 
@@ -15,6 +17,8 @@ export function setSelectedDate(date) {
   selectedDate.setHours(0, 0, 0, 0);
 }
 
+// ================= WEEK STATE =================
+
 let currentWeekStart = getMonday(selectedDate);
 
 function getMonday(date) {
@@ -26,11 +30,17 @@ function getMonday(date) {
   return d;
 }
 
-function getCurrentWeekDays() {
+export function setCurrentWeekStart(date) {
+  currentWeekStart = getMonday(date);
+}
+
+export function getCurrentWeekDays() {
   const days = [];
+
   for (let i = 0; i < 7; i++) {
     const day = new Date(currentWeekStart);
     day.setDate(currentWeekStart.getDate() + i);
+
     days.push({
       date: new Date(day),
       iso: day.toISOString().split("T")[0],
@@ -38,15 +48,34 @@ function getCurrentWeekDays() {
       weekDay: day.toLocaleDateString("en-US", { weekday: "short" })
     });
   }
+
   return days;
 }
+
+// ================= SUPABASE =================
 
 const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
 
+// ================= RING =================
+
 function animateRing(ring, targetPercent) {
-  ring.style.background =
-    `conic-gradient(#0f766e ${targetPercent}%, #e5e7eb ${targetPercent}%)`;
+  let current = 0;
+  const step = targetPercent / 30;
+
+  function update() {
+    current += step;
+    if (current >= targetPercent) current = targetPercent;
+
+    ring.style.background =
+      `conic-gradient(#077a7d ${current}%, #e5e7eb ${current}%)`;
+
+    if (current < targetPercent) {
+      requestAnimationFrame(update);
+    }
+  }
+
+  requestAnimationFrame(update);
 }
 
 function updateBar(id, consumed, target) {
@@ -55,35 +84,49 @@ function updateBar(id, consumed, target) {
   bar.style.width = percent + "%";
 }
 
+// ================= TIMER =================
+
 let timerInterval = null;
 
 function startDailyTimer() {
+
   const sub = document.getElementById("goalSubtext");
   if (!sub) return;
 
-  if (timerInterval) clearInterval(timerInterval);
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
 
   function update() {
     const now = new Date();
     const midnight = new Date();
     midnight.setHours(24, 0, 0, 0);
+
     const diff = midnight - now;
 
     const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
     const m = String(Math.floor((diff / 60000) % 60)).padStart(2, "0");
     const s = String(Math.floor((diff / 1000) % 60)).padStart(2, "0");
 
-    sub.innerText = `Daily goal • Resets in ${h}:${m}:${s}`;
+    sub.innerText = `Resets in ${h}:${m}:${s}`;
   }
 
   update();
   timerInterval = setInterval(update, 1000);
 }
 
+// ================= DASHBOARD =================
+
 export async function loadDashboard(dateOverride = null) {
+
   const token = getToken();
   const user_id = getUserIdFromToken();
-  if (!token || !user_id) return;
+
+  if (!token || !user_id) {
+    window.location.href = "/";
+    return;
+  }
 
   const activeDate = dateOverride ? new Date(dateOverride) : selectedDate;
   activeDate.setHours(0, 0, 0, 0);
@@ -91,14 +134,23 @@ export async function loadDashboard(dateOverride = null) {
 
   const dateStr = activeDate.toISOString().split("T")[0];
 
+  // -------- PROFILE --------
+
   const profileRes = await fetch(
     `${SUPABASE_URL}/rest/v1/profiles?id=eq.${user_id}&select=*`,
-    { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${token}` } }
+    {
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${token}`
+      }
+    }
   );
+
   const profiles = await profileRes.json();
   if (!profiles.length) return;
 
   const profile = profiles[0];
+
   const W = profile.weight_kg || 72;
   const H = profile.height_cm || 170;
   const A = profile.age || 30;
@@ -110,17 +162,29 @@ export async function loadDashboard(dateOverride = null) {
 
   const tdee = bmr * 1.4;
   const targetCalories = Math.round(tdee);
+
   const proteinTarget = Math.round((targetCalories * 0.3) / 4);
   const fatTarget = Math.round((targetCalories * 0.25) / 9);
   const carbsTarget = Math.round((targetCalories * 0.45) / 4);
 
+  // -------- MEALS --------
+
   const mealsRes = await fetch(
     `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&date=eq.${dateStr}&select=*`,
-    { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${token}` } }
+    {
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${token}`
+      }
+    }
   );
+
   const meals = await mealsRes.json();
 
-  let eatenCalories = 0, eatenProtein = 0, eatenFat = 0, eatenCarbs = 0;
+  let eatenCalories = 0;
+  let eatenProtein = 0;
+  let eatenFat = 0;
+  let eatenCarbs = 0;
 
   const foodList = document.getElementById("foodEntries");
   foodList.innerHTML = "";
@@ -133,6 +197,7 @@ export async function loadDashboard(dateOverride = null) {
 
     const li = document.createElement("li");
     li.classList.add("meal-row");
+
     li.innerHTML = `
       <div class="meal-left">
         <div class="meal-name">${m.food_name}</div>
@@ -143,11 +208,22 @@ export async function loadDashboard(dateOverride = null) {
         </div>
       </div>
       <div class="meal-right">
-        <div>${m.calories} Calories</div>
+        <div class="meal-calories">${m.calories} kcal</div>
         <button class="delete-btn" data-id="${m.id}">✕</button>
-      </div>`;
+      </div>
+    `;
+
     foodList.appendChild(li);
   });
+
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      await deleteMeal(btn.getAttribute("data-id"));
+      loadDashboard(activeDate);
+    });
+  });
+
+  // -------- UPDATE UI --------
 
   document.getElementById("caloriesLabel").innerText =
     `${eatenCalories} / ${targetCalories} kcal`;
@@ -166,6 +242,8 @@ export async function loadDashboard(dateOverride = null) {
   document.getElementById("carbsLabel").innerText =
     `${eatenCarbs} / ${carbsTarget} g`;
 
+  // -------- SUMMARY LOGIC --------
+
   const goalTitle = document.getElementById("goalTitle");
   const goalStatus = document.getElementById("goalStatus");
   const goalSubtext = document.getElementById("goalSubtext");
@@ -174,56 +252,43 @@ export async function loadDashboard(dateOverride = null) {
   const activeISO = dateStr;
   const diff = targetCalories - eatenCalories;
 
-  if (activeISO === todayISO) {
-    goalTitle.innerText = "Today’s Goal";
-    goalStatus.innerText =
-      diff >= 0 ? `${diff} Calories left` : `+${Math.abs(diff)} Calories over`;
-    startDailyTimer();
-  } else {
-    const weekday = activeDate.toLocaleDateString("en-US", { weekday: "long" });
-    goalTitle.innerText = `${weekday} Summary`;
-    goalStatus.innerText =
-      diff >= 0
-        ? "You stayed within your goal."
-        : `You went ${Math.abs(diff)} calories over.`;
-    goalSubtext.innerText = "";
+  // Always stop timer first
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
   }
-}
 
-export function renderWeekStrip() {
-  const container = document.getElementById("weekStrip");
-  container.innerHTML = "";
+  if (activeISO === todayISO) {
 
-  const weekDays = getCurrentWeekDays();
-  const todayISO = todayDate.toISOString().split("T")[0];
-  const selectedISO = selectedDate.toISOString().split("T")[0];
+    goalTitle.innerText = "Today’s Goal";
 
-  weekDays.forEach(day => {
-    const el = document.createElement("div");
-    el.classList.add("week-day");
-
-    const diffDays = Math.floor((todayDate - day.date) / 86400000);
-    const isFuture = diffDays < 0;
-    const isLocked = diffDays > 3;
-    const isSelected = day.iso === selectedISO;
-
-    if (isSelected) el.classList.add("selected");
-    else if (isLocked || isFuture) el.classList.add("locked");
-    else el.classList.add("clickable");
-
-    el.innerHTML = `
-      <span>${day.weekDay}</span>
-      <span>${day.dayNumber}</span>
-    `;
-
-    if (!isLocked && !isFuture) {
-      el.addEventListener("click", () => {
-        setSelectedDate(day.date);
-        renderWeekStrip();
-        loadDashboard(day.date);
-      });
+    if (eatenCalories === 0) {
+      goalStatus.innerText = "No entries logged yet.";
+    } else if (diff > 0) {
+      goalStatus.innerText = `${diff} Calories left`;
+    } else if (diff < 0) {
+      goalStatus.innerText = `+${Math.abs(diff)} Calories over`;
+    } else {
+      goalStatus.innerText = "You hit your goal exactly.";
     }
 
-    container.appendChild(el);
-  });
+    startDailyTimer();
+
+  } else {
+
+    const weekday = activeDate.toLocaleDateString("en-US", { weekday: "long" });
+    goalTitle.innerText = `${weekday} Summary`;
+
+    if (eatenCalories === 0) {
+      goalStatus.innerText = "No entries logged.";
+    } else if (diff > 0) {
+      goalStatus.innerText = `Under goal by ${diff} calories.`;
+    } else if (diff < 0) {
+      goalStatus.innerText = `Over goal by ${Math.abs(diff)} calories.`;
+    } else {
+      goalStatus.innerText = "Goal met exactly.";
+    }
+
+    goalSubtext.innerText = "";
+  }
 }
