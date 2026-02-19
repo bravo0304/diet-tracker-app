@@ -491,3 +491,65 @@ body {
   }
 }
 
+
+/* ================= CLEAN TOP DESIGN ================= */
+
+.top-section {
+  padding: 40px;
+}
+
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.goal-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.goal-big {
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.goal-label {
+  font-size: 20px;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+.goal-reset {
+  font-size: 16px;
+  margin-top: 10px;
+  color: var(--text-muted);
+}
+
+.macro-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* MOBILE */
+@media (max-width: 900px) {
+
+  .top-row {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .goal-big {
+    font-size: 48px;
+  }
+
+  .goal-main {
+    align-items: center;
+    text-align: center;
+  }
+
+}
+
