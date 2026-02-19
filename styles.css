@@ -87,23 +87,19 @@ body {
   border: none;
   width: 100%;
   height: 58px;
-  padding: 18px;
   border-radius: 16px;
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
 }
 
-.primary-btn:hover {
-  opacity: 0.9;
-}
+.primary-btn:hover { opacity: 0.9; }
 
 .secondary-btn {
   background: none;
   border: 1px solid var(--border);
   width: 100%;
   height: 58px;
-  padding: 16px;
   border-radius: 16px;
   cursor: pointer;
 }
@@ -114,58 +110,40 @@ body {
 
 .week-strip {
   display: flex;
-  width: 100%;
   gap: 6px;
   margin: 20px 0 30px;
 }
 
 .week-day {
   flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 12px 4px;
   border-radius: 18px;
   border: 1px solid var(--border);
   background: var(--card-bg);
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.week-day.clickable:hover {
-  background: #f8fafc;
+  transition: 0.2s;
 }
 
 .week-day.selected {
-  background: #1e7f73;
+  background: var(--primary);
   color: white;
-  opacity: 1;
 }
 
 .week-day.today-outline {
-  border: 2px solid #1e7f73;
-  background: white;
-  color: #1e7f73;
+  border: 2px solid var(--primary);
+  color: var(--primary);
 }
 
-.week-day.view-only {
-  opacity: 0.5;
-}
-
-.week-day.future {
-  opacity: 0.3;
-  pointer-events: none;
-}
+.week-day.view-only { opacity: 0.5; }
+.week-day.future { opacity: 0.3; pointer-events: none; }
 
 /* ========================================
-   DASHBOARD TOP SECTION
+   DASHBOARD TOP
 ======================================== */
 
-.top-section {
-  padding: 50px;
-}
+.top-section { padding: 50px; }
 
 .top-row {
   display: flex;
@@ -177,16 +155,12 @@ body {
 
 .goal-main {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .goal-big {
   font-size: 84px;
   font-weight: 800;
   line-height: 1;
-  letter-spacing: -2px;
 }
 
 .goal-label {
@@ -218,7 +192,6 @@ body {
   height: 100%;
   border-radius: 50%;
   background: conic-gradient(var(--primary) 0%, var(--border) 0%);
-  transition: background 0.6s ease;
 }
 
 .ring::after {
@@ -238,12 +211,11 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 2;
-  text-align: center;
 }
 
 .ring-number {
-  font-weight: 700;
   font-size: 22px;
+  font-weight: 700;
 }
 
 .ring-label {
@@ -253,7 +225,7 @@ body {
 }
 
 /* ========================================
-   MACRO BARS
+   MACROS
 ======================================== */
 
 .macro-bars {
@@ -270,11 +242,9 @@ body {
 }
 
 .bar-bg {
-  width: 100%;
   height: 10px;
   background: var(--border);
   border-radius: 20px;
-  overflow: hidden;
 }
 
 .bar-fill {
@@ -289,7 +259,7 @@ body {
 .carbs-fill { background: var(--carbs); }
 
 /* ========================================
-   DAILY FOOD LOG
+   FOOD LIST
 ======================================== */
 
 #foodEntries {
@@ -304,18 +274,6 @@ body {
   align-items: center;
   padding: 14px 0;
   border-bottom: 1px solid var(--border);
-}
-
-.meal-name {
-  font-weight: 500;
-  text-transform: uppercase;
-  font-size: 13px;
-  letter-spacing: 0.08em;
-}
-
-.meal-macros {
-  font-size: 13px;
-  font-weight: 600;
 }
 
 .meal-right {
@@ -335,6 +293,329 @@ body {
   color: var(--text-muted);
 }
 
-.delete-btn:hover {
+.delete-btn:hover { color: var(--protein); }
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 768px) {
+
+  .top-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 30px;
+  }
+
+  .goal-big { font-size: 48px; }
+  .goal-label { font-size: 18px; }
+  .goal-reset { font-size: 14px; }
+
+  .ring-wrapper {
+    width: 180px;
+    height: 180px;
+  }
+
+  .ring-number { font-size: 18px; }
+  .ring-label { font-size: 12px; }
+
+  .week-arrow { display: none; }
+}
+
+
+/* ========================================
+   AUTH PAGE
+======================================== */
+
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: var(--bg);
+}
+
+.auth-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.auth-card {
+  background: white;
+  padding: 50px 40px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.auth-title {
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.auth-sub {
+  text-align: center;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+
+.auth-card input {
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 15px;
+}
+
+.auth-card input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.auth-card .primary-btn {
+  margin-top: 15px;
+}
+
+.auth-status {
+  text-align: center;
+  font-size: 14px;
   color: var(--protein);
+}
+
+.auth-link {
+  text-align: center;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: block;
+}
+
+.auth-link:hover {
+  opacity: 0.8;
+}
+
+.auth-logo {
+  width: 140px;
+  margin: 0 auto 10px auto;
+  display: block;
+}
+
+/* ========================================
+   ONBOARDING
+======================================== */
+
+#onboardingForm {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.step h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.step label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 10px;
+}
+
+.step input,
+.step select {
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  font-size: 16px;
+  background: #fafafa;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.step input:focus,
+.step select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(15,118,110,0.08);
+}
+
+.onboarding-header {
+  justify-content: center;
+  font-weight: 700;
+}
+
+/* ========================================
+   BOTTOM SHEET
+======================================== */
+
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 100;
+}
+
+.sheet-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.bottom-sheet {
+  position: fixed;
+  left: 8px;
+  right: 8px;
+  bottom: 0;
+  background: white;
+  border-radius: 28px 28px 0 0;
+  padding: 28px 24px 32px;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(.22,1,.36,1);
+  z-index: 200;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.bottom-sheet.open {
+  transform: translateY(0);
+}
+
+.sheet-handle {
+  width: 50px;
+  height: 5px;
+  background: #d1d5db;
+  border-radius: 10px;
+  margin: 0 auto 20px;
+}
+
+.sheet-content h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.bottom-sheet input {
+  width: 100%;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  font-size: 16px;
+  background: #fafafa;
+  box-sizing: border-box;
+}
+
+.bottom-sheet input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(15,118,110,0.08);
+}
+
+/* Macro input grid */
+
+.macro-input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+/* Sheet actions */
+
+.sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.sheet-actions .secondary-btn {
+  height: 52px;
+  font-weight: 500;
+}
+
+.sheet-actions .primary-btn {
+  height: 56px;
+  font-size: 18px;
+}
+
+/* ========================================
+   WEEK NAVIGATION
+======================================== */
+
+.week-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.week-arrow {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #555;
+}
+
+.week-arrow:hover {
+  color: #000;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 768px) {
+
+  .top-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .goal-big { font-size: 48px; }
+  .goal-label { font-size: 18px; }
+  .goal-reset { font-size: 14px; }
+
+  .ring-wrapper {
+    width: 160px;
+    height: 160px;
+  }
+
+  .calories-text { font-size: 14px; }
+
+  .week-arrow {
+    display: none;
+  }
 }
