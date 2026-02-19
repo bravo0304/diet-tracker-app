@@ -466,3 +466,72 @@ body {
   color: var(--protein);
 }
 
+/* ================= ONBOARDING POLISH ================= */
+
+.onboarding-header {
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+#onboardingForm {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.step h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.step label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 10px;
+}
+
+.step input,
+.step select {
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  font-size: 16px;
+  background: #fafafa;
+}
+
+.step input:focus,
+.step select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(15,118,110,0.08);
+}
+
+/* Full Width Buttons */
+.primary-btn {
+  width: 100%;
+  padding: 18px;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.secondary-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 16px;
+}
+
+/* Make card feel more mobile */
+.card {
+  border-radius: 24px;
+}
