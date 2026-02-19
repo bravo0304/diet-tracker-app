@@ -81,21 +81,16 @@ export function renderWeekStrip() {
     const isFuture = diffDays < 0;
     const isSelected = day.iso === selectedISO;
 
-    if (isSelected) el.classList.add("selected");
-    else if (isFuture) el.classList.add("locked");
-    else el.classList.add("clickable");
+    const isSelected = day.iso === selectedISO;
 
-    el.innerHTML = `
-      <span>${day.weekDay}</span>
-      <span>${day.dayNumber}</span>
-    `;
+if (isSelected) el.classList.add("selected");
+else el.classList.add("clickable");
 
-    if (!isFuture) {
-      el.addEventListener("click", () => {
-        setSelectedDate(day.date);
-        renderWeekStrip();
-        loadDashboard(day.date);
-      });
+el.addEventListener("click", () => {
+  setSelectedDate(day.date);
+  renderWeekStrip();
+  loadDashboard(day.date);
+});
     }
 
     container.appendChild(el);
