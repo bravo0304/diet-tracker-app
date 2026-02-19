@@ -1,44 +1,176 @@
+import { deleteMeal } from "./api.js";
 import { getToken, getUserIdFromToken } from "./auth.js";
-import { SUPABASE_URL, SUPABASE_KEY } from "./api.js";
 
-let selectedDate = new Date();
-const todayDate = new Date();
+/* ===========================
+   DATE STATE
+=========================== */
 
-function formatDate(date) {
-  return date.toISOString().split("T")[0];
+let todayDate = new Date();
+todayDate.setHours(0, 0, 0, 0);
+
+let selectedDate = new Date(todayDate);
+
+export function getSelectedDate() {
+  return selectedDate;
 }
 
-function isToday(date) {
-  return formatDate(date) === formatDate(todayDate);
+export function setSelectedDate(date) {
+  selectedDate = new Date(date);
+  selectedDate.setHours(0, 0, 0, 0);
 }
 
-function getTimeUntilMidnight() {
-  const now = new Date();
-  const midnight = new Date();
-  midnight.setHours(24, 0, 0, 0);
-  return midnight - now;
+/* ===========================
+   WEEK SYSTEM
+=========================== */
+
+let currentWeekStart = getMonday(selectedDate);
+
+function getMonday(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
 }
 
-function formatTime(ms) {
-  const totalSeconds = Math.floor(ms / 1000);
-  const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
-  const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
-  const seconds = String(totalSeconds % 60).padStart(2, "0");
-  return `${hours}:${minutes}:${seconds}`;
+export function getCurrentWeekDays() {
+  const days = [];
+
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(currentWeekStart);
+    day.setDate(currentWeekStart.getDate() + i);
+
+    days.push({
+      date: new Date(day),
+      iso: day.toISOString().split("T")[0],
+      dayNumber: day.getDate(),
+      weekDay: day.toLocaleDateString("en-US", { weekday: "short" })
+    });
+  }
+
+  return days;
 }
 
-export async function loadDashboard(date = selectedDate) {
-  selectedDate = date;
+export function renderWeekStrip() {
+
+  const container = document.getElementById("weekStrip");
+  container.innerHTML = "";
+
+  const weekDays = getCurrentWeekDays();
+  const todayISO = todayDate.toISOString().split("T")[0];
+  const selectedISO = selectedDate.toISOString().split("T")[0];
+
+  weekDays.forEach(day => {
+
+    const el = document.createElement("div");
+    el.classList.add("week-day");
+
+    const diffDays = Math.floor((todayDate - day.date) / 86400000);
+    const isFuture = diffDays < 0;
+    const isLocked = diffDays > 3;
+    const isSelected = day.iso === selectedISO;
+
+    if (isSelected) el.classList.add("selected");
+    else if (isLocked || isFuture) el.classList.add("locked");
+    else el.classList.add("clickable");
+
+    el.innerHTML = `
+      <span>${day.weekDay}</span>
+      <span>${day.dayNumber}</span>
+    `;
+
+    if (!isLocked && !isFuture) {
+      el.addEventListener("click", () => {
+        setSelectedDate(day.date);
+        renderWeekStrip();
+        loadDashboard(day.date);
+      });
+    }
+
+    container.appendChild(el);
+  });
+}
+
+/* ===========================
+   SUPABASE CONFIG
+=========================== */
+
+const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
+const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
+
+/* ===========================
+   UI HELPERS
+=========================== */
+
+function animateRing(ring, targetPercent) {
+  ring.style.background =
+    `conic-gradient(#077a7d ${targetPercent}%, #e5e7eb ${targetPercent}%)`;
+}
+
+function updateBar(id, consumed, target) {
+  const bar = document.getElementById(id);
+  const percent = Math.min((consumed / target) * 100, 100);
+  bar.style.width = percent + "%";
+}
+
+/* ===========================
+   TIMER (TODAY ONLY)
+=========================== */
+
+let timerInterval = null;
+
+function startDailyTimer() {
+
+  const sub = document.getElementById("goalSubtext");
+  if (!sub) return;
+
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  function update() {
+    const now = new Date();
+    const midnight = new Date();
+    midnight.setHours(24, 0, 0, 0);
+
+    const diff = midnight - now;
+
+    const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
+    const m = String(Math.floor((diff / 60000) % 60)).padStart(2, "0");
+    const s = String(Math.floor((diff / 1000) % 60)).padStart(2, "0");
+
+    sub.innerText = `Resets in ${h}:${m}:${s}`;
+  }
+
+  update();
+  timerInterval = setInterval(update, 1000);
+}
+
+/* ===========================
+   MAIN DASHBOARD LOAD
+=========================== */
+
+export async function loadDashboard(dateOverride = null) {
 
   const token = getToken();
-  const userId = getUserIdFromToken();
-  if (!token || !userId) return;
+  const user_id = getUserIdFromToken();
 
-  const dateStr = formatDate(date);
+  if (!token || !user_id) {
+    window.location.href = "/";
+    return;
+  }
 
-  // Load Profile
+  const activeDate = dateOverride ? new Date(dateOverride) : selectedDate;
+  activeDate.setHours(0, 0, 0, 0);
+  selectedDate = activeDate;
+
+  const dateStr = activeDate.toISOString().split("T")[0];
+
+  // PROFILE
   const profileRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}&select=*`,
+    `${SUPABASE_URL}/rest/v1/profiles?id=eq.${user_id}&select=*`,
     {
       headers: {
         apikey: SUPABASE_KEY,
@@ -47,17 +179,30 @@ export async function loadDashboard(date = selectedDate) {
     }
   );
 
-  const profileData = await profileRes.json();
-  const profile = profileData[0];
+  const profiles = await profileRes.json();
+  if (!profiles.length) return;
 
-  const dailyCalories = 2287; // or calculate from profile if needed
-  const proteinGoal = 172;
-  const fatGoal = 64;
-  const carbsGoal = 257;
+  const profile = profiles[0];
 
-  // Load Meals
+  const W = profile.weight_kg || 72;
+  const H = profile.height_cm || 170;
+  const A = profile.age || 30;
+  const sex = profile.sex || "male";
+
+  let bmr = sex === "male"
+    ? 10 * W + 6.25 * H - 5 * A + 5
+    : 10 * W + 6.25 * H - 5 * A - 161;
+
+  const tdee = bmr * 1.4;
+  const targetCalories = Math.round(tdee);
+
+  const proteinTarget = Math.round((targetCalories * 0.3) / 4);
+  const fatTarget = Math.round((targetCalories * 0.25) / 9);
+  const carbsTarget = Math.round((targetCalories * 0.45) / 4);
+
+  // MEALS
   const mealsRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${userId}&date=eq.${dateStr}&select=*`,
+    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&date=eq.${dateStr}&select=*`,
     {
       headers: {
         apikey: SUPABASE_KEY,
@@ -68,102 +213,111 @@ export async function loadDashboard(date = selectedDate) {
 
   const meals = await mealsRes.json();
 
-  let totalCalories = 0;
-  let totalProtein = 0;
-  let totalFat = 0;
-  let totalCarbs = 0;
+  let eatenCalories = 0;
+  let eatenProtein = 0;
+  let eatenFat = 0;
+  let eatenCarbs = 0;
 
-  meals.forEach(meal => {
-    totalCalories += meal.calories || 0;
-    totalProtein += meal.protein || 0;
-    totalFat += meal.fat || 0;
-    totalCarbs += meal.carbs || 0;
+  const foodList = document.getElementById("foodEntries");
+  foodList.innerHTML = "";
+
+  meals.forEach((m) => {
+
+    eatenCalories += m.calories || 0;
+    eatenProtein += m.protein || 0;
+    eatenFat += m.fat || 0;
+    eatenCarbs += m.carbs || 0;
+
+    const li = document.createElement("li");
+    li.classList.add("meal-row");
+
+    li.innerHTML = `
+      <div class="meal-left">
+        <div class="meal-name">${m.food_name}</div>
+        <div class="meal-macros">
+          <span class="macro-protein">P ${m.protein}g</span>
+          <span class="macro-fat">F ${m.fat}g</span>
+          <span class="macro-carbs">C ${m.carbs}g</span>
+        </div>
+      </div>
+      <div class="meal-right">
+        <div class="meal-calories">${m.calories} kcal</div>
+        <button class="delete-btn" data-id="${m.id}">✕</button>
+      </div>
+    `;
+
+    foodList.appendChild(li);
   });
 
-  // ===== UPDATE BIG GOAL DISPLAY =====
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      await deleteMeal(btn.getAttribute("data-id"));
+      loadDashboard(activeDate);
+    });
+  });
 
-  const caloriesLeft = dailyCalories - totalCalories;
+  // UPDATE RING + MACROS
+  document.getElementById("caloriesLabel").innerText =
+    `${eatenCalories} / ${targetCalories} kcal`;
 
-  const goalBigNumber = document.getElementById("goalBigNumber");
-  const goalLabel = document.getElementById("goalLabel");
+  const percent = Math.min((eatenCalories / targetCalories) * 100, 100);
+  animateRing(document.getElementById("caloriesRing"), percent);
+
+  updateBar("proteinBar", eatenProtein, proteinTarget);
+  updateBar("fatBar", eatenFat, fatTarget);
+  updateBar("carbsBar", eatenCarbs, carbsTarget);
+
+  document.getElementById("proteinLabel").innerText =
+    `${eatenProtein} / ${proteinTarget} g`;
+  document.getElementById("fatLabel").innerText =
+    `${eatenFat} / ${fatTarget} g`;
+  document.getElementById("carbsLabel").innerText =
+    `${eatenCarbs} / ${carbsTarget} g`;
+
+  // SUMMARY LOGIC
+  const goalTitle = document.getElementById("goalTitle");
+  const goalStatus = document.getElementById("goalStatus");
   const goalSubtext = document.getElementById("goalSubtext");
 
-  if (isToday(date)) {
+  const todayISO = todayDate.toISOString().split("T")[0];
+  const diff = targetCalories - eatenCalories;
 
-    goalBigNumber.innerText = Math.abs(caloriesLeft);
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
 
-    goalLabel.innerText =
-      caloriesLeft >= 0 ? "Calories left" : "Calories over";
+  if (dateStr === todayISO) {
 
-    goalSubtext.innerText = `Resets in ${formatTime(getTimeUntilMidnight())}`;
+    goalTitle.innerText = "Today’s Goal";
+
+    if (eatenCalories === 0) {
+      goalStatus.innerText = "No entries logged yet.";
+    } else if (diff > 0) {
+      goalStatus.innerText = `${diff} Calories left`;
+    } else if (diff < 0) {
+      goalStatus.innerText = `+${Math.abs(diff)} Calories over`;
+    } else {
+      goalStatus.innerText = "You hit your goal exactly.";
+    }
+
+    startDailyTimer();
 
   } else {
 
-    const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
+    const weekday = activeDate.toLocaleDateString("en-US", { weekday: "long" });
+    goalTitle.innerText = `${weekday} Summary`;
 
-    if (meals.length === 0) {
-      goalBigNumber.innerText = "—";
-      goalLabel.innerText = "No entries logged";
-      goalSubtext.innerText = "";
-    } else if (caloriesLeft >= 0) {
-      goalBigNumber.innerText = Math.abs(caloriesLeft);
-      goalLabel.innerText = `Under goal`;
-      goalSubtext.innerText = `${dayName} summary`;
+    if (eatenCalories === 0) {
+      goalStatus.innerText = "No entries logged.";
+    } else if (diff > 0) {
+      goalStatus.innerText = `Under goal by ${diff} calories.`;
+    } else if (diff < 0) {
+      goalStatus.innerText = `Over goal by ${Math.abs(diff)} calories.`;
     } else {
-      goalBigNumber.innerText = Math.abs(caloriesLeft);
-      goalLabel.innerText = `Over goal`;
-      goalSubtext.innerText = `${dayName} summary`;
+      goalStatus.innerText = "Goal met exactly.";
     }
+
+    goalSubtext.innerText = "";
   }
-
-  // ===== UPDATE RING =====
-
-  const percent = Math.min((totalCalories / dailyCalories) * 100, 100);
-
-  document.getElementById("caloriesLabel").innerText =
-    `${totalCalories} / ${dailyCalories} kcal`;
-
-  document.getElementById("caloriesRing").style.background =
-    `conic-gradient(var(--primary) ${percent}%, #e5e7eb ${percent}%)`;
-
-  // ===== UPDATE MACROS =====
-
-  updateMacro("protein", totalProtein, proteinGoal);
-  updateMacro("fat", totalFat, fatGoal);
-  updateMacro("carbs", totalCarbs, carbsGoal);
-
-  // ===== UPDATE FOOD LIST =====
-
-  const list = document.getElementById("foodEntries");
-  list.innerHTML = "";
-
-  meals.forEach(meal => {
-    const li = document.createElement("li");
-    li.innerText = `${meal.food_name} - ${meal.calories} kcal`;
-    list.appendChild(li);
-  });
-
-  startCountdownIfToday();
-}
-
-function updateMacro(type, value, goal) {
-  const percent = Math.min((value / goal) * 100, 100);
-
-  document.getElementById(`${type}Label`).innerText =
-    `${value} / ${goal} g`;
-
-  document.getElementById(`${type}Bar`).style.width =
-    `${percent}%`;
-}
-
-function startCountdownIfToday() {
-  if (!isToday(selectedDate)) return;
-
-  const sub = document.getElementById("goalSubtext");
-
-  setInterval(() => {
-    if (isToday(selectedDate)) {
-      sub.innerText = `Resets in ${formatTime(getTimeUntilMidnight())}`;
-    }
-  }, 1000);
 }
