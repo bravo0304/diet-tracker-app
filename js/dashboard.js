@@ -34,6 +34,11 @@ function getMonday(date) {
   return d;
 }
 
+function shiftWeek(days) {
+  currentWeekStart.setDate(currentWeekStart.getDate() + days);
+  renderWeekStrip();
+}
+
 export function getCurrentWeekDays() {
   const days = [];
 
@@ -58,19 +63,19 @@ export function renderWeekStrip() {
 
   const weekDays = getCurrentWeekDays();
   const selectedISO = selectedDate.toISOString().split("T")[0];
+  const todayISO = todayDate.toISOString().split("T")[0];
 
   weekDays.forEach(day => {
 
     const el = document.createElement("div");
     el.classList.add("week-day");
 
-    const diffDays = Math.floor((todayDate - day.date) / 86400000);
-    const isFuture = diffDays < 0;
-    const isLocked = diffDays > 3;
+    const isFuture = day.iso > todayISO;
+    const isPast = day.iso < todayISO;
     const isSelected = day.iso === selectedISO;
 
     if (isSelected) el.classList.add("selected");
-    else if (isLocked || isFuture) el.classList.add("locked");
+    else if (isPast || isFuture) el.classList.add("locked");
     else el.classList.add("clickable");
 
     el.innerHTML = `
@@ -78,7 +83,7 @@ export function renderWeekStrip() {
       <span>${day.dayNumber}</span>
     `;
 
-    if (!isLocked && !isFuture) {
+    if (!isPast && !isFuture) {
       el.addEventListener("click", () => {
         setSelectedDate(day.date);
         renderWeekStrip();
@@ -87,6 +92,31 @@ export function renderWeekStrip() {
     }
 
     container.appendChild(el);
+  });
+
+  /* ===== Swipe Support ===== */
+
+  let touchStartX = null;
+
+  container.addEventListener("touchstart", e => {
+    touchStartX = e.changedTouches[0].screenX;
+  });
+
+  container.addEventListener("touchend", e => {
+    if (touchStartX === null) return;
+
+    const touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        shiftWeek(-7); // swipe left → previous week
+      } else {
+        shiftWeek(7);  // swipe right → next week
+      }
+    }
+
+    touchStartX = null;
   });
 }
 
@@ -151,6 +181,8 @@ export async function loadDashboard(dateOverride = null) {
   selectedDate = activeDate;
 
   const dateStr = activeDate.toISOString().split("T")[0];
+  const todayISO = todayDate.toISOString().split("T")[0];
+  const isToday = dateStr === todayISO;
 
   /* ===== PROFILE ===== */
 
@@ -173,7 +205,7 @@ export async function loadDashboard(dateOverride = null) {
   const goal = profile.goal || "maintain";
   const multiplier = profile.activity_multiplier || 1.4;
 
-  /* ===== BMR ===== */
+  /* ===== CALCULATION ===== */
 
   let bmr = sex === "male"
     ? 10 * W + 6.25 * H - 5 * A + 5
@@ -181,30 +213,20 @@ export async function loadDashboard(dateOverride = null) {
 
   const tdee = bmr * multiplier;
 
-  /* ===== GOAL ENGINE ===== */
-
   let calorieMultiplier = 1;
-
   if (goal === "lose") calorieMultiplier = 0.85;
   if (goal === "gain") calorieMultiplier = 1.08;
-  if (goal === "maintain") calorieMultiplier = 1;
 
   const targetCalories = Math.round(tdee * calorieMultiplier);
 
-  /* ===== MACROS ===== */
-
-  let proteinPerKg = 1.8;
-  if (goal === "lose") proteinPerKg = 2.0;
-
+  let proteinPerKg = goal === "lose" ? 2.0 : 1.8;
   const proteinTarget = Math.round(W * proteinPerKg);
 
-  const fatCalories = targetCalories * 0.25;
-  const fatTarget = Math.round(fatCalories / 9);
-
-  const remainingCalories =
-    targetCalories - (proteinTarget * 4) - (fatTarget * 9);
-
-  const carbsTarget = Math.max(0, Math.round(remainingCalories / 4));
+  const fatTarget = Math.round((targetCalories * 0.25) / 9);
+  const carbsTarget = Math.max(
+    0,
+    Math.round((targetCalories - (proteinTarget * 4) - (fatTarget * 9)) / 4)
+  );
 
   /* ===== MEALS ===== */
 
@@ -236,34 +258,43 @@ export async function loadDashboard(dateOverride = null) {
       <div class="meal-left">
         <div class="meal-name">${m.food_name}</div>
         <div class="meal-macros">
-          <span class="macro-protein">P ${m.protein}g</span>
-          <span class="macro-fat">F ${m.fat}g</span>
-          <span class="macro-carbs">C ${m.carbs}g</span>
+          <span>P ${m.protein}g</span>
+          <span>F ${m.fat}g</span>
+          <span>C ${m.carbs}g</span>
         </div>
       </div>
       <div class="meal-right">
         <div class="meal-calories">${m.calories} kcal</div>
-        <button class="delete-btn" data-id="${m.id}">✕</button>
+        ${isToday ? `<button class="delete-btn" data-id="${m.id}">✕</button>` : ""}
       </div>
     `;
 
     foodList.appendChild(li);
   });
 
-  document.querySelectorAll(".delete-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      await deleteMeal(btn.getAttribute("data-id"));
-      loadDashboard(activeDate);
+  if (isToday) {
+    document.querySelectorAll(".delete-btn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        await deleteMeal(btn.getAttribute("data-id"));
+        loadDashboard(activeDate);
+      });
     });
-  });
+  }
 
-  /* ===== UPDATE UI ===== */
+  const addBtn = document.getElementById("newEntryBtn");
+  if (addBtn) {
+    addBtn.style.display = isToday ? "block" : "none";
+  }
+
+  /* ===== UI UPDATE ===== */
 
   document.getElementById("caloriesLabel").innerText =
     `${eatenCalories} / ${targetCalories} kcal`;
 
-  const percent = Math.min((eatenCalories / targetCalories) * 100, 100);
-  animateRing(document.getElementById("caloriesRing"), percent);
+  animateRing(
+    document.getElementById("caloriesRing"),
+    Math.min((eatenCalories / targetCalories) * 100, 100)
+  );
 
   updateBar("proteinBar", eatenProtein, proteinTarget);
   updateBar("fatBar", eatenFat, fatTarget);
@@ -282,12 +313,11 @@ export async function loadDashboard(dateOverride = null) {
   const goalLabel = document.getElementById("goalLabel");
   const goalSubtext = document.getElementById("goalSubtext");
 
-  const todayISO = todayDate.toISOString().split("T")[0];
   const diff = targetCalories - eatenCalories;
 
   if (timerInterval) clearInterval(timerInterval);
 
-  if (dateStr === todayISO) {
+  if (isToday) {
 
     goalBigNumber.innerText = Math.abs(diff);
 
