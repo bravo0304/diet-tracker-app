@@ -43,6 +43,7 @@ export function getCurrentWeekDays() {
   const weekStart = getMonday(currentAnchorDate);
   const days = [];
 
+   
   for (let i = 0; i < 7; i++) {
     const day = new Date(weekStart);
     day.setDate(weekStart.getDate() + i);
@@ -328,3 +329,17 @@ export async function loadDashboard(dateOverride = null) {
     goalSubtext.innerText = `${weekday} summary`;
   }
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const prevBtn = document.getElementById("prevWeekBtn");
+  const nextBtn = document.getElementById("nextWeekBtn");
+
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => shiftWeek(-1));
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => shiftWeek(1));
+  }
+});
