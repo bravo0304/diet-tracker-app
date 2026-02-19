@@ -53,7 +53,6 @@ export function getCurrentWeekDays() {
 }
 
 export function renderWeekStrip() {
-
   const container = document.getElementById("weekStrip");
   container.innerHTML = "";
 
@@ -93,13 +92,6 @@ export function renderWeekStrip() {
 }
 
 /* ===========================
-   SUPABASE CONFIG
-=========================== */
-
-const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
-const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
-
-/* ===========================
    UI HELPERS
 =========================== */
 
@@ -115,7 +107,7 @@ function updateBar(id, consumed, target) {
 }
 
 /* ===========================
-   TIMER (TODAY ONLY)
+   TIMER
 =========================== */
 
 let timerInterval = null;
@@ -154,13 +146,10 @@ function startDailyTimer() {
 
 export async function loadDashboard(dateOverride = null) {
 
-  const token = getToken();
-  const user_id = getUserIdFromToken();
+  const session = await requireAuth();
+  if (!session) return;
 
-  if (!token || !user_id) {
-    window.location.href = "/";
-    return;
-  }
+  const user_id = session.user.id;
 
   const activeDate = dateOverride ? new Date(dateOverride) : selectedDate;
   activeDate.setHours(0, 0, 0, 0);
@@ -168,19 +157,14 @@ export async function loadDashboard(dateOverride = null) {
 
   const dateStr = activeDate.toISOString().split("T")[0];
 
-  // PROFILE
-  const profileRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/profiles?id=eq.${user_id}&select=*`,
-    {
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${token}`
-      }
-    }
-  );
+  /* ===== PROFILE ===== */
 
-  const profiles = await profileRes.json();
-  if (!profiles.length) return;
+  const { data: profiles, error: profileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user_id);
+
+  if (profileError || !profiles.length) return;
 
   const profile = profiles[0];
 
@@ -200,18 +184,15 @@ export async function loadDashboard(dateOverride = null) {
   const fatTarget = Math.round((targetCalories * 0.25) / 9);
   const carbsTarget = Math.round((targetCalories * 0.45) / 4);
 
-  // MEALS
-  const mealsRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/meals?user_id=eq.${user_id}&date=eq.${dateStr}&select=*`,
-    {
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${token}`
-      }
-    }
-  );
+  /* ===== MEALS ===== */
 
-  const meals = await mealsRes.json();
+  const { data: meals, error: mealsError } = await supabase
+    .from("meals")
+    .select("*")
+    .eq("user_id", user_id)
+    .eq("date", dateStr);
+
+  if (mealsError) return;
 
   let eatenCalories = 0;
   let eatenProtein = 0;
@@ -256,7 +237,8 @@ export async function loadDashboard(dateOverride = null) {
     });
   });
 
-  // UPDATE RING + MACROS
+  /* ===== UPDATE UI ===== */
+
   document.getElementById("caloriesLabel").innerText =
     `${eatenCalories} / ${targetCalories} kcal`;
 
@@ -274,57 +256,52 @@ export async function loadDashboard(dateOverride = null) {
   document.getElementById("carbsLabel").innerText =
     `${eatenCarbs} / ${carbsTarget} g`;
 
-  // SUMMARY LOGIC (NEW BIG NUMBER STYLE)
+  /* ===== SUMMARY ===== */
 
-const goalBigNumber = document.getElementById("goalBigNumber");
-const goalLabel = document.getElementById("goalLabel");
-const goalSubtext = document.getElementById("goalSubtext");
+  const goalBigNumber = document.getElementById("goalBigNumber");
+  const goalLabel = document.getElementById("goalLabel");
+  const goalSubtext = document.getElementById("goalSubtext");
 
-const todayISO = todayDate.toISOString().split("T")[0];
-const diff = targetCalories - eatenCalories;
+  const todayISO = todayDate.toISOString().split("T")[0];
+  const diff = targetCalories - eatenCalories;
 
-if (timerInterval) {
-  clearInterval(timerInterval);
-  timerInterval = null;
-}
-
-if (dateStr === todayISO) {
-
-  // TODAY VIEW
-  goalBigNumber.innerText = Math.abs(diff);
-
-  if (eatenCalories === 0) {
-    goalLabel.innerText = "Calories left";
-  } else if (diff > 0) {
-    goalLabel.innerText = "Calories left";
-  } else if (diff < 0) {
-    goalLabel.innerText = "Calories over";
-  } else {
-    goalLabel.innerText = "Goal met exactly";
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
   }
 
-  startDailyTimer();
+  if (dateStr === todayISO) {
 
-} else {
-
-  // PAST DAY VIEW
-  const weekday = activeDate.toLocaleDateString("en-US", { weekday: "long" });
-
-  if (eatenCalories === 0) {
-    goalBigNumber.innerText = "—";
-    goalLabel.innerText = "No entries logged";
-  } else if (diff > 0) {
     goalBigNumber.innerText = Math.abs(diff);
-    goalLabel.innerText = "Under goal";
-  } else if (diff < 0) {
-    goalBigNumber.innerText = Math.abs(diff);
-    goalLabel.innerText = "Over goal";
+
+    if (diff > 0) {
+      goalLabel.innerText = "Calories left";
+    } else if (diff < 0) {
+      goalLabel.innerText = "Calories over";
+    } else {
+      goalLabel.innerText = "Goal met exactly";
+    }
+
+    startDailyTimer();
+
   } else {
-    goalBigNumber.innerText = 0;
-    goalLabel.innerText = "Goal met exactly";
+
+    const weekday = activeDate.toLocaleDateString("en-US", { weekday: "long" });
+
+    if (eatenCalories === 0) {
+      goalBigNumber.innerText = "—";
+      goalLabel.innerText = "No entries logged";
+    } else if (diff > 0) {
+      goalBigNumber.innerText = Math.abs(diff);
+      goalLabel.innerText = "Under goal";
+    } else if (diff < 0) {
+      goalBigNumber.innerText = Math.abs(diff);
+      goalLabel.innerText = "Over goal";
+    } else {
+      goalBigNumber.innerText = 0;
+      goalLabel.innerText = "Goal met exactly";
+    }
+
+    goalSubtext.innerText = `${weekday} summary`;
   }
-
-  goalSubtext.innerText = `${weekday} summary`;
-}
-
 }
