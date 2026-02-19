@@ -274,50 +274,57 @@ export async function loadDashboard(dateOverride = null) {
   document.getElementById("carbsLabel").innerText =
     `${eatenCarbs} / ${carbsTarget} g`;
 
-  // SUMMARY LOGIC
-  const goalTitle = document.getElementById("goalTitle");
-  const goalStatus = document.getElementById("goalStatus");
-  const goalSubtext = document.getElementById("goalSubtext");
+  // SUMMARY LOGIC (NEW BIG NUMBER STYLE)
 
-  const todayISO = todayDate.toISOString().split("T")[0];
-  const diff = targetCalories - eatenCalories;
+const goalBigNumber = document.getElementById("goalBigNumber");
+const goalLabel = document.getElementById("goalLabel");
+const goalSubtext = document.getElementById("goalSubtext");
 
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
+const todayISO = todayDate.toISOString().split("T")[0];
+const diff = targetCalories - eatenCalories;
 
-  if (dateStr === todayISO) {
+if (timerInterval) {
+  clearInterval(timerInterval);
+  timerInterval = null;
+}
 
-    goalTitle.innerText = "Today’s Goal";
+if (dateStr === todayISO) {
 
-    if (eatenCalories === 0) {
-      goalStatus.innerText = "No entries logged yet.";
-    } else if (diff > 0) {
-      goalStatus.innerText = `${diff} Calories left`;
-    } else if (diff < 0) {
-      goalStatus.innerText = `+${Math.abs(diff)} Calories over`;
-    } else {
-      goalStatus.innerText = "You hit your goal exactly.";
-    }
+  // TODAY VIEW
+  goalBigNumber.innerText = Math.abs(diff);
 
-    startDailyTimer();
-
+  if (eatenCalories === 0) {
+    goalLabel.innerText = "Calories left";
+  } else if (diff > 0) {
+    goalLabel.innerText = "Calories left";
+  } else if (diff < 0) {
+    goalLabel.innerText = "Calories over";
   } else {
-
-    const weekday = activeDate.toLocaleDateString("en-US", { weekday: "long" });
-    goalTitle.innerText = `${weekday} Summary`;
-
-    if (eatenCalories === 0) {
-      goalStatus.innerText = "No entries logged.";
-    } else if (diff > 0) {
-      goalStatus.innerText = `Under goal by ${diff} calories.`;
-    } else if (diff < 0) {
-      goalStatus.innerText = `Over goal by ${Math.abs(diff)} calories.`;
-    } else {
-      goalStatus.innerText = "Goal met exactly.";
-    }
-
-    goalSubtext.innerText = "";
+    goalLabel.innerText = "Goal met exactly";
   }
+
+  startDailyTimer();
+
+} else {
+
+  // PAST DAY VIEW
+  const weekday = activeDate.toLocaleDateString("en-US", { weekday: "long" });
+
+  if (eatenCalories === 0) {
+    goalBigNumber.innerText = "—";
+    goalLabel.innerText = "No entries logged";
+  } else if (diff > 0) {
+    goalBigNumber.innerText = Math.abs(diff);
+    goalLabel.innerText = "Under goal";
+  } else if (diff < 0) {
+    goalBigNumber.innerText = Math.abs(diff);
+    goalLabel.innerText = "Over goal";
+  } else {
+    goalBigNumber.innerText = 0;
+    goalLabel.innerText = "Goal met exactly";
+  }
+
+  goalSubtext.innerText = `${weekday} summary`;
+}
+
 }
