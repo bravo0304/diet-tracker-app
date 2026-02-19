@@ -1,37 +1,44 @@
-const SUPABASE_URL = "https://rvwozaxippmuwwekubbn.supabase.co";
-const SUPABASE_KEY = "sb_publishable_u3Cz5ndzBjEJvSA7MkC32g_jezgzQxM";
+import { supabase } from "./auth.js";
 
 async function login() {
-  const email = document.getElementById("email")?.value;
-  const password = document.getElementById("password")?.value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
   const status = document.getElementById("status");
 
-  if (!email || !password) {
-    if (status) status.innerText = "Enter email and password";
-    return;
-  }
+  status.innerText = "Logging in...";
 
-  if (status) status.innerText = "Logging in...";
-
-  const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-    method: "POST",
-    headers: {
-      "apikey": SUPABASE_KEY,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ email, password })
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password
   });
 
-  const data = await res.json();
-
-  if (!data.access_token) {
-    if (status) status.innerText = "Login failed";
+  if (error) {
+    status.innerText = error.message;
     return;
   }
 
-  localStorage.setItem("token", data.access_token);
   window.location.href = "/dashboard.html";
 }
 
-// make login global for inline onclick
+async function signup() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const status = document.getElementById("status");
+
+  status.innerText = "Creating account...";
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password
+  });
+
+  if (error) {
+    status.innerText = error.message;
+    return;
+  }
+
+  status.innerText = "Check your email to confirm signup.";
+}
+
 window.login = login;
+window.signup = signup;
