@@ -594,3 +594,28 @@ box-sizing: border-box;
   width: 100%;
   box-sizing: border-box;
 }
+
+
+.week-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.week-arrow {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #555;
+}
+
+.week-arrow:hover {
+  color: #000;
+}
+
+@media (max-width: 768px) {
+  .week-arrow {
+    display: none;
+  }
+}
