@@ -633,3 +633,27 @@ box-sizing: border-box;
 .week-day.selected {
   opacity: 1;
 }
+
+/* Selected = solid green */
+.week-day.selected {
+  background: #1e7f73;
+  color: white;
+}
+
+/* Today (if not selected) = outline */
+.week-day.today-outline {
+  border: 2px solid #1e7f73;
+  background: white;
+  color: #1e7f73;
+}
+
+/* View-only past days */
+.week-day.view-only {
+  opacity: 0.5;
+}
+
+/* Future days */
+.week-day.future {
+  opacity: 0.3;
+  pointer-events: none;
+}
