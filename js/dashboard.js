@@ -182,7 +182,33 @@ export async function loadDashboard(dateOverride = null) {
   const isFuture = diffDays < 0;
   const isEditable = diffDays >= 0 && diffDays <= 2;
 
-  if (isFuture) return;
+
+if (isFuture) {
+  // Clear food list
+  const foodList = document.getElementById("foodEntries");
+  if (foodList) foodList.innerHTML = "";
+
+  // Hide add button
+  const addBtn = document.getElementById("newEntryBtn");
+  if (addBtn) addBtn.style.display = "none";
+
+  // Reset summary display
+  document.getElementById("caloriesLabel").innerText = `0 / 0 kcal`;
+  document.getElementById("proteinLabel").innerText = `0 / 0 g`;
+  document.getElementById("fatLabel").innerText = `0 / 0 g`;
+  document.getElementById("carbsLabel").innerText = `0 / 0 g`;
+
+  animateRing(document.getElementById("caloriesRing"), 0);
+  updateBar("proteinBar", 0, 1);
+  updateBar("fatBar", 0, 1);
+  updateBar("carbsBar", 0, 1);
+
+  document.getElementById("goalBigNumber").innerText = "—";
+  document.getElementById("goalLabel").innerText = "Future day";
+  document.getElementById("goalSubtext").innerText = "No data yet";
+
+  return;
+}
 
   /* PROFILE */
 
