@@ -1,7 +1,5 @@
 import { saveMeal } from "./js/api.js";
-import { loadDashboard, startDailyTimer, renderWeekStrip, getSelectedDate } from "./js/dashboard.js";
-
-
+import { loadDashboard, renderWeekStrip, getSelectedDate } from "./js/dashboard.js";
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -45,11 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectedDateObj = getSelectedDate();
     const dateString = selectedDateObj.toISOString().split("T")[0];
 
-    await saveMeal(
-      { food_name, calories, protein, carbs, fat },
-      dateString
-    );
-
+    await saveMeal({ food_name, calories, protein, carbs, fat }, dateString);
 
     closeSheet();
     loadDashboard();
