@@ -1,5 +1,7 @@
+
 import { deleteMeal } from "./api.js";
-import { supabase, requireAuth, initAuthListener } from "./auth.js";
+import { supabase, requireAuth } from "./auth.js";
+
 
 /* ===========================
    INIT AUTH
