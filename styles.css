@@ -586,3 +586,11 @@ box-sizing: border-box;
   max-width: 420px;
   margin: 0 auto;
 }
+
+
+.step input,
+.step select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
