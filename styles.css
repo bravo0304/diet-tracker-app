@@ -502,7 +502,11 @@ body {
   transform: translateY(100%);
   transition: transform 0.35s cubic-bezier(.22,1,.36,1);
   z-index: 200;
+     box-sizing: border-box;
+  max-width: 100%;
 }
+
+
 
 .bottom-sheet.open {
   transform: translateY(0);
