@@ -400,3 +400,69 @@ body {
   }
 
 }
+
+
+
+
+/* ================= AUTH PAGE ================= */
+
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: var(--bg);
+}
+
+.auth-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.auth-card {
+  background: white;
+  padding: 50px 40px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.auth-title {
+  font-size: 32px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.auth-sub {
+  text-align: center;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.auth-card input {
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 15px;
+}
+
+.auth-card input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.signup-btn {
+  margin-top: 5px;
+}
+
+.auth-status {
+  text-align: center;
+  font-size: 14px;
+  color: var(--protein);
+}
+
