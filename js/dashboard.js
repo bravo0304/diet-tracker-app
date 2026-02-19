@@ -20,10 +20,10 @@ export function setSelectedDate(date) {
 }
 
 /* ===========================
-   WEEK SYSTEM
+   WEEK SYSTEM (STABLE VERSION)
 =========================== */
 
-let weekOffset = 0;
+let currentAnchorDate = new Date(selectedDate);
 
 function getMonday(date) {
   const d = new Date(date);
@@ -34,19 +34,13 @@ function getMonday(date) {
   return d;
 }
 
-function getCurrentWeekStart() {
-  const base = new Date(todayDate);
-  base.setDate(base.getDate() + weekOffset * 7);
-  return getMonday(base);
-}
-
 function shiftWeek(direction) {
-  weekOffset += direction;
+  currentAnchorDate.setDate(currentAnchorDate.getDate() + direction * 7);
   renderWeekStrip();
 }
 
 export function getCurrentWeekDays() {
-  const weekStart = getCurrentWeekStart();
+  const weekStart = getMonday(currentAnchorDate);
   const days = [];
 
   for (let i = 0; i < 7; i++) {
@@ -70,28 +64,29 @@ export function renderWeekStrip() {
 
   const weekDays = getCurrentWeekDays();
   const selectedISO = selectedDate.toISOString().split("T")[0];
-  const todayISO = todayDate.toISOString().split("T")[0];
 
   weekDays.forEach(day => {
 
     const el = document.createElement("div");
     el.classList.add("week-day");
 
-    const diffDays = Math.floor((todayDate - day.date) / 86400000);
-    const isFuture = diffDays < 0;
-    const isSelected = day.iso === selectedISO;
-
-    const isSelected = day.iso === selectedISO;
-
-if (isSelected) el.classList.add("selected");
-else el.classList.add("clickable");
-
-el.addEventListener("click", () => {
-  setSelectedDate(day.date);
-  renderWeekStrip();
-  loadDashboard(day.date);
-});
+    if (day.iso === selectedISO) {
+      el.classList.add("selected");
+    } else {
+      el.classList.add("clickable");
     }
+
+    el.innerHTML = `
+      <span>${day.weekDay}</span>
+      <span>${day.dayNumber}</span>
+    `;
+
+    el.addEventListener("click", () => {
+      setSelectedDate(day.date);
+      currentAnchorDate = new Date(day.date);
+      renderWeekStrip();
+      loadDashboard(day.date);
+    });
 
     container.appendChild(el);
   });
@@ -110,15 +105,14 @@ el.addEventListener("click", () => {
     const touchEndX = e.changedTouches[0].screenX;
     const diff = touchStartX - touchEndX;
 
-  if (Math.abs(diff) > 50) {
-  if (diff > 0) shiftWeek(-1);  // previous week
-  else shiftWeek(1);            // next week
-}
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) shiftWeek(-1);  // previous week
+      else shiftWeek(1);            // next week
+    }
 
     touchStartX = null;
   };
 }
-
 /* ===========================
    UI HELPERS
 =========================== */
