@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="auth-page">
+
+  <main class="auth-container">
+    <div class="auth-card">
+
+      <h1 class="auth-title">Create Account</h1>
+      <p class="auth-sub">Start tracking your nutrition</p>
+
+      <form onsubmit="event.preventDefault(); signup();">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+
+        <button class="primary-btn" type="submit">Create Account</button>
+      </form>
+
+      <a href="/" class="auth-link">
+        Already have an account? Login
+      </a>
+
+      <div id="status" class="auth-status"></div>
+
+    </div>
+  </main>
+
+<script type="module" src="./js/login.js"></script>
+</body>
+</html>
