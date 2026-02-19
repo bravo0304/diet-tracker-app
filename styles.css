@@ -548,3 +548,13 @@ body {
 .auth-link:hover {
   opacity: 0.8;
 }
+
+
+.primary-btn {
+  height: 58px;
+  font-size: 18px;
+}
+
+.secondary-btn {
+  height: 58px;
+}
