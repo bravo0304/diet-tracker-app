@@ -3,32 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calorie Tracker</title>
+  <title>Create Account</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-
 <body class="auth-page">
 
   <main class="auth-container">
     <div class="auth-card">
+  <img src="/assets/logo.png" class="auth-logo" alt="Calorie Tracker Logo">
 
-       <img src="/assets/logo.png" class="auth-logo" alt="Kalori Logo">
+      <h1 class="auth-title">Create Account</h1>
+      <p class="auth-sub">Start tracking your nutrition</p>
 
-    <h1 class="auth-title">Welcome Back</h1>
-    <p class="auth-sub">Log in to continue your goals</p>
-
-
-      <form onsubmit="event.preventDefault(); login();">
+      <form onsubmit="event.preventDefault(); signup();">
         <input type="email" id="email" placeholder="Email" required>
         <input type="password" id="password" placeholder="Password" required>
 
-        <button class="primary-btn" type="submit">Login</button>
+        <button class="primary-btn" type="submit">Create Account</button>
       </form>
 
-     <a href="/signup.html" class="auth-link">
-  Create Account
-</a>
-
+      <a href="/" class="auth-link">
+        Already have an account? Login
+      </a>
 
       <div id="status" class="auth-status"></div>
 

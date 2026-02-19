@@ -61,16 +61,51 @@ body {
   font-weight: 500;
 }
 
+.header-logo {
+  height: 32px;
+}
+
 /* ========================================
    CARDS
 ======================================== */
 
 .card {
   background: var(--card-bg);
-  border-radius: 18px;
+  border-radius: 24px; /* merged */
   padding: 40px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.04);
   margin-bottom: 30px;
+}
+
+/* ========================================
+   BUTTONS (MERGED CLEAN)
+======================================== */
+
+.primary-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  width: 100%;
+  height: 58px;
+  padding: 18px;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  opacity: 0.9;
+}
+
+.secondary-btn {
+  background: none;
+  border: 1px solid var(--border);
+  width: 100%;
+  height: 58px;
+  padding: 16px;
+  border-radius: 16px;
+  cursor: pointer;
 }
 
 /* ========================================
@@ -116,14 +151,12 @@ body {
 }
 
 /* ========================================
-   TOP DASHBOARD SECTION
+   DASHBOARD TOP SECTION
 ======================================== */
 
 .top-section {
   padding: 50px;
 }
-
-/* TOP ROW (BIG NUMBER + RING) */
 
 .top-row {
   display: flex;
@@ -132,8 +165,6 @@ body {
   gap: 60px;
   margin-bottom: 50px;
 }
-
-/* LEFT SIDE (BIG CALORIES INFO) */
 
 .goal-main {
   flex: 1;
@@ -161,7 +192,7 @@ body {
   color: #9ca3af;
 }
 
-/* RIGHT SIDE (RING) */
+/* Ring */
 
 .ring-wrapper {
   position: relative;
@@ -277,134 +308,8 @@ body {
 }
 
 /* ========================================
-   BUTTONS
+   AUTH PAGE
 ======================================== */
-
-.primary-btn {
-  background: var(--primary);
-  color: white;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.primary-btn:hover {
-  opacity: 0.9;
-}
-
-.secondary-btn {
-  background: none;
-  border: 1px solid var(--border);
-  padding: 10px 18px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-/* ========================================
-   BOTTOM SHEET
-======================================== */
-
-.sheet-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  z-index: 99;
-}
-
-.sheet-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.bottom-sheet {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--card-bg);
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  transform: translateY(100%);
-  transition: transform 0.35s ease;
-  z-index: 100;
-}
-
-.bottom-sheet.active {
-  transform: translateY(0);
-}
-
-.sheet-handle {
-  width: 40px;
-  height: 5px;
-  background: var(--border);
-  border-radius: 10px;
-  margin: 12px auto;
-}
-
-.sheet-content {
-  padding: 20px 25px 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.macro-input-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.sheet-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-/* ========================================
-   RESPONSIVE
-======================================== */
-
-@media (max-width: 768px) {
-
-  .top-row {
-    flex-direction: row;     /* KEEP SIDE BY SIDE */
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-  }
-
-  .goal-big {
-    font-size: 48px;
-  }
-
-  .goal-label {
-    font-size: 18px;
-  }
-
-  .goal-reset {
-    font-size: 14px;
-  }
-
-  .ring-wrapper {
-    width: 160px;
-    height: 160px;
-  }
-
-  .calories-text {
-    font-size: 14px;
-  }
-
-}
-
-
-
-
-/* ================= AUTH PAGE ================= */
 
 .auth-page {
   display: flex;
@@ -434,7 +339,7 @@ body {
 
 .auth-title {
   font-size: 32px;
-  font-weight: 800;
+  font-weight: 700;
   text-align: center;
 }
 
@@ -442,6 +347,7 @@ body {
   text-align: center;
   color: var(--text-muted);
   margin-bottom: 10px;
+  line-height: 1.6;
 }
 
 .auth-card input {
@@ -456,8 +362,14 @@ body {
   border-color: var(--primary);
 }
 
-.signup-btn {
-  margin-top: 5px;
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.auth-card .primary-btn {
+  margin-top: 15px;
 }
 
 .auth-status {
@@ -466,13 +378,30 @@ body {
   color: var(--protein);
 }
 
-/* ================= ONBOARDING POLISH ================= */
-
-.onboarding-header {
-  justify-content: center;
-  font-size: 24px;
-  font-weight: 700;
+.auth-link {
+  text-align: center;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: block;
 }
+
+.auth-link:hover {
+  opacity: 0.8;
+}
+
+.auth-logo {
+  width: 140px;
+  margin: 0 auto 10px auto;
+  display: block;
+}
+
+/* ========================================
+   ONBOARDING
+======================================== */
 
 #onboardingForm {
   display: flex;
@@ -516,22 +445,133 @@ body {
   box-shadow: 0 0 0 3px rgba(15,118,110,0.08);
 }
 
-/* Full Width Buttons */
-.primary-btn {
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 768px) {
+
+  .top-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .goal-big { font-size: 48px; }
+  .goal-label { font-size: 18px; }
+  .goal-reset { font-size: 14px; }
+
+  .ring-wrapper {
+    width: 160px;
+    height: 160px;
+  }
+
+  .calories-text { font-size: 14px; }
+}
+
+
+/* ========================================
+   BOTTOM SHEET (PREMIUM CLEAN)
+======================================== */
+
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 100;
+}
+
+.sheet-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.bottom-sheet {
+  position: fixed;
+  left: 8px;
+  right: 8px;
+  bottom: 0;
+   
+  background: white;
+  border-radius: 28px 28px 0 0;
+  padding: 28px 24px 32px;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(.22,1,.36,1);
+  z-index: 200;
+box-sizing: border-box;
+  max-width: 100%;
+}
+
+
+
+.bottom-sheet.open {
+  transform: translateY(0);
+}
+
+.sheet-handle {
+  width: 50px;
+  height: 5px;
+  background: #d1d5db;
+  border-radius: 10px;
+  margin: 0 auto 20px;
+}
+
+.sheet-content h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* INPUTS */
+
+.bottom-sheet input {
   width: 100%;
   padding: 18px;
   border-radius: 16px;
+  border: 1px solid var(--border);
   font-size: 16px;
-  font-weight: 700;
+  background: #fafafa;
+  box-sizing: border-box;
 }
 
-.secondary-btn {
-  width: 100%;
-  padding: 16px;
-  border-radius: 16px;
+
+
+.bottom-sheet input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(15,118,110,0.08);
 }
 
-/* Make card feel more mobile */
-.card {
-  border-radius: 24px;
+/* Macro grid cleaner */
+
+.macro-input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+/* Buttons */
+
+.sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.sheet-actions .secondary-btn {
+  height: 52px;
+  font-weight: 500;
+}
+
+.sheet-actions .primary-btn {
+  height: 56px;
+  font-size: 18px;
 }
