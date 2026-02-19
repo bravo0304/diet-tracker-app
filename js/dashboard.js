@@ -164,7 +164,10 @@ export async function loadDashboard(dateOverride = null) {
     .select("*")
     .eq("id", user_id);
 
-  if (profileError || !profiles.length) return;
+  if (!profiles || profiles.length === 0) {
+  window.location.href = "/onboarding.html";
+  return;
+}
 
   const profile = profiles[0];
 
