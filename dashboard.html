@@ -4,13 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard</title>
-
   <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
 
-  <!-- TOP CONTEXT BAR -->
+  <!-- TOP BAR -->
   <header class="top-bar">
     <div class="top-left">Dashboard - Daily Goal</div>
     <a href="settings.html" class="settings-link">Settings</a>
@@ -18,12 +17,16 @@
 
   <main class="container">
 
+    <!-- NEW GOAL SUMMARY -->
+    <div class="goal-summary">
+      <h2 id="goalTitle"></h2>
+      <div id="goalStatus"></div>
+      <div id="goalSubtext"></div>
+    </div>
 
+    <!-- WEEK STRIP -->
+    <div id="weekStrip" class="week-strip"></div>
 
-<div id="weekStrip" class="week-strip"></div>
-
-
-    
     <!-- DAILY OVERVIEW -->
     <section class="card daily-overview">
 
@@ -36,7 +39,6 @@
 
       <div class="macro-bars">
 
-        <!-- Protein -->
         <div class="macro-bar">
           <div class="macro-header">
             <span>Protein</span>
@@ -47,7 +49,6 @@
           </div>
         </div>
 
-        <!-- Fat -->
         <div class="macro-bar">
           <div class="macro-header">
             <span>Fat</span>
@@ -58,7 +59,6 @@
           </div>
         </div>
 
-        <!-- Carbs -->
         <div class="macro-bar">
           <div class="macro-header">
             <span>Carbs</span>
@@ -82,10 +82,8 @@
 
   </main>
 
-  <!-- OVERLAY -->
   <div id="sheetOverlay" class="sheet-overlay"></div>
 
-  <!-- BOTTOM SHEET -->
   <div id="mealSheet" class="bottom-sheet">
     <div class="sheet-handle"></div>
 
