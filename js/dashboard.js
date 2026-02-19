@@ -71,14 +71,20 @@ export function renderWeekStrip() {
     const el = document.createElement("div");
     el.classList.add("week-day");
 
-   const diffDays = Math.floor((todayDate - day.date) / 86400000);
+const diffDays = Math.floor((todayDate - day.date) / 86400000);
 const isFuture = diffDays < 0;
 const isEditable = diffDays >= 0 && diffDays <= 3;
+const isToday = day.iso === todayDate.toISOString().split("T")[0];
+const isSelected = day.iso === selectedISO;
 
-if (day.iso === selectedISO) {
+if (isSelected) {
   el.classList.add("selected");
 } else {
   el.classList.add("clickable");
+}
+
+if (isToday && !isSelected) {
+  el.classList.add("today-outline");
 }
 
 if (!isEditable && !isFuture) {
