@@ -211,7 +211,7 @@ if (isFuture) {
   if (addBtn) addBtn.style.display = "none";
 
   // Reset summary display
-  document.getElementById("caloriesLabel").innerText = `0 / 0 kcal`;
+  document.getElementById("caloriesLabel").innerText = `0 / 0 Calories`;
   document.getElementById("proteinLabel").innerText = `0 / 0 g`;
   document.getElementById("fatLabel").innerText = `0 / 0 g`;
   document.getElementById("carbsLabel").innerText = `0 / 0 g`;
@@ -304,7 +304,7 @@ if (isFuture) {
          </div>
       </div>
       <div class="meal-right">
-        <div class="meal-calories">${m.calories} kcal</div>
+        <div class="meal-calories">${m.calories} Calories</div>
         ${isEditable ? `<button class="delete-btn" data-id="${m.id}">✕</button>` : ""}
       </div>
     `;
@@ -329,7 +329,7 @@ if (isFuture) {
   /* UPDATE UI */
 
   document.getElementById("caloriesLabel").innerText =
-    `${eatenCalories} / ${targetCalories} kcal`;
+    `${eatenCalories} / ${targetCalories} Calories`;
 
   animateRing(
     document.getElementById("caloriesRing"),
