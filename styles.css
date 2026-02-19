@@ -577,6 +577,8 @@ box-sizing: border-box;
 }
 
 
+
+/* Onboarding specific layout */
 .onboarding-header {
   justify-content: center;
   font-weight: 700;
@@ -587,10 +589,8 @@ box-sizing: border-box;
   margin: 0 auto;
 }
 
-
 .step input,
 .step select {
   width: 100%;
   box-sizing: border-box;
 }
-
