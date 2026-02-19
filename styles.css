@@ -478,17 +478,17 @@ body {
 .sheet-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.35);
-  backdrop-filter: blur(2px);
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(6px);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
-  z-index: 50;
+  z-index: 100;
 }
 
 .sheet-overlay.open {
   opacity: 1;
-  pointer-events: all;
+  pointer-events: auto;
 }
 
 .bottom-sheet {
@@ -496,8 +496,26 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--card-bg);
+  background: white;
   border-radius: 24px 24px 0 0;
-  padding: 25px;
+  padding: 30px;
   transform: translateY(100%);
-  trans
+  transition: transform 0.35s ease;
+  z-index: 200;
+}
+
+.bottom-sheet.open {
+  transform: translateY(0);
+}
+
+.sheet-handle {
+  width: 50px;
+  height: 5px;
+  background: var(--border);
+  border-radius: 10px;
+  margin: 0 auto 20px;
+}
+
+.sheet-content h3 {
+  margin-top: 0;
+}
