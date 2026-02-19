@@ -56,3 +56,7 @@ async function finishOnboarding(){
 
   window.location.href = "/dashboard.html";
 }
+
+
+window.nextStep = nextStep;
+window.finishOnboarding = finishOnboarding;
