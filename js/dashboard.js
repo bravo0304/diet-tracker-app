@@ -5,8 +5,8 @@ import { supabase, requireAuth } from "./auth.js";
    DATE STATE
 =========================== */
 
-const freshToday = new Date();
-freshToday.setHours(0, 0, 0, 0);
+let todayDate = new Date();
+todayDate.setHours(0, 0, 0, 0);
 
 let selectedDate = new Date(todayDate);
 
