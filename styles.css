@@ -330,11 +330,13 @@ body {
 .meal-macros {
   font-size: 13px;
   font-weight: 600;
+   display: flex;
+  gap: 14px;
 }
 
-.macro-protein { color: var(--protein); padding:0 10px 0 0; }
-.macro-fat { color: var(--fat); padding:0 10px 0 0;}
-.macro-carbs { color: var(--carbs); padding:0 10px 0 0;}
+.macro-protein { color: var(--protein); }
+.macro-fat { color: var(--fat); }
+.macro-carbs { color: var(--carbs); }
 
 .delete-btn {
   background: none;
