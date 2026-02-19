@@ -228,7 +228,7 @@ body {
 .ring::after {
   content: "";
   position: absolute;
-  inset: 28px;   /* ⬅ thinner ring (was 18px) */
+  inset: 10px;   /* ⬅ thinner ring (was 18px) */
   background: var(--card-bg);
   border-radius: 50%;
   z-index: 1;
