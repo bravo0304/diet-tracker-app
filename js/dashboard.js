@@ -1,5 +1,14 @@
 import { deleteMeal } from "./api.js";
-import { supabase, requireAuth } from "./auth.js";
+import { supabase, requireAuth, initAuthListener } from "./auth.js";
+
+/* ===========================
+   INIT AUTH
+=========================== */
+
+initAuthListener();
+
+let session = await requireAuth();
+if (!session) throw new Error("No active session");
 
 /* ===========================
    DATE STATE
@@ -54,6 +63,8 @@ export function getCurrentWeekDays() {
 
 export function renderWeekStrip() {
   const container = document.getElementById("weekStrip");
+  if (!container) return;
+
   container.innerHTML = "";
 
   const weekDays = getCurrentWeekDays();
@@ -61,7 +72,6 @@ export function renderWeekStrip() {
   const selectedISO = selectedDate.toISOString().split("T")[0];
 
   weekDays.forEach(day => {
-
     const el = document.createElement("div");
     el.classList.add("week-day");
 
@@ -96,12 +106,14 @@ export function renderWeekStrip() {
 =========================== */
 
 function animateRing(ring, targetPercent) {
+  if (!ring) return;
   ring.style.background =
     `conic-gradient(#077a7d ${targetPercent}%, #e5e7eb ${targetPercent}%)`;
 }
 
 function updateBar(id, consumed, target) {
   const bar = document.getElementById(id);
+  if (!bar || !target) return;
   const percent = Math.min((consumed / target) * 100, 100);
   bar.style.width = percent + "%";
 }
@@ -113,14 +125,10 @@ function updateBar(id, consumed, target) {
 let timerInterval = null;
 
 function startDailyTimer() {
-
   const sub = document.getElementById("goalSubtext");
   if (!sub) return;
 
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
+  if (timerInterval) clearInterval(timerInterval);
 
   function update() {
     const now = new Date();
@@ -146,7 +154,7 @@ function startDailyTimer() {
 
 export async function loadDashboard(dateOverride = null) {
 
-  const session = await requireAuth();
+  session = await requireAuth();
   if (!session) return;
 
   const user_id = session.user.id;
@@ -162,11 +170,15 @@ export async function loadDashboard(dateOverride = null) {
   const { data: profiles, error: profileError } = await supabase
     .from("profiles")
     .select("*")
-    .eq("id", user_id);
+    .eq("id", user_id)
+    .single();
 
-  if (profileError || !profiles.length) return;
+  if (profileError) {
+    console.error("Profile error:", profileError);
+    return;
+  }
 
-  const profile = profiles[0];
+  const profile = profiles;
 
   const W = profile.weight_kg || 72;
   const H = profile.height_cm || 170;
@@ -192,7 +204,10 @@ export async function loadDashboard(dateOverride = null) {
     .eq("user_id", user_id)
     .eq("date", dateStr);
 
-  if (mealsError) return;
+  if (mealsError) {
+    console.error("Meals error:", mealsError);
+    return;
+  }
 
   let eatenCalories = 0;
   let eatenProtein = 0;
@@ -200,14 +215,15 @@ export async function loadDashboard(dateOverride = null) {
   let eatenCarbs = 0;
 
   const foodList = document.getElementById("foodEntries");
-  foodList.innerHTML = "";
+  if (foodList) foodList.innerHTML = "";
 
   meals.forEach((m) => {
-
     eatenCalories += m.calories || 0;
     eatenProtein += m.protein || 0;
     eatenFat += m.fat || 0;
     eatenCarbs += m.carbs || 0;
+
+    if (!foodList) return;
 
     const li = document.createElement("li");
     li.classList.add("meal-row");
@@ -265,22 +281,15 @@ export async function loadDashboard(dateOverride = null) {
   const todayISO = todayDate.toISOString().split("T")[0];
   const diff = targetCalories - eatenCalories;
 
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
+  if (timerInterval) clearInterval(timerInterval);
 
   if (dateStr === todayISO) {
 
     goalBigNumber.innerText = Math.abs(diff);
 
-    if (diff > 0) {
-      goalLabel.innerText = "Calories left";
-    } else if (diff < 0) {
-      goalLabel.innerText = "Calories over";
-    } else {
-      goalLabel.innerText = "Goal met exactly";
-    }
+    if (diff > 0) goalLabel.innerText = "Calories left";
+    else if (diff < 0) goalLabel.innerText = "Calories over";
+    else goalLabel.innerText = "Goal met exactly";
 
     startDailyTimer();
 
