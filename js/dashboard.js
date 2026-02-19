@@ -328,8 +328,10 @@ if (isFuture) {
 
   /* UPDATE UI */
 
-  document.getElementById("caloriesLabel").innerText =
-    `${eatenCalories} / ${targetCalories} Calories`;
+const ringNumber = document.getElementById("ringNumber");
+if (ringNumber) {
+  ringNumber.innerText = `${eatenCalories} / ${targetCalories}`;
+}
 
   animateRing(
     document.getElementById("caloriesRing"),
