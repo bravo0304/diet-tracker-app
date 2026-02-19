@@ -106,9 +106,9 @@ export function renderWeekStrip() {
     const diff = touchStartX - touchEndX;
 
     if (Math.abs(diff) > 50) {
-      if (diff > 0) shiftWeek(-1);  // previous week
-      else shiftWeek(1);            // next week
-    }
+  if (diff > 0) shiftWeek(1);   // swipe left → next week
+  else shiftWeek(-1);           // swipe right → previous week
+}
 
     touchStartX = null;
   };
