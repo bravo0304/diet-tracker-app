@@ -314,3 +314,12 @@ export async function loadDashboard(dateOverride = null) {
     goalSubtext.innerText = `${weekday} summary`;
   }
 }
+
+/* ===========================
+   INITIAL LOAD
+=========================== */
+
+document.addEventListener("DOMContentLoaded", async () => {
+  renderWeekStrip();
+  await loadDashboard();
+});
