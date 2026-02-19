@@ -10,13 +10,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveBtn = document.getElementById("saveMealBtn");
 
   function openSheet() {
-    sheet.classList.add("active");
-    overlay.classList.add("active");
+    sheet.classList.add("open");
+    overlay.classList.add("open");
   }
 
   function closeSheet() {
-    sheet.classList.remove("active");
-    overlay.classList.remove("active");
+    sheet.classList.remove("open");
+    overlay.classList.remove("open");
+
   }
 
   openBtn?.addEventListener("click", openSheet);
