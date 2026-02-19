@@ -575,3 +575,14 @@ box-sizing: border-box;
   height: 56px;
   font-size: 18px;
 }
+
+
+.onboarding-header {
+  justify-content: center;
+  font-weight: 700;
+}
+
+#onboardingForm {
+  max-width: 420px;
+  margin: 0 auto;
+}
