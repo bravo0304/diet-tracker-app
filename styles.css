@@ -330,6 +330,8 @@ body {
 .meal-macros {
   font-size: 13px;
   font-weight: 600;
+   display: flex;
+  gap: 14px;
 }
 
 .macro-protein { color: var(--protein); padding:0 10px 0 0; }
