@@ -290,9 +290,20 @@ const carbsTarget = snapshot.carbs_target;
          </div>
       </div>
       <div class="meal-right">
-        <div class="meal-calories">${m.calories} Calories</div>
-        ${isEditable ? `<button class="delete-btn" data-id="${m.id}">✕</button>` : ""}
-      </div>
+  <div class="meal-calories">${m.calories} Calories</div>
+  ${isEditable ? `
+    <button class="edit-btn" 
+      data-id="${m.id}"
+      data-name="${m.food_name}"
+      data-calories="${m.calories}"
+      data-protein="${m.protein}"
+      data-carbs="${m.carbs}"
+      data-fat="${m.fat}">
+      Edit
+    </button>
+    <button class="delete-btn" data-id="${m.id}">✕</button>
+  ` : ""}
+</div>
     `;
 
     foodList.appendChild(li);
@@ -306,6 +317,42 @@ const carbsTarget = snapshot.carbs_target;
       });
     });
   }
+
+
+if (isEditable) {
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+
+      const id = btn.dataset.id;
+      const name = btn.dataset.name;
+      const calories = btn.dataset.calories;
+      const protein = btn.dataset.protein;
+      const carbs = btn.dataset.carbs;
+      const fat = btn.dataset.fat;
+
+      // Fill bottom sheet inputs
+      document.getElementById("mealName").value = name;
+      document.getElementById("mealCalories").value = calories;
+      document.getElementById("mealProtein").value = protein;
+      document.getElementById("mealCarbs").value = carbs;
+      document.getElementById("mealFat").value = fat;
+
+      // Set editing mode
+      window.currentEditingMealId = id;
+
+      // Change button label
+      const saveBtn = document.getElementById("saveMealBtn");
+      if (saveBtn) saveBtn.innerText = "Update";
+
+      // Open sheet
+      document.getElementById("mealSheet").classList.add("open");
+      document.getElementById("sheetOverlay").classList.add("open");
+
+    });
+  });
+}
+
+
 
   const addBtn = document.getElementById("newEntryBtn");
   if (addBtn) {
