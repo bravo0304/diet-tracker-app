@@ -1,5 +1,6 @@
 import { deleteMeal } from "./api.js";
 import { supabase, requireAuth } from "./auth.js";
+import { calculateTargets } from "./nutrition-engine.js";
 
 /* ===========================
    DATE STATE
@@ -242,31 +243,13 @@ if (isFuture) {
 
   const profile = profiles[0];
 
-  const W = profile.weight_kg || 72;
-  const H = profile.height_cm || 170;
-  const A = profile.age || 30;
-  const sex = profile.sex || "male";
-  const goal = profile.goal || "maintain";
-  const multiplier = profile.activity_multiplier || 1.4;
+ const {
+  calories_target: targetCalories,
+  protein_target: proteinTarget,
+  fat_target: fatTarget,
+  carbs_target: carbsTarget
+} = calculateTargets(profile);
 
-  let bmr = sex === "male"
-    ? 10 * W + 6.25 * H - 5 * A + 5
-    : 10 * W + 6.25 * H - 5 * A - 161;
-
-  const tdee = bmr * multiplier;
-
-  let calorieMultiplier = 1;
-  if (goal === "lose") calorieMultiplier = 0.85;
-  if (goal === "gain") calorieMultiplier = 1.08;
-
-  const targetCalories = Math.round(tdee * calorieMultiplier);
-
-  const proteinTarget = Math.round(W * (goal === "lose" ? 2.0 : 1.8));
-  const fatTarget = Math.round((targetCalories * 0.25) / 9);
-  const carbsTarget = Math.max(
-    0,
-    Math.round((targetCalories - (proteinTarget * 4) - (fatTarget * 9)) / 4)
-  );
 
   /* MEALS */
 
