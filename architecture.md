@@ -524,7 +524,49 @@ This creates a clean boundary between:
 - Rendering layer (dashboard)
 
 
+Phase 2.2 – Snapshot Enforcement Completed
 
+Snapshot-first enforcement has been fully integrated into the dashboard.
+
+Changes Implemented
+
+Created targets.js
+
+Implemented getOrCreateDailyTarget(user_id, dateStr)
+
+Dashboard no longer calculates targets directly
+
+Targets now sourced exclusively from daily_targets
+
+Nutrition math moved to nutrition-engine.js
+
+Snapshot insertion occurs automatically on first load of a date
+
+Architectural Impact
+
+Historical days are immutable
+
+Goal changes only affect dates without existing snapshots
+
+Dashboard is now rendering-only for targets
+
+Clear separation between:
+
+Rendering Layer (dashboard.js)
+
+Snapshot Layer (targets.js)
+
+Calculation Layer (nutrition-engine.js)
+
+Behavioral Guarantee
+
+Past days never recalculate
+
+Today freezes once snapshot created
+
+Future dates use current profile state until changed
+
+Snapshot integrity is now enforced at runtime.
 
 
 

@@ -1,6 +1,6 @@
 import { deleteMeal } from "./api.js";
 import { supabase, requireAuth } from "./auth.js";
-import { calculateTargets } from "./nutrition-engine.js";
+import { getOrCreateDailyTarget } from "./targets.js";
 
 /* ===========================
    DATE STATE
@@ -243,14 +243,16 @@ if (isFuture) {
 
   const profile = profiles[0];
 
- const {
-  calories_target: targetCalories,
-  protein_target: proteinTarget,
-  fat_target: fatTarget,
-  carbs_target: carbsTarget
-} = calculateTargets(profile);
+const snapshot = await getOrCreateDailyTarget(user_id, dateStr);
+if (!snapshot) {
+  console.error("No snapshot returned.");
+  return;
+}
 
-
+const targetCalories = snapshot.calories_target;
+const proteinTarget = snapshot.protein_target;
+const fatTarget = snapshot.fat_target;
+const carbsTarget = snapshot.carbs_target;
   /* MEALS */
 
   const { data: meals } = await supabase
