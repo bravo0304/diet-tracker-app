@@ -1,8 +1,16 @@
 import { supabase } from "./auth.js";
 import { calculateTargets } from "./nutrition-engine.js";
 
+const snapshotCache = {};
+
 export async function getOrCreateDailyTarget(user_id, dateStr) {
 
+  // 🔹 Return cached snapshot if available
+  if (snapshotCache[dateStr]) {
+    return snapshotCache[dateStr];
+  }
+
+    
   // 1️⃣ Try to fetch existing snapshot
   const { data: existing, error: fetchError } = await supabase
     .from("daily_targets")
@@ -16,9 +24,10 @@ export async function getOrCreateDailyTarget(user_id, dateStr) {
     return null;
   }
 
-  if (existing) {
-    return existing;
-  }
+if (existing) {
+  snapshotCache[dateStr] = existing; // cache it
+  return existing;
+}
 
   // 2️⃣ If not found, fetch profile
   const { data: profile, error: profileError } = await supabase
@@ -52,5 +61,7 @@ export async function getOrCreateDailyTarget(user_id, dateStr) {
     return null;
   }
 
-  return inserted;
+  snapshotCache[dateStr] = inserted; // cache it
+return inserted;
+
 }
