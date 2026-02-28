@@ -636,3 +636,29 @@ body {
     display: none;
   }
 }
+
+/* ========================================
+   INGREDIENT FORM REFINEMENT
+======================================== */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.section-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin: 16px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

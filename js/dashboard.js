@@ -254,58 +254,124 @@ const targetCalories = snapshot.calories_target;
 const proteinTarget = snapshot.protein_target;
 const fatTarget = snapshot.fat_target;
 const carbsTarget = snapshot.carbs_target;
-  /* MEALS */
+  
+/* MEALS */
 
-  const { data: meals } = await supabase
-    .from("meals")
+const { data: meals } = await supabase
+  .from("meals")
+  .select("*")
+  .eq("user_id", user_id)
+  .eq("date", dateStr);
+
+// STEP 1 — Get meal IDs
+const mealIds = meals?.map(m => m.id) || [];
+
+// STEP 2 — Fetch meal_items
+let mealItems = [];
+
+if (mealIds.length > 0) {
+  const { data } = await supabase
+    .from("meal_items")
     .select("*")
-    .eq("user_id", user_id)
-    .eq("date", dateStr);
+    .in("meal_id", mealIds);
 
-  let eatenCalories = 0;
-  let eatenProtein = 0;
-  let eatenFat = 0;
-  let eatenCarbs = 0;
+  mealItems = data || [];
+}
+
+// STEP 3 — Aggregate totals (ingredient-based only)
+let eatenCalories = 0;
+let eatenProtein = 0;
+let eatenFat = 0;
+let eatenCarbs = 0;
+
+mealItems.forEach(item => {
+  eatenCalories += item.calories || 0;
+  eatenProtein += item.protein || 0;
+  eatenFat += item.fat || 0;
+  eatenCarbs += item.carbs || 0;
+});
 
   const foodList = document.getElementById("foodEntries");
   foodList.innerHTML = "";
 
   meals?.forEach((m) => {
+    // Aggregate ingredients for this meal
+const ingredients = mealItems.filter(item => item.meal_id === m.id);
 
-    eatenCalories += m.calories || 0;
-    eatenProtein += m.protein || 0;
-    eatenFat += m.fat || 0;
-    eatenCarbs += m.carbs || 0;
+let mealCalories = 0;
+let mealProtein = 0;
+let mealFat = 0;
+let mealCarbs = 0;
 
+ingredients.forEach(item => {
+  mealCalories += item.calories || 0;
+  mealProtein += item.protein || 0;
+  mealFat += item.fat || 0;
+  mealCarbs += item.carbs || 0;
+});
     const li = document.createElement("li");
-    li.classList.add("meal-row");
+    li.classList.add("meal-row", "clickable-meal");
+    li.dataset.id = m.id;
+
+
 
     li.innerHTML = `
-      <div class="meal-left">
-        <div class="meal-name">${m.food_name}</div>
-         <div class="meal-macros">
-           <span class="macro-protein">P ${m.protein}g</span>
-           <span class="macro-fat">F ${m.fat}g</span>
-           <span class="macro-carbs">C ${m.carbs}g</span>
-         </div>
-      </div>
-      <div class="meal-right">
-        <div class="meal-calories">${m.calories} Calories</div>
-        ${isEditable ? `<button class="delete-btn" data-id="${m.id}">✕</button>` : ""}
-      </div>
-    `;
+  <div class="meal-left">
+    <div class="meal-name">${m.food_name}</div>
+    <div class="meal-macros">
+      <span class="macro-protein">P ${mealProtein}g</span>
+      <span class="macro-fat">F ${mealFat}g</span>
+      <span class="macro-carbs">C ${mealCarbs}g</span>
+    </div>
+  </div>
+
+  <div class="meal-right">
+    <div class="meal-calories">${mealCalories} Calories</div>
+    ${isEditable ? `
+      <button class="delete-btn" data-id="${m.id}">✕</button>
+    ` : ""}
+  </div>
+`;
 
     foodList.appendChild(li);
   });
 
-  if (isEditable) {
-    document.querySelectorAll(".delete-btn").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        await deleteMeal(btn.getAttribute("data-id"));
-        loadDashboard(activeDate);
-      });
+if (isEditable) {
+  const deleteButtons = document.querySelectorAll(".delete-btn");
+
+  deleteButtons.forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const mealId = btn.dataset.id;
+
+      await deleteMeal(mealId);
+      await loadDashboard(activeDate);
     });
-  }
+  });
+}
+
+
+
+// Meal row click → open ingredient view
+document.querySelectorAll(".clickable-meal").forEach(row => {
+  row.addEventListener("click", async (e) => {
+
+    // Ignore edit/delete clicks
+    if (e.target.closest(".edit-btn") || e.target.closest(".delete-btn")) {
+      return;
+    }
+
+    const mealId = row.dataset.id;
+
+    const { data: items } = await supabase
+      .from("meal_items")
+      .select("*")
+      .eq("meal_id", mealId);
+
+    openMealDetailSheet(items || [], mealId);
+  });
+});
+
 
   const addBtn = document.getElementById("newEntryBtn");
   if (addBtn) {
@@ -362,16 +428,246 @@ if (ringNumber) {
   }
 }
 
+/* ===========================
+   MEAL DETAIL SHEET
+=========================== */
+
+function openMealDetailSheet(items, mealId) { 
+  const sheet = document.getElementById("mealDetailSheet");
+  sheet.dataset.mealId = mealId;
+
+  const overlay = document.getElementById("sheetOverlay");
+  const container = document.getElementById("mealDetailList");
+
+  container.innerHTML = "";
+
+  items.forEach(item => {
+
+    const row = document.createElement("div");
+    row.classList.add("meal-row", "clickable-ingredient");
+
+    row.dataset.id = item.id;
+
+    row.innerHTML = `
+      <div class="ingredient-left">
+        <div class="ingredient-name">
+          ${(item.food_name || "Ingredient").toUpperCase()}
+        </div>
+        <div class="meal-macros">
+          <span class="macro-protein">P ${item.protein || 0}g</span>
+          <span class="macro-fat">F ${item.fat || 0}g</span>
+          <span class="macro-carbs">C ${item.carbs || 0}g</span>
+        </div>
+      </div>
+
+      <div class="ingredient-right">
+        <div class="ingredient-calories">
+          ${item.calories || 0} Calories
+        </div>
+        <button class="ingredient-delete" data-id="${item.id}">✕</button>
+      </div>
+    `;
+
+    container.appendChild(row);
+  });
+
+  /* Delete ingredient */
+  container.querySelectorAll(".ingredient-delete").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+
+      const id = btn.dataset.id;
+
+      await supabase
+        .from("meal_items")
+        .delete()
+        .eq("id", id);
+
+      await loadDashboard(getSelectedDate());
+    });
+  });
+
+  /* Edit ingredient */
+  container.querySelectorAll(".clickable-ingredient").forEach(row => {
+    row.addEventListener("click", async (e) => {
+
+      if (e.target.closest(".ingredient-delete")) return;
+
+      const ingredientId = row.dataset.id;
+
+      const { data: ingredient } = await supabase
+        .from("meal_items")
+        .select("*")
+        .eq("id", ingredientId)
+        .single();
+
+      if (!ingredient) return;
+
+      openIngredientEditSheet(ingredient);
+    });
+  });
+
+  sheet.classList.add("open");
+  overlay.classList.add("open");
+}
+
+
+/* ===========================
+   INGREDIENT EDIT SHEET
+=========================== */
+
+function openIngredientEditSheet(ingredient) {
+
+  // Close meal detail
+  document.getElementById("mealDetailSheet")?.classList.remove("open");
+
+  const sheet = document.getElementById("ingredientEditSheet");
+  const overlay = document.getElementById("sheetOverlay");
+
+  document.getElementById("ingredientName").value = ingredient.food_name || "";
+  document.getElementById("ingredientQuantity").value = ingredient.quantity || 1;
+  document.getElementById("ingredientCalories").value = ingredient.base_calories || 0;
+  document.getElementById("ingredientProtein").value = ingredient.base_protein || 0;
+  document.getElementById("ingredientCarbs").value = ingredient.base_carbs || 0;
+  document.getElementById("ingredientFat").value = ingredient.base_fat || 0;
+
+  sheet.dataset.id = ingredient.id;
+
+  sheet.classList.add("open");
+  overlay.classList.add("open");
+}
+
+
+/* ===========================
+   DOM READY
+=========================== */
 
 document.addEventListener("DOMContentLoaded", () => {
+
   const prevBtn = document.getElementById("prevWeekBtn");
   const nextBtn = document.getElementById("nextWeekBtn");
+  const overlay = document.getElementById("sheetOverlay");
 
-  if (prevBtn) {
-    prevBtn.addEventListener("click", () => shiftWeek(-1));
+  /* Close Meal Detail */
+  const closeDetail = document.getElementById("closeMealDetail");
+  if (closeDetail) {
+    closeDetail.addEventListener("click", () => {
+      document.getElementById("mealDetailSheet")?.classList.remove("open");
+      overlay?.classList.remove("open");
+    });
   }
 
-  if (nextBtn) {
-    nextBtn.addEventListener("click", () => shiftWeek(1));
+  /* Save Ingredient */
+  const saveIngredientBtn = document.getElementById("saveIngredientBtn");
+
+if (saveIngredientBtn) {
+  saveIngredientBtn.addEventListener("click", async () => {
+
+    const sheet = document.getElementById("ingredientEditSheet");
+    const ingredientId = sheet?.dataset.id;
+    const mealId = sheet?.dataset.mealId;
+
+    const name = document.getElementById("ingredientName").value;
+    const quantity = parseFloat(document.getElementById("ingredientQuantity").value) || 1;
+
+    const baseCalories = parseFloat(document.getElementById("ingredientCalories").value) || 0;
+    const baseProtein = parseFloat(document.getElementById("ingredientProtein").value) || 0;
+    const baseCarbs = parseFloat(document.getElementById("ingredientCarbs").value) || 0;
+    const baseFat = parseFloat(document.getElementById("ingredientFat").value) || 0;
+
+    const payload = {
+      food_name: name,
+      quantity,
+      base_calories: baseCalories,
+      base_protein: baseProtein,
+      base_carbs: baseCarbs,
+      base_fat: baseFat,
+      calories: baseCalories * quantity,
+      protein: baseProtein * quantity,
+      carbs: baseCarbs * quantity,
+      fat: baseFat * quantity
+    };
+
+    if (ingredientId) {
+      // UPDATE
+      await supabase
+        .from("meal_items")
+        .update(payload)
+        .eq("id", ingredientId);
+    } else {
+      // INSERT
+      await supabase
+        .from("meal_items")
+        .insert([{ ...payload, meal_id: mealId }]);
+    }
+
+    // Close edit sheet
+    document.getElementById("ingredientEditSheet")?.classList.remove("open");
+
+    // Reopen meal detail
+    const { data: items } = await supabase
+      .from("meal_items")
+      .select("*")
+      .eq("meal_id", mealId);
+
+    openMealDetailSheet(items || [], mealId);
+
+    await loadDashboard(getSelectedDate());
+  });
+}
+
+  /* Cancel Ingredient */
+  const cancelIngredientBtn = document.getElementById("cancelIngredientBtn");
+  if (cancelIngredientBtn) {
+    cancelIngredientBtn.addEventListener("click", () => {
+      document.getElementById("ingredientEditSheet")?.classList.remove("open");
+      overlay?.classList.remove("open");
+    });
   }
+
+  /* Overlay click closes everything */
+  if (overlay) {
+    overlay.addEventListener("click", () => {
+      document.getElementById("mealDetailSheet")?.classList.remove("open");
+      document.getElementById("ingredientEditSheet")?.classList.remove("open");
+      overlay.classList.remove("open");
+    });
+  }
+
+  if (prevBtn) prevBtn.addEventListener("click", () => shiftWeek(-1));
+  if (nextBtn) nextBtn.addEventListener("click", () => shiftWeek(1));
+
+
+const addIngredientBtn = document.getElementById("addIngredientBtn");
+
+if (addIngredientBtn) {
+  addIngredientBtn.addEventListener("click", () => {
+
+    const mealSheet = document.getElementById("mealDetailSheet");
+    const mealId = mealSheet.dataset.mealId;
+
+    if (!mealId) return;
+
+    const editSheet = document.getElementById("ingredientEditSheet");
+
+    editSheet.dataset.id = ""; // no ingredient id
+    editSheet.dataset.mealId = mealId; // store meal id
+
+    // Clear fields
+    document.getElementById("ingredientName").value = "";
+    document.getElementById("ingredientQuantity").value = 1;
+    document.getElementById("ingredientCalories").value = 0;
+    document.getElementById("ingredientProtein").value = 0;
+    document.getElementById("ingredientCarbs").value = 0;
+    document.getElementById("ingredientFat").value = 0;
+
+    // Close meal detail first
+document.getElementById("mealDetailSheet")?.classList.remove("open");
+
+// Then open edit
+editSheet.classList.add("open");
+  });
+}
+
+
 });

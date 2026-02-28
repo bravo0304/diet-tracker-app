@@ -27,10 +27,6 @@ export async function saveMeal(meal, dateString) {
       {
         user_id,
         food_name: meal.food_name,
-        calories: meal.calories,
-        protein: meal.protein,
-        carbs: meal.carbs,
-        fat: meal.fat,
         meal_type: "general",
         date: dateString
       }
@@ -39,8 +35,11 @@ export async function saveMeal(meal, dateString) {
   if (error) {
     alert("Error saving meal.");
     console.error(error.message);
+    return;
   }
 }
+
+
 
 /* ===========================
    DELETE MEAL
@@ -63,4 +62,33 @@ export async function deleteMeal(id) {
     alert("Failed to delete meal.");
     console.error(error.message);
   }
+}
+
+
+
+/* ===========================
+   UPDATE MEAL
+=========================== */
+
+export async function updateMeal(id, updatedMeal) {
+
+  const session = await requireAuth();
+  if (!session) return;
+
+  const user_id = session.user.id;
+console.log("Update called with ID:", id);
+  const { data, error } = await supabase
+  .from("meals")
+  .update({
+    food_name: updatedMeal.food_name,
+    calories: updatedMeal.calories,
+    protein: updatedMeal.protein,
+    carbs: updatedMeal.carbs,
+    fat: updatedMeal.fat
+  })
+  .eq("id", id)
+  .select();
+
+console.log("Update result:", data);
+console.log("Update error:", error);
 }

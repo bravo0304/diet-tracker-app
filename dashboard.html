@@ -87,14 +87,11 @@
 
 </div>
 
-
-  
-
   </div>
 
   <!-- DAILY LOG -->
   <section class="card">
-    <h3>Recent Upload</h3>
+    <h3>Recent Uploads</h3>
     <ul id="foodEntries"></ul>
     <button id="newEntryBtn" class="primary-btn">Add Meal</button>
   </section>
@@ -108,16 +105,9 @@
     <div class="sheet-handle"></div>
 
     <div class="sheet-content">
-      <h3>Add Meal</h3>
+      <h3>New Meal</h3>
 
-      <input id="mealName" placeholder="Food name" />
-
-      <div class="macro-input-grid">
-        <input id="mealCalories" type="number" placeholder="Calories" />
-        <input id="mealProtein" type="number" placeholder="Protein (g)" />
-        <input id="mealCarbs" type="number" placeholder="Carbs (g)" />
-        <input id="mealFat" type="number" placeholder="Fat (g)" />
-      </div>
+      <input id="mealName" placeholder="What did you eat?" />
 
       <div class="sheet-actions">
         <button id="cancelMeal" class="secondary-btn">Cancel</button>
@@ -125,6 +115,80 @@
       </div>
     </div>
   </div>
+
+
+
+<!-- ===========================
+     INGREDIENT EDIT SHEET
+=========================== -->
+
+<div id="ingredientEditSheet" class="bottom-sheet">
+  <div class="sheet-handle"></div>
+
+<div class="sheet-content">
+  <h3>Edit Ingredient</h3>
+
+  <div class="form-group">
+    <label>Ingredient Name</label>
+    <input id="ingredientName" type="text" />
+  </div>
+
+  <div class="form-group">
+    <label>Quantity</label>
+    <input id="ingredientQuantity" type="number" step="0.01" />
+  </div>
+
+  <p class="section-label">Per 1 Unit Nutrition</p>
+
+  <div class="macro-input-grid">
+    <div class="form-group">
+      <label>Calories</label>
+      <input id="ingredientCalories" type="number" step="0.01" />
+    </div>
+
+    <div class="form-group">
+      <label>Protein (g)</label>
+      <input id="ingredientProtein" type="number" step="0.01" />
+    </div>
+
+    <div class="form-group">
+      <label>Carbs (g)</label>
+      <input id="ingredientCarbs" type="number" step="0.01" />
+    </div>
+
+    <div class="form-group">
+      <label>Fat (g)</label>
+      <input id="ingredientFat" type="number" step="0.01" />
+    </div>
+  </div>
+
+  <div class="sheet-actions">
+    <button id="deleteIngredientBtn" class="secondary-btn">Delete</button>
+    <button id="cancelIngredientBtn" class="secondary-btn">Cancel</button>
+    <button id="saveIngredientBtn" class="primary-btn">Save</button>
+  </div>
+</div>
+</div>
+
+
+
+
+<div id="mealDetailSheet" class="bottom-sheet">
+  <div class="sheet-handle"></div>
+
+  <div class="sheet-content">
+    <h3>Meal Details</h3>
+
+    <div id="mealDetailList"></div>
+<button id="addIngredientBtn" class="add-ingredient-btn">
+  + Add Ingredient
+</button>
+    <div class="sheet-actions">
+      <button id="closeMealDetail" class="primary-btn">Close</button>
+    </div>
+  </div>
+</div>
+
 
   <script type="module" src="app.js"></script>
 

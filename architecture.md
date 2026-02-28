@@ -570,4 +570,709 @@ Snapshot integrity is now enforced at runtime.
 
 
 
+15️⃣ Meal Data Model – Current State (Relational)
 
+Smart Macro has transitioned from a flat meal model to a relational structure.
+
+Tables Involved
+meals (Container Layer)
+
+Represents a meal event on a specific date.
+
+Columns:
+
+id
+
+user_id
+
+date
+
+food_name (legacy display)
+
+calories (legacy compatibility)
+
+protein (legacy compatibility)
+
+fat (legacy compatibility)
+
+carbs (legacy compatibility)
+
+created_at
+
+Role:
+
+Container for meal_items
+
+Maintained for backward compatibility
+
+Rendering still reads display values from this table
+
+meal_items (Nutrition Source Layer)
+
+Represents ingredient-level entries inside a meal.
+
+Columns:
+
+id
+
+meal_id (FK → meals.id)
+
+user_id
+
+food_name
+
+quantity
+
+unit
+
+calories
+
+protein
+
+fat
+
+carbs
+
+created_at
+
+Role:
+
+Primary source of nutrition totals
+
+Allows ingredient breakdown
+
+Enables structured meal composition
+
+16️⃣ Aggregation Logic (Relational Priority System)
+
+Dashboard totals follow this exact rule:
+
+Fetch meals for date.
+
+Extract meal IDs.
+
+Fetch meal_items where meal_id IN mealIds.
+
+If meal_items exist → aggregate from meal_items.
+
+Else → fallback to meals table.
+
+Implementation:
+
+if (mealItems.length > 0) {
+  aggregate meal_items
+} else {
+  aggregate meals
+}
+
+This guarantees:
+
+Backward compatibility
+
+No historical data rewrite
+
+Smooth migration from flat to relational
+
+Zero data breakage
+
+17️⃣ Snapshot System (Unchanged)
+
+daily_targets remains the immutable target layer.
+
+Behavior:
+
+One row per user per date
+
+Created only if missing
+
+Never recalculated
+
+Cached in-memory per session
+
+Relational meal upgrade did not alter snapshot behavior.
+
+Snapshot integrity remains enforced.
+
+18️⃣ Data Flow (Meal Creation)
+
+Meal creation flow remains layered:
+
+UI Layer → app.js
+
+Reads inputs
+
+Validates
+
+Calls saveMeal()
+
+API Layer → api.js
+
+Inserts into meals
+
+Inserts into meal_items
+
+No DOM logic
+
+Rendering Layer → dashboard.js
+
+Fetches meals
+
+Fetches meal_items
+
+Aggregates totals
+
+Updates UI
+
+Snapshot Layer → targets.js
+
+Ensures daily target immutability
+
+Calculation Layer → nutrition-engine.js
+
+Performs BMR / TDEE only
+
+No layer merges occurred during relational upgrade.
+
+19️⃣ Responsibility Rules
+
+The following rules must never be violated:
+
+dashboard.js never writes to the database.
+
+api.js never touches the DOM.
+
+nutrition-engine.js never accesses Supabase.
+
+targets.js never renders UI.
+
+app.js never performs nutrition math.
+
+Layer violations are structural regressions.
+
+20️⃣ Mutation Rules
+
+profiles:
+
+Fully mutable.
+
+meals:
+
+Editable only within 3-day window.
+
+Future dates locked.
+
+Older than 3 days view-only.
+
+daily_targets:
+
+Immutable once created.
+
+Never recalculated.
+
+Only created if missing.
+
+No retroactive mutation of historical targets is allowed.
+
+21️⃣ Stored vs Derived Data
+
+Stored:
+
+profiles configuration
+
+meals
+
+meal_items
+
+daily_targets
+
+Derived (never stored):
+
+Daily consumed totals
+
+Ring percentages
+
+Macro bar percentages
+
+Goal difference
+
+Dashboard is a pure derived view.
+
+22️⃣ Current System Status
+
+Active Tables:
+
+profiles
+
+meals
+
+meal_items
+
+daily_targets
+
+Active Aggregation Source:
+
+meal_items (primary)
+
+meals (fallback)
+
+Rendering:
+
+Reads display fields from meals
+
+Totals derived relationally
+
+System is:
+Stable
+Backward compatible
+Relationally upgraded
+
+
+Legacy macro columns remain in meals intentionally for compatibility and display.
+
+
+20️⃣ Meal System Refactor — Ingredient-Based Architecture (Phase 1 Complete)
+🔁 Previous System (Deprecated)
+
+Previously:
+
+meals table stored:
+
+calories
+
+protein
+
+fat
+
+carbs
+
+Dashboard aggregated directly from meals
+
+No ingredient-level structure
+
+No relational breakdown
+
+Meal detail popup did not use a separate table
+
+This is no longer how the system works.
+
+21️⃣ Current Data Model (Relational)
+🗂 Tables
+meals
+
+Now represents:
+
+A container only.
+
+Columns currently in use:
+
+id
+
+user_id
+
+food_name
+
+date
+
+created_at
+
+⚠️ Macros in this table are now considered legacy.
+They are not used for aggregation.
+
+meal_items
+
+Represents:
+
+Ingredients inside a meal.
+
+Columns:
+
+id
+
+meal_id (FK → meals.id)
+
+name
+
+calories
+
+protein
+
+fat
+
+carbs
+
+created_at
+
+This table is now the single source of truth for nutrition data.
+
+22️⃣ Aggregation Logic (Changed)
+❌ Old Aggregation (Removed)
+
+Dashboard previously did:
+
+eatenCalories += m.calories;
+
+This is no longer valid.
+
+✅ New Aggregation
+
+Dashboard now:
+
+1️⃣ Fetches meals for date
+2️⃣ Extracts meal IDs
+3️⃣ Fetches all meal_items for those meals
+4️⃣ Aggregates totals from meal_items ONLY
+
+mealItems.forEach(item => {
+  eatenCalories += item.calories || 0;
+  eatenProtein += item.protein || 0;
+  eatenFat += item.fat || 0;
+  eatenCarbs += item.carbs || 0;
+});
+
+Meal rows also aggregate from their related meal_items.
+
+The meals table macros are ignored entirely.
+
+23️⃣ Manual Meal Creation — Placeholder Ingredient Strategy
+
+When a user manually creates a meal:
+
+System now inserts:
+
+1️⃣ A row into meals
+2️⃣ A placeholder row into meal_items
+
+The placeholder mirrors manual macros:
+
+meal_id: <new meal id>
+name: "Manual Entry"
+calories: <entered calories>
+protein: <entered protein>
+fat: <entered fat>
+carbs: <entered carbs>
+
+Purpose:
+
+Keeps relational integrity
+
+Allows ingredient popup to always show data
+
+Keeps aggregation consistent
+
+Prepares system for future AI ingredient injection
+
+Prevents empty ingredient views
+
+This ensures every meal always has at least one meal_item.
+
+24️⃣ Dashboard Rendering Changes
+
+Meal row macros now display:
+
+Aggregated ingredient totals per meal:
+
+const ingredients = mealItems.filter(item => item.meal_id === m.id);
+
+Then:
+
+mealCalories += item.calories;
+
+Rendering uses:
+
+P ${mealProtein}g
+F ${mealFat}g
+C ${mealCarbs}g
+${mealCalories} Calories
+25️⃣ Delete Behavior Updated
+
+Deleting a meal:
+
+Calls deleteMeal(mealId)
+
+Reloads dashboard
+
+Relies on database FK cascade (or manual deletion if implemented)
+
+Delete listeners are attached AFTER DOM render.
+
+Listeners are NOT inside the loop.
+
+26️⃣ Meal Detail Sheet Behavior
+
+Clicking a meal:
+
+Fetches its meal_items
+
+Renders each ingredient row
+
+Displays:
+
+Name
+
+Calories
+
+Protein
+
+Fat
+
+Carbs
+
+Supports ingredient-level delete
+
+Ingredient delete:
+
+Deletes row from meal_items
+
+Closes sheet
+
+Reloads dashboard
+
+27️⃣ Layer Discipline (Maintained)
+UI Layer
+
+dashboard.js handles rendering
+
+No direct macro math outside aggregation
+
+Data Layer
+
+api.js handles inserts/deletes
+
+No DOM logic
+
+Snapshot Layer
+
+targets.js handles daily target immutability
+
+Auth Layer
+
+auth.js handles session + RLS enforcement
+
+Separation preserved.
+
+28️⃣ RLS Considerations
+
+All queries rely on:
+
+.eq("user_id", user_id)
+
+RLS must allow:
+
+SELECT on meals
+
+SELECT on meal_items
+
+INSERT on meal_items
+
+DELETE on meal_items
+
+Scoped by user ownership.
+
+29️⃣ Current System State Summary
+
+✔ Ingredient-based architecture active
+✔ Meals act as containers
+✔ Aggregation uses meal_items only
+✔ Manual meals generate placeholder ingredient
+✔ Delete works
+✔ Detail sheet uses relational data
+✔ Future AI injection path ready
+
+System is now structurally relational and stable.
+
+
+
+Relational Nutrition Architecture (Current State)
+Hierarchy
+
+The system now follows a strict 3-level relational hierarchy:
+
+Level 1 — Day
+
+Displays daily macro totals
+
+Displays list of meals
+
+Totals are aggregated from meal_items only
+
+Level 2 — Meal
+
+Meal is a container only
+
+Does NOT calculate macros directly
+
+Displays list of ingredients
+
+Meal totals = SUM of its ingredients
+
+Level 3 — Ingredient
+
+Stores actual macro values
+
+Fields:
+
+food_name
+
+quantity
+
+unit
+
+calories
+
+protein
+
+fat
+
+carbs
+
+base_calories
+
+base_protein
+
+base_fat
+
+base_carbs
+
+All macro calculations in the app originate from meal_items.
+
+Database Structure (Active)
+profiles
+
+User onboarding data.
+
+daily_targets
+
+Snapshot-based system.
+Stores:
+
+calories_target
+
+protein_target
+
+fat_target
+
+carbs_target
+
+mode_used
+
+date
+
+user_id
+
+Used for daily macro comparison.
+
+meals
+
+Meal container table.
+
+Fields:
+
+id
+
+user_id
+
+food_name
+
+date
+
+meal_type
+
+Legacy macro columns still exist but are NOT used for aggregation:
+
+calories
+
+protein
+
+fat
+
+carbs
+
+These remain for backward compatibility only.
+
+meal_items
+
+Source of truth for macros.
+
+Fields:
+
+id
+
+meal_id (FK → meals.id)
+
+food_name
+
+quantity
+
+unit
+
+base_calories
+
+base_protein
+
+base_fat
+
+base_carbs
+
+calories
+
+protein
+
+fat
+
+carbs
+
+All dashboard totals are calculated from this table.
+
+Current Behavior
+
+When a new meal is created:
+
+Insert row into meals
+
+Insert ONE placeholder row into meal_items
+
+Same name
+
+Same macros
+
+quantity = 1
+
+unit = "serving"
+
+This allows meals to function immediately under relational architecture.
+
+Dashboard aggregation:
+
+Fetch meals for selected day
+
+Fetch all meal_items for those meals
+
+Aggregate totals from meal_items only
+
+Meal display:
+
+Meal row shows sum of its ingredients
+
+Meal detail sheet shows ingredient list
+
+Ingredient click currently logs ID (edit sheet not yet built)
+
+Next Architectural Step
+
+Convert Meal Detail Sheet into true Level 2 page:
+
+Title should display meal name (not generic “Meal Details”)
+
+Display ingredient list
+
+Add “+ Add Ingredient” button
+
+Ingredient click should open Level 3 Ingredient Edit Sheet
+
+Ingredient save updates meal_items only
+
+Meal totals auto-recalculate
+
+Day totals auto-recalculate
+
+This step formalizes the full Day → Meal → Ingredient hierarchy before AI integration.

@@ -1,4 +1,4 @@
-import { saveMeal } from "./js/api.js";
+import { saveMeal, updateMeal } from "./js/api.js";
 import { loadDashboard, renderWeekStrip, getSelectedDate } from "./js/dashboard.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -9,54 +9,76 @@ document.addEventListener("DOMContentLoaded", () => {
   const cancelBtn = document.getElementById("cancelMeal");
   const saveBtn = document.getElementById("saveMealBtn");
 
+window.currentEditingMealId = null;
+
+
   function openSheet() {
     sheet.classList.add("open");
     overlay.classList.add("open");
   }
 
   function closeSheet() {
-    sheet.classList.remove("open");
-    overlay.classList.remove("open");
+  sheet.classList.remove("open");
+  overlay.classList.remove("open");
 
-  }
+  window.currentEditingMealId = null;
+
+  const saveBtn = document.getElementById("saveMealBtn");
+  if (saveBtn) saveBtn.innerText = "Save";
+
+  const nameInput = document.getElementById("mealName");
+  if (nameInput) nameInput.value = "";
+}
 
   openBtn?.addEventListener("click", openSheet);
   cancelBtn?.addEventListener("click", closeSheet);
   overlay?.addEventListener("click", closeSheet);
 
+  
   saveBtn?.addEventListener("click", async () => {
 
-    if (saveBtn.dataset.loading === "true") return;
-    saveBtn.dataset.loading = "true";
+  if (saveBtn.dataset.loading === "true") return;
+  saveBtn.dataset.loading = "true";
 
-    const food_name = document.getElementById("mealName").value.trim();
-    const calories = parseInt(document.getElementById("mealCalories").value, 10);
-    const protein = parseInt(document.getElementById("mealProtein").value, 10) || 0;
-    const carbs = parseInt(document.getElementById("mealCarbs").value, 10) || 0;
-    const fat = parseInt(document.getElementById("mealFat").value, 10) || 0;
+ const food_name = document.getElementById("mealName").value.trim();
 
-    if (!food_name || isNaN(calories)) {
-      alert("Invalid input.");
-      saveBtn.dataset.loading = "false";
-      return;
-    }
+  if (!food_name) {
+  alert("Meal name required.");
+  saveBtn.dataset.loading = "false";
+  return;
+}
 
+  if (window.currentEditingMealId) {
+
+    // 🔹 UPDATE MODE
+    await updateMeal(window.currentEditingMealId, {
+  food_name
+});
+
+  } else {
+
+    // 🔹 CREATE MODE
     const selectedDateObj = getSelectedDate();
     const dateString = selectedDateObj.toISOString().split("T")[0];
 
-    await saveMeal({ food_name, calories, protein, carbs, fat }, dateString);
+    await saveMeal(
+      { food_name },
+      dateString
+    );
+  }
 
-    closeSheet();
-    loadDashboard();
+  // Reset editing state
+  window.currentEditingMealId = null;
+  saveBtn.innerText = "Save";
 
-    document.getElementById("mealName").value = "";
-    document.getElementById("mealCalories").value = "";
-    document.getElementById("mealProtein").value = "";
-    document.getElementById("mealCarbs").value = "";
-    document.getElementById("mealFat").value = "";
+  closeSheet();
+  await loadDashboard();
 
-    saveBtn.dataset.loading = "false";
-  });
+  document.getElementById("mealName").value = "";
+
+  saveBtn.dataset.loading = "false";
+});
+
 
   renderWeekStrip();
   loadDashboard();
